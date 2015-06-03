@@ -1,1 +1,7 @@
+*.ipr
+*.iws
+*.iml
+*.class
 .idea/*
+target/*
+pom.xml.*
