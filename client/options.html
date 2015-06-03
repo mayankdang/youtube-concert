@@ -51,6 +51,7 @@
 
    function playVideo() {
         player.playVideo();
+    player.setLoop();
    }
 
   function doConnect()
@@ -102,8 +103,9 @@
     if(evt.data.indexOf("CHANGE_VIDEO_ID")>-1){
       var id=evt.data.split(":")[1];
       player.loadVideoById(id);
+      player.seekTo(0);
+      player.pauseVideo();
     }
-
 
   }
 
@@ -127,5 +129,12 @@
 doConnect();
 
     </script>
+
+    <input type="text"  id="text"/>
+
+    <button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value)">Change Id</button>
+    <button onclick="doSend('PAUSE_VIDEO')">Stop</button>
+    <button onclick="doSend('START_VIDEO');setTimeout(function(){playVideo()},15);">Synced Start</button>
+
   </body>
 </html>
