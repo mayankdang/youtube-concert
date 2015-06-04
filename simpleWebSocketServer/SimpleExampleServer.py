@@ -89,6 +89,15 @@ class SimpleChat(WebSocket):
                 userIdMainMap[userId].setNetworkDelay(delay)
                 # userIdMainMap[userId].client.sendMessage(u'client wala send message')
 
+            elif msg.startswith("CHANGE_VIDEO_ID"):
+                video_url = msg.split(":")[1]
+                if userIdMainMap[userId].groupId is not None:
+                    group = groupIdHashMap.get(userIdMainMap[userId].groupId)
+                    group.videoUrl = video_url
+                    for userId in group.users:
+                        userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:'+video_url)
+                        print "changed videoId for user"+ userId
+
             elif msg.startswith("CREATE_CONCERT"):
                 success = userIdMainMap[userId].createConcert(msg.split(":")[1])
                 if not success:

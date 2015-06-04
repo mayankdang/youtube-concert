@@ -136,12 +136,25 @@
         setTimeout(function(){randomizeSound()},15);
     }
 
-    function getVideoUrl() {
-        return document.getElementById("text").value;
+    function getVideoId() {
+        return document.getElementById("videoId").value;
+    }
+
+    function getGroupId() {
+        return document.getElementById("groupId").value;
+    }
+
+    function changeVideoId() {
+        doSend('CHANGE_VIDEO_ID:'+getVideoId());
+        //setTimeout(function(){window.location=(document.location.href.split('=')[0])+'='+getVideoId()},15);
     }
 
     function createConcert() {
-        doSend('CREATE_CONCERT:'+getVideoUrl());
+        doSend('CREATE_CONCERT:'+getVideoId());
+    }
+
+    function joinConcert() {
+        doSend('JOIN_CONCERT:'+getGroupId());
     }
 
     var delayArray = [];
@@ -232,7 +245,7 @@
             }
         }
 
-        if(evt.data.indexOf("CHANGE_VIDEO_ID")>-1){
+        if(evt.data.indexOf("CHANGED_VIDEO_ID")>-1){
             var id=evt.data.split(":")[1];
             player.loadVideoById(id);
             player.seekTo(0);
@@ -277,8 +290,8 @@
 
 <br>
 
-<input type="text"  id="text"/>
-<button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value);setTimeout(function(){window.location=(document.location.href.split('=')[0])+'='+document.getElementById('text').value;},15);">Change Id</button>
+<input type="text"  id="videoId"/>
+<button onclick='changeVideoId()'>Change Id</button>
 <input type="image" name='play' id='play' src="images/pause_32x32.png" onclick='playPauseVideo()' />
 <button onclick='resetVideo()'>Broadcast</button>
 <button onclick='randomizeSound()'>Randomize-Sound</button>
@@ -287,6 +300,7 @@
 <br>
 
 <input type="text"  id="groupId"/>
+<button onclick='joinConcert()'></button>
 <button onclick="doSend('RANDOMIZE_SOUND_PEOPLE');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
 
 </body>
