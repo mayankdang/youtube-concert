@@ -53,27 +53,30 @@ class User(object):
 class SimpleChat(WebSocket):
 
     def handleMessage(self):
-        message=json.loads(self.data)
-        msg = message["message"]
-        userId = message["id"]
+        try:
+            message=json.loads(self.data)
+            msg = message["message"]
+            userId = message["id"]
 
-        if msg.startswith("HELLO_BUDDY"):
-            self.sendMessage('HEY_BUDDY:'+msg.split(":")[1])
+            if msg.startswith("HELLO_BUDDY"):
+                self.sendMessage('HEY_BUDDY:'+msg.split(":")[1])
 
-        if msg.startswith("NETWORK_DELAY"):
-            delay = msg.split(":")[1]
-            print "Handshaking done", delay, "Sending confirmation to client."
-            self.sendMessage("HANDSHAKING_DONE:"+msg.split(":")[1])
-            if userIdMainMap.get(userId, -1) == (-1):
-                userIdMainMap[userId] = User(userId, self)
-                # print "putting in map"
-            userIdMainMap[userId].setNetworkDelay(delay)
-            # userIdMainMap[userId].client.sendMessage(u'client wala send message')
+            elif msg.startswith("NETWORK_DELAY"):
+                delay = msg.split(":")[1]
+                print "Handshaking done", delay, "Sending confirmation to client."
+                self.sendMessage("HANDSHAKING_DONE:"+msg.split(":")[1])
+                if userIdMainMap.get(userId, -1) == (-1):
+                    userIdMainMap[userId] = User(userId, self)
+                    # print "putting in map"
+                userIdMainMap[userId].setNetworkDelay(delay)
+                # userIdMainMap[userId].client.sendMessage(u'client wala send message')
 
-        else:
-            for client in list(clients):
-                if client != self:
-                    client.sendMessage(self.address[0] + ' - ' + message)
+            else:
+                for client in list(clients):
+                    if client != self:
+                        client.sendMessage(self.address[0] + ' - ' + msg)
+        except Exception(e):
+            print e
 
     def handleConnected(self):
         print self.address, 'connected'
