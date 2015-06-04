@@ -163,6 +163,7 @@
         websocket.onerror = function(evt) { onError(evt) };
     }
 
+
     var myip;
     function onOpen(evt) {
         doSend("HELLO_BUDDY:"+new Date().getTime());
@@ -179,12 +180,15 @@
     }
 
     function onMessage(evt) {
-        console.log("response: " + evt.data + '\n');
-        console.log("response: " + JSON.stringify(evt.data) + '\n');
+      console.log("response: " + evt.data + '\n');
 
         if (evt.data.indexOf("HeyYo! ty")>-1) {
             alert("omg");
         }
+
+      if(evt.data.indexOf("HANDSHAKING_DONE")){
+        alert("omg! sai h yaaaR" );
+      }
 
         if(evt.data.indexOf("HEY_BUDDY")>-1) {
             console.log(evt.data)
