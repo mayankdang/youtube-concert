@@ -47,41 +47,54 @@
 
     var flag=0;
     var volume=100;
+    var MYID=0;
+
+
+
+    function upDowning(){
+        try{
+            MYID=parseInt(document.getElementById('name').value);
+        }catch (err){
+
+        }
+
+        if (flag === 0) {
+                var interval = 30.0;  // in ms
+                var tid = setInterval(mycode, interval);
+                var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
+                var counter = 1;
+
+                function mycode() {
+                    flag = 1;
+                    console.log("counter" + counter);
+                    console.log("interval" + interval);
+                    console.log("period" + period);
+
+                    // do some stuff...
+                    // no need to recall the function (it's an interval, it'll loop forever)
+                    // The value of seed should lie between -1 to 1
+                    var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
+                    console.log("seed=" + seed);
+                    var projectedSeed = Math.abs(Math.floor(seed * 100));
+                    volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
+                    console.log("volume=" +volume);
+                    player.setVolume(volume);
+                    counter++;
+                }
+
+                function abortTimer() { // to be called when you want to stop the timer
+                    clearInterval(tid);
+                }
+
+                setTimeout(function () {
+                    abortTimer();
+                    flag = 0;
+                }, 20000);  // abort after 20 seconds..
+            }
+    }
 
     function randomizeSound() {
-        if (flag === 0) {
-            var interval = 30.0;  // in ms
-            var tid = setInterval(mycode, interval);
-            var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
-            var counter = 1;
-
-            function mycode() {
-                flag = 1;
-                console.log("counter" + counter);
-                console.log("interval" + interval);
-                console.log("period" + period);
-
-                // do some stuff...
-                // no need to recall the function (it's an interval, it'll loop forever)
-                // The value of seed should lie between -1 to 1
-                var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
-                console.log("seed=" + seed);
-                var projectedSeed = Math.abs(Math.floor(seed * 100));
-                volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
-                console.log("volume=" +volume);
-                player.setVolume(volume);
-                counter++;
-            }
-
-            function abortTimer() { // to be called when you want to stop the timer
-                clearInterval(tid);
-            }
-
-            setTimeout(function () {
-                abortTimer();
-                flag = 0;
-            }, 20000);  // abort after 20 seconds..
-        }
+        setTimeout( upDowning , MYID*15)
     }
 
     function stopVideo() {
@@ -175,11 +188,12 @@
 <button onclick="doSend('PAUSE_VIDEO');setTimeout(function(){ player.pauseVideo();},15);">Pause</button>
 <button onclick="doSend('START_VIDEO');setTimeout(function(){playVideo()},15);">Play</button>
 <button onclick="doSend('RESET_VIDEO');setTimeout(function(){player.seekTo(0);player.playVideo()},15);">Broadcast</button>
-<button onclick="doSend('RANDOMIZE_SOUND');setTimeout(function(){randomizeSound()},15);">Randomize-Sound</button>
+<button onclick="doSend('RANDOMIZE_SOUND:'+MYID);setTimeout(function(){randomizeSound()},15);">Randomize-Sound</button>
 
 <br>
 
-<button onclick="doSend('RANDOMIZE_SOUND');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
+<input type="text"  id="name"/>
+<button onclick="doSend('RANDOMIZE_SOUND_PEOPLE');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
 
 </body>
 </html>
