@@ -106,6 +106,34 @@
         player.setLoop();
     }
 
+    var playing = true;
+    var img_array;
+    img_array= new Array('images/play_32x32.png','images/pause_32x32.png');
+    function playPauseVideo() {
+
+        if (playing === false) {
+            doSend('START_VIDEO');
+            setTimeout(function(){playVideo()},15);
+            playing = true;
+            document.getElementById("play").src=img_array[1];
+        } else {
+            doSend('PAUSE_VIDEO');
+            setTimeout(function(){ player.pauseVideo();},15);
+            playing = false;
+            document.getElementById("play").src=img_array[0];
+        }
+    }
+
+    function resetVideo() {
+        doSend('RESET_VIDEO');
+        setTimeout(function(){player.seekTo(0);player.playVideo()},15);
+    }
+
+    function randomizeSound() {
+        doSend('RANDOMIZE_SOUND:'+MYID);
+        setTimeout(function(){randomizeSound()},15);
+    }
+
     function doConnect() {
         websocket = new WebSocket( "ws://192.168.0.109:8000/" );
         websocket.onopen = function(evt) { onOpen(evt) };
@@ -185,10 +213,9 @@
 
 <input type="text"  id="text"/>
 <button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value);setTimeout(function(){window.location=(document.location.href.split('=')[0])+'='+document.getElementById('text').value;},15);">Change Id</button>
-<button onclick="doSend('PAUSE_VIDEO');setTimeout(function(){ player.pauseVideo();},15);">Pause</button>
-<button onclick="doSend('START_VIDEO');setTimeout(function(){playVideo()},15);">Play</button>
-<button onclick="doSend('RESET_VIDEO');setTimeout(function(){player.seekTo(0);player.playVideo()},15);">Broadcast</button>
-<button onclick="doSend('RANDOMIZE_SOUND:'+MYID);setTimeout(function(){randomizeSound()},15);">Randomize-Sound</button>
+<input type="image" name='play' id='play' src="images/pause_32x32.png" onclick='playPauseVideo()' />
+<button onclick='resetVideo()'>Broadcast</button>
+<button onclick='randomizeSound()'>Randomize-Sound</button>
 
 <br>
 
