@@ -95,7 +95,7 @@ class SimpleChat(WebSocket):
                     group.videoUrl = video_url
                     for userId in group.users:
                         userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:'+video_url)
-                        print "changed videoId for user"+ userId
+                        print "changed videoId for user", userId
 
             elif msg.startswith("CREATE_CONCERT"):
                 success = userIdMainMap[userId].createConcert(msg.split(":")[1])
