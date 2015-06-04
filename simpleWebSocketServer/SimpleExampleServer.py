@@ -20,10 +20,11 @@ clients = []
 userIdMainMap = {}
 groupIdHashMap = {}
 
+SHARING_CODE_LENGTH = 3
 
 class Group(object):
     def __init__(self, userId, videoUrl=None):
-        self.groupId = self.id_generator(10)
+        self.groupId = self.id_generator(SHARING_CODE_LENGTH)
         self.ownerId = userId
         self.users = [userId]
         self.groupSize = 0

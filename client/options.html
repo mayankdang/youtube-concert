@@ -286,6 +286,7 @@
             player.loadVideoById(id);
 
             player.seekTo(0);
+            player.setVolume(0);
             player.playVideo();
 
             setTimeout(function(){
@@ -308,6 +309,7 @@
             setTimeout(function(){
                 player.seekTo(0);
                 player.playVideo();
+                player.setVolume(100);
             },5000);
         }
     }
