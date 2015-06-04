@@ -121,8 +121,9 @@ class SimpleChat(WebSocket):
                 group.users.append(userId)
                 userIdMainMap[userId].groupId = groupId
                 userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl)
-                for x in group.users:
-                    userIdMainMap[x].client.sendMessage(u'NEW_USER_JOINED:' + userId + u':' + groupId)
+                print group.users
+                for group_user_id in group.users:
+                    userIdMainMap[group_user_id].client.sendMessage(u'NEW_USER_JOINED:'+str(userId)+':'+groupId)
                     print "added new user" + userId
 
             elif msg.startswith("LEAVE_CONCERT"):
