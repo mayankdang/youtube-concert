@@ -7,3 +7,6 @@ target/*
 pom.xml.*
 simpleWebSocketServer/.idea/*
 client/.idea/*
+simpleWebSocketServer/*.pyc
+simpleWebSocketServer/nohup.out
+
