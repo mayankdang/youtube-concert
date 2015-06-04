@@ -135,7 +135,7 @@
     }
 
     function doConnect() {
-        websocket = new WebSocket( "ws://192.168.0.109:8000/" );
+        websocket = new WebSocket( "ws://ec2-52-74-89-96.ap-southeast-1.compute.amazonaws.com:80/" );
         websocket.onopen = function(evt) { onOpen(evt) };
         websocket.onclose = function(evt) { onClose(evt) };
         websocket.onmessage = function(evt) { onMessage(evt) };
