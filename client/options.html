@@ -15,11 +15,13 @@
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
     var player;
+
+    var idtemp=document.location.href.split("=")[1];
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             height: '390',
             width: '640',
-            videoId: '4Vk5DpS8hmY',
+            videoId: idtemp,
             events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
@@ -125,7 +127,7 @@
 </script>
 
 <input type="text"  id="text"/>
-<button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value);setTimeout(function(){player.loadVideoById(id);player.seekTo(0);player.pauseVideo();},15);">Change Id</button>
+<button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value);setTimeout(function(){window.location=(document.location.href.split('=')[0])+'='+document.getElementById('text').value;},15);">Change Id</button>
 <button onclick="doSend('PAUSE_VIDEO');setTimeout(function(){ player.pauseVideo();},15);">Pause</button>
 <button onclick="doSend('START_VIDEO');setTimeout(function(){playVideo()},15);">Play</button>
 <button onclick="doSend('RESET_VIDEO');setTimeout(function(){player.seekTo(0);player.playVideo()},15);">Broadcast</button>
