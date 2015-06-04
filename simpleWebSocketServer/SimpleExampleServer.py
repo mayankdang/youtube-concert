@@ -43,7 +43,6 @@ class User(object):
         self.userId = userId
         self.networkDelay = 15      # default
         self.recentTime = -1
-        self.concertId = 0
         self.client = client
         self.isConnected = True
         self.groupId = None
@@ -110,7 +109,14 @@ class SimpleChat(WebSocket):
                 pass
 
             elif msg.startswith("JOIN_CONCERT"):
-                pass
+                groupId = msg.split(":")[1]
+                group = groupIdHashMap.get(groupId)
+                group.users.append(userId)
+                userIdMainMap[userId].groupId = groupId
+                userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:'+group.videoUrl)
+                for x in group.users:
+                    userIdMainMap[x].client.sendMessage(u'NEW_USER_JOINED:'+userId+u':'+groupId)
+                    print "added new user"+ userId
 
             elif msg.startswith("LEAVE_CONCERT"):
                 pass
