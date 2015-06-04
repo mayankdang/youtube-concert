@@ -145,6 +145,8 @@
 
     function changeVideoId() {
         doSend('CHANGE_VIDEO_ID:'+getVideoId());
+        playing = false;
+        document.getElementById("play").src=img_array[0];
         //setTimeout(function(){window.location=(document.location.href.split('=')[0])+'='+getVideoId()},15);
     }
 
@@ -263,6 +265,16 @@
             alert("Group Id:" + groupId);
         }
 
+        if(evt.data.indexOf("NEW_USER_JOINED")>-1) {
+            new_userId = evt.data.split(":")[1];
+            var groupId = evt.data.split(":")[2];
+            if (userId === new_userId) {
+                alert("Successfully Joined Concert:" + groupId);
+            } else {
+                alert("New User "+userId+ " Joined Concert !");   
+            }            
+        }        
+
         if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_GROUP")>-1) {
             alert("You already belong to a group, Sire!");
         }
@@ -336,7 +348,7 @@
 <br>
 
 <input type="text"  id="groupId"/>
-<button onclick='joinConcert()'></button>
+<button onclick='joinConcert()'>Join Concert</button>
 <button onclick="doSend('RANDOMIZE_SOUND_PEOPLE');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
 
 
