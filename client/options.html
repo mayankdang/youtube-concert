@@ -136,6 +136,14 @@
         setTimeout(function(){randomizeSound()},15);
     }
 
+    function getVideoUrl() {
+        return document.getElementById("text").value;
+    }
+
+    function createConcert() {
+        doSend('CREATE_CONCERT:'+getVideoUrl());
+    }
+
     var delayArray = [];
     var sent = false;
     function saveNetworkDelay(delay) {
@@ -191,9 +199,9 @@
             alert("omg");
         }
 
-      if (evt.data.indexOf("HANDSHAKING_DONE")>-1){
-          console.log("Handshaking done.");
-      }
+        if (evt.data.indexOf("HANDSHAKING_DONE")>-1){
+            console.log("Handshaking done.");
+        }
 
         if(evt.data.indexOf("HEY_BUDDY")>-1) {
             var diff = new Date().getTime()-parseInt(evt.data.split(':')[1]);
@@ -235,6 +243,17 @@
         {
             setTimeout(randomizeSound,13+Math.random()*27);
         }
+
+
+        if(evt.data.indexOf("GROUP_CREATED")>-1) {
+            var groupId = evt.data.split(":")[1];
+            document.getElementById("groupId").value = groupId;
+            alert("Group Id:" + groupId);
+        }
+
+        if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_GROUP")>-1) {
+            alert("You already belong to a group, Sire!");
+        }
     }
 
     function onError(evt)
@@ -263,10 +282,11 @@
 <input type="image" name='play' id='play' src="images/pause_32x32.png" onclick='playPauseVideo()' />
 <button onclick='resetVideo()'>Broadcast</button>
 <button onclick='randomizeSound()'>Randomize-Sound</button>
+<button onclick='createConcert()'>Create-Concert</button>
 
 <br>
 
-<input type="text"  id="name"/>
+<input type="text"  id="groupId"/>
 <button onclick="doSend('RANDOMIZE_SOUND_PEOPLE');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
 
 </body>

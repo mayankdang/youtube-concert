@@ -2,7 +2,7 @@ import json
 import signal, sys, ssl
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 from optparse import OptionParser
-import string
+import string, time, random
 
 
 class SimpleEcho(WebSocket):
@@ -17,14 +17,17 @@ class SimpleEcho(WebSocket):
         pass
 
 clients = []
-
 userIdMainMap = {}
+groupIdHashMap = {}
 
 class Group(object):
-    def __init__(self):
+    def __init__(self, userId, videoUrl=None):
         self.groupId = self.id_generator(10)
-        self.users = {}
+        self.ownerId = userId
+        self.users = [userId]
+        self.groupSize = 0
         self.maxNetworkDelayOfUsers = 100
+        self.videoUrl = videoUrl
 
     def setMaxNetworkDelayOfUsers(self):
         maxDelay = 0
@@ -42,6 +45,8 @@ class User(object):
         self.recentTime = -1
         self.concertId = 0
         self.client = client
+        self.isConnected = True
+        self.groupId = None
     def getCurrentTime(self):
         return int(round(time.time() * 1000))
     def updateRecentTime(self):
@@ -49,6 +54,19 @@ class User(object):
     def setNetworkDelay(self, delay):
         self.networkDelay = delay
         print "set network delay as", delay
+    def createConcert(self, videoUrl):
+        if self.groupId is None or self.groupId not in groupIdHashMap:
+            newGroup = Group(self.userId, videoUrl)
+            self.groupId = newGroup.groupId
+            groupIdHashMap[newGroup.groupId] = newGroup
+            return True
+        else:
+            print "The user", self.userId, "is already in group -", self.groupId
+        return False
+
+    def joinToGroup(self, groupId):
+        if groupIdHashMap.get(groupId) is None:
+            self.groupId = groupId
 
 class SimpleChat(WebSocket):
 
@@ -64,18 +82,35 @@ class SimpleChat(WebSocket):
             elif msg.startswith("NETWORK_DELAY"):
                 delay = msg.split(":")[1]
                 print "Handshaking done", delay, "Sending confirmation to client."
-                self.sendMessage("HANDSHAKING_DONE:"+msg.split(":")[1])
-                if userIdMainMap.get(userId, -1) == (-1):
+                self.sendMessage(u"HANDSHAKING_DONE:"+msg.split(":")[1])
+                if userIdMainMap.get(userId) is None:
                     userIdMainMap[userId] = User(userId, self)
                     # print "putting in map"
                 userIdMainMap[userId].setNetworkDelay(delay)
                 # userIdMainMap[userId].client.sendMessage(u'client wala send message')
 
+            elif msg.startswith("CREATE_CONCERT"):
+                success = userIdMainMap[userId].createConcert(msg.split(":")[1])
+                if not success:
+                    self.sendMessage(u'YOU_ALREADY_BELONG_TO_A_GROUP')
+                else:
+                    self.sendMessage(u'GROUP_CREATED:'+userIdMainMap[userId].groupId)
+                pass
+
+            elif msg.startswith("END_CONCERT"):
+                pass
+
+            elif msg.startswith("JOIN_CONCERT"):
+                pass
+
+            elif msg.startswith("LEAVE_CONCERT"):
+                pass
+
             else:
                 for client in list(clients):
                     if client != self:
                         client.sendMessage(self.address[0] + ' - ' + msg)
-        except Exception(e):
+        except Exception, e:
             print e
 
     def handleConnected(self):
