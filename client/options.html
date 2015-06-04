@@ -127,8 +127,7 @@
     }
 
     function resetVideo() {
-        doSend('RESET_VIDEO');
-        setTimeout(function(){player.seekTo(0);player.playVideo()},15);
+        doSend("EVENT_START_IN_5_SEC");
     }
 
     function randomizeSound() {
@@ -267,7 +266,38 @@
         if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_GROUP")>-1) {
             alert("You already belong to a group, Sire!");
         }
+
+        if(evt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
+            var id=evt.data.split(":")[1];
+            player.loadVideoById(id);
+
+            player.seekTo(0);
+            player.playVideo();
+
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 4_SEC");
+                setEventStatus("CONCERT_START_IN 4_SEC");
+            },1000);
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 3_SEC");
+                setEventStatus ("CONCERT_START_IN 3_SEC");
+            },2000);
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 2_SEC");
+            },3000);
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 1_SEC");
+                setEventStatus("CONCERT_START_IN 1_SEC");
+            },4000);
+
+            setTimeout(function(){
+                player.seekTo(0);
+                player.playVideo();
+            },5000);
+        }
     }
+
+
 
     function onError(evt)
     {
@@ -285,6 +315,12 @@
     function doDisconnect() {
         websocket.close();
     }
+
+    function setEventStatus(status){
+        document.getElementById("event_status").value=status;
+    }
+
+
     doConnect();
 </script>
 
@@ -303,5 +339,8 @@
 <button onclick='joinConcert()'></button>
 <button onclick="doSend('RANDOMIZE_SOUND_PEOPLE');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
 
+
+<br>
+<div>Time Left:</div><div id="event_status">Not Started</div>
 </body>
 </html>

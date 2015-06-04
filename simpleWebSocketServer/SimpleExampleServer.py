@@ -114,6 +114,15 @@ class SimpleChat(WebSocket):
 
             elif msg.startswith("LEAVE_CONCERT"):
                 pass
+                
+            elif msg.startswith("EVENT_START_IN_5_SEC"):
+				 if userId == groupIdHashMap.get(userIdMainMap[userId].groupId).ownerId
+				 group = groupIdHashMap.get(userIdMainMap[userId].groupId)
+                 for userId in group.users:
+					userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:'+group.videoUrl)
+                pass
+                
+                
 
             else:
                 for client in list(clients):
