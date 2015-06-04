@@ -140,7 +140,7 @@
     var sent = false;
     function saveNetworkDelay(delay) {
         if (!sent) {
-            if (delayArray.length>=0) {
+            if (delayArray.length>=10) {
                 computeDelayMedianAndSend();
                 sent = true;
             } else {
@@ -150,9 +150,11 @@
     }
 
     function computeDelayMedianAndSend() {
+        delayArray.sort();
         console.log("Sending delay..");
-//        doSend("NETWORK_DELAY:" + parseInt((parseInt(delayArray[5]) + parseInt(delayArray[4]) / 2)));
-        doSend("NETWORK_DELAY:789");
+        doSend("NETWORK_DELAY:" + parseInt(
+                (parseInt(delayArray[5]) + parseInt(delayArray[4]) / 2)));
+//        doSend("NETWORK_DELAY:789");
     }
 
     function doConnect() {
@@ -167,12 +169,6 @@
     var myip;
     function onOpen(evt) {
         doSend("HELLO_BUDDY:"+new Date().getTime());
-        for (var i=0;i<1;i++) {
-            setTimeout(function() {
-                doSend("HELLO_BUDDY:"+new Date().getTime());
-            }, (i+1)*30);
-        }
-
     }
 
     function onClose(evt) {
@@ -180,20 +176,32 @@
     }
 
     function onMessage(evt) {
-      console.log("response: " + evt.data + '\n');
+        console.log("response: " + evt.data + '\n');
+        console.log("response json: " + JSON.stringify(evt.data) + '\n');
+        if (evt.data instanceof Blob) {
+            reader = new FileReader();
+            reader.onload = function() {
+                console.log(reader.result);
+            }
+            reader.readAsText(evt.data);
+        }
+        console.log("response formatted: " + evt.data + '\n');
+        console.log("response formatted json: " + JSON.stringify(evt.data) + '\n');
+
 
         if (evt.data.indexOf("HeyYo! ty")>-1) {
             alert("omg");
         }
 
-      if(evt.data.indexOf("HANDSHAKING_DONE")){
-        alert("omg! sai h yaaaR" );
+      if (evt.data.indexOf("HANDSHAKING_DONE")>-1){
+          console.log("Handshaking done.");
       }
 
         if(evt.data.indexOf("HEY_BUDDY")>-1) {
             console.log(evt.data)
             var diff = new Date().getTime()-parseInt(evt.data.split(':')[1]);
-            saveNetworkDelay(diff);
+            doSend("NETWORK_DELAY:786:" + diff)
+//            saveNetworkDelay(diff);
         }
 
         if(evt.data.indexOf("START_VIDEO")>-1) {

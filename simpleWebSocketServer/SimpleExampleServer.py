@@ -6,69 +6,72 @@ from optparse import OptionParser
 
 class SimpleEcho(WebSocket):
 
-   def handleMessage(self):
-      self.sendMessage(self.data)
+    def handleMessage(self):
+        self.sendMessage(self.data)
 
-   def handleConnected(self):
-      pass
+    def handleConnected(self):
+        pass
 
-   def handleClose(self):
-      pass
+    def handleClose(self):
+        pass
 
 clients = []
 
 
 class SimpleChat(WebSocket):
 
-   def handleMessage(self): 
-      message=json.loads(self.data)
-      self.sendMessage(self.address[0] + ' - ' + self.data)
-      msg= message["message"]
-      
-      if msg.startswith("HELLO_BUDDY"):
-		   self.sendMessage('HEY_BUDDY:'+msg.split(":")[1])            
+    def handleMessage(self):
+        message=json.loads(self.data)
+        msg = message["message"]
+        userId = message["id"]
 
-      if msg.startswith("NETWORK_DELAY"):
-		   self.sendMessage('HANDSHAKING_DONE:'+msg.split(":")[1])            
+        if msg.startswith("HELLO_BUDDY"):
+            print "chutiyaap"
+            self.sendMessage('HEY_BUDDY:'+msg.split(":")[1])
 
-   def handleConnected(self):
-      print self.address, 'connected'
-      for client in list(clients):
-         client.sendMessage(self.address[0] + u' - connected')
-      clients.append(self)
+        if msg.startswith("NETWORK_DELAY"):
+            delay = msg.split(":")[1]
+            print delay
+            self.sendMessage("HANDSHAKING_DONE:"+msg.split(":")[1])
 
-   def handleClose(self):
-      clients.remove(self)
-      print self.address, 'closed'
-      for client in list(clients):
-         client.sendMessage(self.address[0] + u' - disconnected')
-      
+    def handleConnected(self):
+        print self.address, 'connected'
+        for client in list(clients):
+            client.sendMessage(self.address[0] + u' - connected')
+        clients.append(self)
+
+    def handleClose(self):
+        clients.remove(self)
+        print self.address, 'closed'
+        for client in list(clients):
+            client.sendMessage(self.address[0] + u' - disconnected')
+
 
 if __name__ == "__main__":
 
-   parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
-   parser.add_option("--host", default='', type='string', action="store", dest="host", help="hostname (localhost)")
-   parser.add_option("--port", default=8000, type='int', action="store", dest="port", help="port (8000)")
-   parser.add_option("--example", default='echo', type='string', action="store", dest="example", help="echo, chat")
-   parser.add_option("--ssl", default=0, type='int', action="store", dest="ssl", help="ssl (1: on, 0: off (default))")
-   parser.add_option("--cert", default='./cert.pem', type='string', action="store", dest="cert", help="cert (./cert.pem)")
-   parser.add_option("--ver", default=ssl.PROTOCOL_TLSv1, type=int, action="store", dest="ver", help="ssl version")
-   
-   (options, args) = parser.parse_args()
+    parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
+    parser.add_option("--host", default='', type='string', action="store", dest="host", help="hostname (localhost)")
+    parser.add_option("--port", default=8000, type='int', action="store", dest="port", help="port (8000)")
+    parser.add_option("--example", default='echo', type='string', action="store", dest="example", help="echo, chat")
+    parser.add_option("--ssl", default=0, type='int', action="store", dest="ssl", help="ssl (1: on, 0: off (default))")
+    parser.add_option("--cert", default='./cert.pem', type='string', action="store", dest="cert", help="cert (./cert.pem)")
+    parser.add_option("--ver", default=ssl.PROTOCOL_TLSv1, type=int, action="store", dest="ver", help="ssl version")
 
-   cls = SimpleEcho
-   if options.example == 'chat':
-      cls = SimpleChat	
+    (options, args) = parser.parse_args()
 
-   if options.ssl == 1:
-      server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.cert, version=options.ver)
-   else:	
-      server = SimpleWebSocketServer(options.host, options.port, cls)
+    cls = SimpleEcho
+    if options.example == 'chat':
+        cls = SimpleChat
 
-   def close_sig_handler(signal, frame):
-      server.close()
-      sys.exit()
+    if options.ssl == 1:
+        server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.cert, version=options.ver)
+    else:
+        server = SimpleWebSocketServer(options.host, options.port, cls)
 
-   signal.signal(signal.SIGINT, close_sig_handler)
+    def close_sig_handler(signal, frame):
+        server.close()
+        sys.exit()
 
-   server.serveforever()
+    signal.signal(signal.SIGINT, close_sig_handler)
+
+    server.serveforever()
