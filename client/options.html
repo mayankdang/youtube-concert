@@ -144,17 +144,21 @@
                 computeDelayMedianAndSend();
                 sent = true;
             } else {
-                delayArray.push(delay);
+                delayArray.push(parseInt(delay));
             }
         }
     }
 
+    function sortNumberComparator(a,b) {
+        return a - b;
+    }
+
     function computeDelayMedianAndSend() {
-        delayArray.sort();
-        console.log("Sending delay..");
+        delayArray.sort(sortNumberComparator);
+        // extra division by 2 to divide RoundTripTime RTT and get single way duration.
         doSend("NETWORK_DELAY:" + parseInt(
-                (parseInt(delayArray[5]) + parseInt(delayArray[4]) / 2)));
-//        doSend("NETWORK_DELAY:789");
+                (parseInt(delayArray[5]) + parseInt(delayArray[4])) / 4));
+        console.log(JSON.stringify(delayArray));
     }
 
     function doConnect() {
@@ -169,6 +173,11 @@
     var myip;
     function onOpen(evt) {
         doSend("HELLO_BUDDY:"+new Date().getTime());
+        for (var i=0;i<20;i++) {
+            setTimeout(function() {
+                doSend("HELLO_BUDDY:" + new Date().getTime());
+            }, (i+1)* 80);
+        }
     }
 
     function onClose(evt) {
@@ -177,17 +186,6 @@
 
     function onMessage(evt) {
         console.log("response: " + evt.data + '\n');
-        console.log("response json: " + JSON.stringify(evt.data) + '\n');
-        if (evt.data instanceof Blob) {
-            reader = new FileReader();
-            reader.onload = function() {
-                console.log(reader.result);
-            }
-            reader.readAsText(evt.data);
-        }
-        console.log("response formatted: " + evt.data + '\n');
-        console.log("response formatted json: " + JSON.stringify(evt.data) + '\n');
-
 
         if (evt.data.indexOf("HeyYo! ty")>-1) {
             alert("omg");
@@ -198,10 +196,8 @@
       }
 
         if(evt.data.indexOf("HEY_BUDDY")>-1) {
-            console.log(evt.data)
             var diff = new Date().getTime()-parseInt(evt.data.split(':')[1]);
-            doSend("NETWORK_DELAY:786:" + diff)
-//            saveNetworkDelay(diff);
+            saveNetworkDelay(diff);
         }
 
         if(evt.data.indexOf("START_VIDEO")>-1) {

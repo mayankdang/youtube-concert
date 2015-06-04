@@ -26,12 +26,11 @@ class SimpleChat(WebSocket):
         userId = message["id"]
 
         if msg.startswith("HELLO_BUDDY"):
-            print "chutiyaap"
             self.sendMessage('HEY_BUDDY:'+msg.split(":")[1])
 
         if msg.startswith("NETWORK_DELAY"):
             delay = msg.split(":")[1]
-            print delay
+            print "Handshaking done", delay, "Sending confirmation to client."
             self.sendMessage("HANDSHAKING_DONE:"+msg.split(":")[1])
 
     def handleConnected(self):
