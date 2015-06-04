@@ -1,131 +1,134 @@
 <!DOCTYPE html>
 <html>
-    <body>
-    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
-        <div id="player"></div>
-        <script>
+<body>
+<!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+<div id="player"></div>
+<script>
 
-            // 2. This code loads the IFrame Player API code asynchronously.
-            var tag = document.createElement('script');
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
 
-            tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-            // 3. This function creates an <iframe> (and YouTube player)
-            //    after the API code downloads.
-            var player;
-            function onYouTubeIframeAPIReady() {
-                player = new YT.Player('player', {
-                    height: '390',
-                    width: '640',
-                    videoId: '4Vk5DpS8hmY',
-                    events: {
-                        'onReady': onPlayerReady,
-                        'onStateChange': onPlayerStateChange
-                    }
-                });
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '390',
+            width: '640',
+            videoId: '4Vk5DpS8hmY',
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
             }
+        });
+    }
 
-            // 4. The API will call this function when the video player is ready.
-            function onPlayerReady(event) {
-                event.target.playVideo();
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+        event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    var done = false;
+
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+            done = true;
+//                    setTimeout(function(){stopVideo();player.seekTo(0);},3000);
+        }
+    }
+
+    function stopVideo() {
+        player.stopVideo();
+    }
+
+    function playVideo() {
+        player.playVideo();
+        player.setLoop();
+    }
+
+    function doConnect() {
+        websocket = new WebSocket( "ws://192.168.0.109:8000/" );
+        websocket.onopen = function(evt) { onOpen(evt) };
+        websocket.onclose = function(evt) { onClose(evt) };
+        websocket.onmessage = function(evt) { onMessage(evt) };
+        websocket.onerror = function(evt) { onError(evt) };
+    }
+
+    var myip;
+    function onOpen(evt) {
+        doSend("HELLO_BUDDY:"+new Date().getTime());
+    }
+
+    function onClose(evt) {
+        console.log("disconnected\n");
+    }
+
+    function onMessage(evt) {
+        console.log("response: " + evt.data + '\n');
+
+        if(evt.data.indexOf("START_VIDEO")>-1) {
+            playVideo();
+        }
+
+        if(evt.data.indexOf("PAUSE_VIDEO")>-1) {
+            player.pauseVideo();
+        }
+
+        if(evt.data.indexOf("RESET_VIDEO")>-1) {
+            player.seekTo(0);player.playVideo()
+        }
+
+        if(evt.data.indexOf("PRINT_TIME")>-1) {
+            console.log(evt.data + " "+ new Date().getTime());
+        }
+
+        if(evt.data.indexOf("VOLUME")>-1){
+            var x=evt.data.split(":")[1];
+            var ip=evt.data.split(":")[0].split(" ");
+            if(myip==ip){
+                player.setVolume(parseInt(x));
             }
+        }
 
-            // 5. The API calls this function when the player's state changes.
-            //    The function indicates that when playing a video (state=1),
-            //    the player should play for six seconds and then stop.
-            var done = false;
+        if(evt.data.indexOf("CHANGE_VIDEO_ID")>-1){
+            var id=evt.data.split(":")[1];
+            player.loadVideoById(id);
+            player.seekTo(0);
+            player.pauseVideo();
+        }
 
-            function onPlayerStateChange(event) {
-                if (event.data == YT.PlayerState.PLAYING && !done) {
-                    done = true;
-                    setTimeout(function(){stopVideo();player.seekTo(0);},3000);
-                }
-            }
+    }
 
-            function stopVideo() {
-                player.stopVideo();
-                doSend("Mai to ready !");
-            }
+    function onError(evt)
+    {
+        console.log('error: ' + evt.data + '\n');
+        websocket.close();
+    }
 
-            function playVideo() {
-                player.playVideo();
-                player.setLoop();
-            }
+    function doSend(message)
+    {
+        console.log("sent: " + message + '\n');
+        websocket.send(message);
+    }
 
-            function doConnect() {
-                websocket = new WebSocket( "ws://192.168.0.109:8000/" );
-                websocket.onopen = function(evt) { onOpen(evt) };
-                websocket.onclose = function(evt) { onClose(evt) };
-                websocket.onmessage = function(evt) { onMessage(evt) };
-                websocket.onerror = function(evt) { onError(evt) };
-            }
+    function doDisconnect() {
+        websocket.close();
+    }
+    doConnect();
+</script>
 
-            function onOpen(evt) {
-                console.log("connected\n");
-                doSend("Hello Buddy");
-                doSend("TIME:"+new Date().getTime())
-            }
+<input type="text"  id="text"/>
+<button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value);setTimeout(function(){player.loadVideoById(id);player.seekTo(0);player.pauseVideo();},15);">Change Id</button>
+<button onclick="doSend('PAUSE_VIDEO');setTimeout(function(){ player.pauseVideo();},15);">Pause</button>
+<button onclick="doSend('START_VIDEO');setTimeout(function(){playVideo()},15);">Play</button>
+<button onclick="doSend('RESET_VIDEO');setTimeout(function(){player.seekTo(0);player.playVideo()},15);">Broadcast</button>
 
-            function onClose(evt) {
-                console.log("disconnected\n");
-            }
-
-            function onMessage(evt) {
-                console.log("response: " + evt.data + '\n');
-
-                if(evt.data.indexOf("START_VIDEO")>-1) {
-                    playVideo();
-                }
-
-                if(evt.data.indexOf("PAUSE_VIDEO")>-1) {
-                    player.pauseVideo();
-                }
-
-                if(evt.data.indexOf("RESET_VIDEO")>-1) {
-                    player.seekTo(0);
-                }
-
-                if(evt.data.indexOf("PRINT_TIME")>-1) {
-                    console.log(evt.data + " "+ new Date().getTime());
-                }
-
-                if(evt.data.indexOf("VOLUME")>-1){
-                    var x=evt.data.split(":")[1];
-                    player.setVolume(parseInt(x));
-                }
-
-                if(evt.data.indexOf("CHANGE_VIDEO_ID")>-1){
-                    var id=evt.data.split(":")[1];
-                    player.loadVideoById(id);
-                    player.seekTo(0);
-                    player.pauseVideo();
-                }
-            }
-
-            function onError(evt)
-            {
-                console.log('error: ' + evt.data + '\n');
-                websocket.close();
-            }
-
-            function doSend(message)
-            {
-                console.log("sent: " + message + '\n');
-                websocket.send(message);
-            }
-
-            function doDisconnect() {
-                websocket.close();
-            }
-            doConnect();
-        </script>
-
-    <input type="text"  id="text"/>
-    <button onclick="doSend('CHANGE_VIDEO_ID:'+document.getElementById('text').value)">Change Id</button>
-    <button onclick="doSend('PAUSE_VIDEO')">Stop</button>
-    <button onclick="doSend('START_VIDEO');setTimeout(function(){playVideo()},15);">Synced Start</button>
-
-    </body>
+</body>
 </html>
