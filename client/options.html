@@ -248,6 +248,7 @@
 
         if(evt.data.indexOf("CHANGED_VIDEO_ID")>-1){
             var id=evt.data.split(":")[1];
+            document.getElementById("videoId").value = groupId;
             player.loadVideoById(id);
             player.seekTo(0);
             player.pauseVideo();
