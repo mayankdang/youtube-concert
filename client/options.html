@@ -18,6 +18,7 @@
     //    after the API code downloads.
     var player;
     var idtemp=document.location.href.split("=")[1];
+
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             height: '390',
@@ -248,7 +249,7 @@
 
         if(evt.data.indexOf("CHANGED_VIDEO_ID")>-1){
             var id=evt.data.split(":")[1];
-            document.getElementById("videoId").value = groupId;
+            document.getElementById("videoId").value = id;
             player.loadVideoById(id);
             player.seekTo(0);
             player.pauseVideo();
@@ -356,5 +357,10 @@
 
 <br>
 <div>Time Left:</div><div id="event_status">Not Started</div>
+
+<script type="text/javascript">
+    // To set The video Id when youtube player initializes at the start
+    document.getElementById("videoId").value = idtemp;
+</script>
 </body>
 </html>
