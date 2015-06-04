@@ -6,10 +6,12 @@
 
 <script language="javascript" type="text/javascript">
 
+    var PORT = "8000";
+    var IP = "localhost";
 
   function init()
   {
-	document.myform.url.value = "ws://52.74.89.96:80/"
+	document.myform.url.value = "ws://"+IP+":"+PORT+"/"
 	document.myform.inputtext.value = "Hello World!"
 	document.myform.disconnectButton.disabled = true;
   }

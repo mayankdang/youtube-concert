@@ -4,6 +4,8 @@
 <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
 <div id="player"></div>
 <script>
+    var IP = "localhost";
+    var PORT = "8000";
 
     // 2. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
@@ -134,8 +136,27 @@
         setTimeout(function(){randomizeSound()},15);
     }
 
+    var delayArray = [];
+    var sent = false;
+    function saveNetworkDelay(delay) {
+        if (!sent) {
+            if (delayArray.length>=0) {
+                computeDelayMedianAndSend();
+                sent = true;
+            } else {
+                delayArray.push(delay);
+            }
+        }
+    }
+
+    function computeDelayMedianAndSend() {
+        console.log("Sending delay..");
+//        doSend("NETWORK_DELAY:" + parseInt((parseInt(delayArray[5]) + parseInt(delayArray[4]) / 2)));
+        doSend("NETWORK_DELAY:789");
+    }
+
     function doConnect() {
-        websocket = new WebSocket( "ws://52.74.89.96:80/" );
+        websocket = new WebSocket( "ws://"+IP+":"+PORT+"/" );
         websocket.onopen = function(evt) { onOpen(evt) };
         websocket.onclose = function(evt) { onClose(evt) };
         websocket.onmessage = function(evt) { onMessage(evt) };
@@ -145,6 +166,12 @@
     var myip;
     function onOpen(evt) {
         doSend("HELLO_BUDDY:"+new Date().getTime());
+        for (var i=0;i<1;i++) {
+            setTimeout(function() {
+                doSend("HELLO_BUDDY:"+new Date().getTime());
+            }, (i+1)*30);
+        }
+
     }
 
     function onClose(evt) {
@@ -153,6 +180,17 @@
 
     function onMessage(evt) {
         console.log("response: " + evt.data + '\n');
+        console.log("response: " + JSON.stringify(evt.data) + '\n');
+
+        if (evt.data.indexOf("HeyYo! ty")>-1) {
+            alert("omg");
+        }
+
+        if(evt.data.indexOf("HEY_BUDDY")>-1) {
+            console.log(evt.data)
+            var diff = new Date().getTime()-parseInt(evt.data.split(':')[1]);
+            saveNetworkDelay(diff);
+        }
 
         if(evt.data.indexOf("START_VIDEO")>-1) {
             playVideo();
@@ -197,10 +235,11 @@
         websocket.close();
     }
 
+    var userId = Math.floor(Math.random()*1000000000);
     function doSend(message)
     {
         console.log("sent: " + message + '\n');
-        websocket.send(message);
+        websocket.send(JSON.stringify({message:message,id:userId}));
     }
 
     function doDisconnect() {
