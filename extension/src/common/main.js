@@ -64,6 +64,7 @@ function onMessage(evt) {
             || (evt.data.indexOf("PAUSE_VIDEO")>-1)
             || (evt.data.indexOf("RESET_VIDEO")>-1)
             || (evt.data.indexOf("VOLUME")>-1)
+            || (evt.data.indexOf("GROUP_CREATED")>-1)
         )
     {
         kango.browser._tabs.getAll(function(tabs){
@@ -88,7 +89,10 @@ function onMessage(evt) {
         saveNetworkDelay(diff);
     }
 
-
+    if(evt.data.indexOf("GROUP_CREATED")>-1) {
+        groupId = evt.data.split(":")[1];
+        kango.storage.setItem("groupId",groupId);
+    }
 
     if(evt.data.indexOf("PRINT_TIME")>-1) {
         console.log(evt.data + " "+ new Date().getTime());
