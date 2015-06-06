@@ -22,9 +22,12 @@ groupIdHashMap = {}
 
 SHARING_CODE_LENGTH = 3
 
+def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in xrange(size))
+
 class Group(object):
     def __init__(self, userId, videoUrl=None):
-        self.groupId = self.id_generator(SHARING_CODE_LENGTH)
+        self.groupId = idGenerator(SHARING_CODE_LENGTH)
         self.ownerId = userId
         self.users = [userId]
         self.groupSize = 0
@@ -37,17 +40,12 @@ class Group(object):
             maxDelay = max(maxDelay, value.networkDelay)
         self.maxNetworkDelayOfUsers = maxDelay
 
-    def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
-        return ''.join(random.choice(chars) for _ in xrange(size))
-
-
 class User(object):
     def __init__(self, userId, client):
         self.userId = userId
         self.networkDelay = 15  # default
         self.recentTime = -1
         self.client = client
-        self.isConnected = True
         self.groupId = None
 
     def getCurrentTime(self):
@@ -133,6 +131,15 @@ class SimpleChat(WebSocket):
                 group = groupIdHashMap.get(userIdMainMap[userId].groupId)
                 for userId in group.users:
                     userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
+                pass
+
+            elif msg.startswith("REGISTER_USER"):
+                userId = idGenerator(20)
+                self.sendMessage(u"USER_REGISTERED:" + userId)
+                print "New user registered:", userId
+                pass
+
+            elif msg.startswith("USER_ONLINE"):
                 pass
 
             else:

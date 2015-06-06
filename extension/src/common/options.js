@@ -1,0 +1,39 @@
+function getVideoId() {
+    return document.getElementById("videoId").value;
+}
+
+function getGroupId() {
+    return document.getElementById("groupId").value;
+}
+
+function resetVideo() {
+    doSend("EVENT_START_IN_5_SEC");
+}
+
+function changeVideoId() {
+    doSend('CHANGE_VIDEO_ID:'+getVideoId());
+}
+
+function createConcert() {
+    doSend('CREATE_CONCERT:'+getVideoId());
+}
+
+function joinConcert() {
+    doSend('JOIN_CONCERT:'+getGroupId());
+}
+
+//if(evt.data.indexOf("GROUP_CREATED")>-1) {
+//    var groupId = evt.data.split(":")[1];
+//    document.getElementById("groupId").value = groupId;
+//    alert("Group Id:" + groupId);
+//}
+
+function doSend(message) {
+    kango.dispatchMessage("optionsToMain", {message:message});
+    console.log("Sent to main:" + message);
+}
+
+document.getElementById("changeId").onclick = changeVideoId;
+document.getElementById("broadcast").onclick = resetVideo;
+document.getElementById("createConcert").onclick = createConcert;
+document.getElementById("joinConcert").onclick = joinConcert;

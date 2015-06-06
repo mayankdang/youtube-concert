@@ -10,7 +10,13 @@
     "browser_button": {
         "caption": "Kango", 
         "icon": "icons/button.png", 
-        "tooltipText": "Kango"
-    }, 
+        "tooltipText": "Kango",
+        "popup": {
+            "url": "options.html",
+            "width": 200,
+            "height": 100
+        }
+    },
+    "options_page": "options.html",
     "name": "Concert"
 }
