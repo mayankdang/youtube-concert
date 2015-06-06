@@ -9,4 +9,11 @@ simpleWebSocketServer/.idea/*
 client/.idea/*
 simpleWebSocketServer/*.pyc
 simpleWebSocketServer/nohup.out
+extension/certificates/*
+extension/output/*
+extension/src/chrome/*
+extension/src/firefox/*
+extension/src/ie/*
+extension/src/safari/*
+
 

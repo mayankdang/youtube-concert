@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html>
-<body>
-<!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
-<div id="player"></div>
-<script>
+function youtuber(){
     var IP = "192.168.0.109";
     var PORT = "8000";
 
-    // 2. This code loads the IFrame Player API code asynchronously.
+//  2. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
 
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    // 3. This function creates an <iframe> (and YouTube player)
-    //    after the API code downloads.
+//  3. This function creates an <iframe> (and YouTube player)
+//  after the API code downloads.
     var player;
     var idtemp=document.location.href.split("=")[1];
 
@@ -31,14 +26,14 @@
         });
     }
 
-    // 4. The API will call this function when the video player is ready.
+//  4. The API will call this function when the video player is ready.
     function onPlayerReady(event) {
         event.target.playVideo();
     }
 
-    // 5. The API calls this function when the player's state changes.
-    //    The function indicates that when playing a video (state=1),
-    //    the player should play for six seconds and then stop.
+//  5. The API calls this function when the player's state changes.
+//  The function indicates that when playing a video (state=1),
+//    the player should play for six seconds and then stop.
     var done = false;
 
     function onPlayerStateChange(event) {
@@ -62,38 +57,38 @@
         }
 
         if (flag === 0) {
-                var interval = 30.0;  // in ms
-                var tid = setInterval(mycode, interval);
-                var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
-                var counter = 1;
+            var interval = 30.0;  // in ms
+            var tid = setInterval(mycode, interval);
+            var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
+            var counter = 1;
 
-                function mycode() {
-                    flag = 1;
-                    console.log("counter" + counter);
-                    console.log("interval" + interval);
-                    console.log("period" + period);
+            function mycode() {
+                flag = 1;
+                console.log("counter" + counter);
+                console.log("interval" + interval);
+                console.log("period" + period);
 
-                    // do some stuff...
-                    // no need to recall the function (it's an interval, it'll loop forever)
-                    // The value of seed should lie between -1 to 1
-                    var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
-                    console.log("seed=" + seed);
-                    var projectedSeed = Math.abs(Math.floor(seed * 100));
-                    volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
-                    console.log("volume=" +volume);
-                    player.setVolume(volume);
-                    counter++;
-                }
-
-                function abortTimer() { // to be called when you want to stop the timer
-                    clearInterval(tid);
-                }
-
-                setTimeout(function () {
-                    abortTimer();
-                    flag = 0;
-                }, 20000);  // abort after 20 seconds..
+                // do some stuff...
+                // no need to recall the function (it's an interval, it'll loop forever)
+                // The value of seed should lie between -1 to 1
+                var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
+                console.log("seed=" + seed);
+                var projectedSeed = Math.abs(Math.floor(seed * 100));
+                volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
+                console.log("volume=" +volume);
+                player.setVolume(volume);
+                counter++;
             }
+
+            function abortTimer() { // to be called when you want to stop the timer
+                clearInterval(tid);
+            }
+
+            setTimeout(function () {
+                abortTimer();
+                flag = 0;
+            }, 20000);  // abort after 20 seconds..
+        }
     }
 
     function randomizeSound() {
@@ -180,7 +175,7 @@
         delayArray.sort(sortNumberComparator);
         // extra division by 2 to divide RoundTripTime RTT and get single way duration.
         doSend("NETWORK_DELAY:" + parseInt(
-                (parseInt(delayArray[5]) + parseInt(delayArray[4])) / 4));
+            (parseInt(delayArray[5]) + parseInt(delayArray[4])) / 4));
         console.log(JSON.stringify(delayArray));
     }
 
@@ -273,9 +268,9 @@
             if (userId === new_userId) {
                 alert("Successfully Joined Concert:" + groupId);
             } else {
-                alert("New User "+userId+ " Joined Concert !");   
-            }            
-        }        
+                alert("New User "+userId+ " Joined Concert !");
+            }
+        }
 
         if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_GROUP")>-1) {
             alert("You already belong to a group, Sire!");
@@ -299,7 +294,7 @@
             },2000);
             setTimeout(function(){
                 console.log("CONCERT_START_IN 2_SEC");
-                   setEventStatus ("CONCERT_START_IN 2_SEC");
+                setEventStatus ("CONCERT_START_IN 2_SEC");
             },3000);
             setTimeout(function(){
                 console.log("CONCERT_START_IN 1_SEC");
@@ -339,30 +334,9 @@
 
 
     doConnect();
-</script>
 
-<br>
+}
 
-<input type="text"  id="videoId"/>
-<button onclick='changeVideoId()'>Change Id</button>
-<input type="image" name='play' id='play' src="images/pause_32x32.png" onclick='playPauseVideo()' />
-<button onclick='resetVideo()'>Broadcast</button>
-<button onclick='randomizeSound()'>Randomize-Sound</button>
-<button onclick='createConcert()'>Create-Concert</button>
-
-<br>
-
-<input type="text"  id="groupId"/>
-<button onclick='joinConcert()'>Join Concert</button>
-<button onclick="doSend('RANDOMIZE_SOUND_PEOPLE');setTimeout(function(){randomizeSound()},15);">Randomize-People</button>
-
-
-<br>
-<div>Time Left:</div><div id="event_status">Not Started</div>
-
-<script type="text/javascript">
-    // To set The video Id when youtube player initializes at the start
-    document.getElementById("videoId").value = idtemp;
-</script>
-</body>
-</html>
+if(document.location.host=="www.youtube.com"){
+    youtuber();
+}
