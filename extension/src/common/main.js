@@ -1,4 +1,5 @@
 ﻿var IP = "localhost";
+//var IP = "localhost";
 var PORT = "8000";
 var userId =-1;
 var flag=0;
@@ -48,8 +49,18 @@ function onOpen(evt) {
     if (kango.storage.getItem("userId")) {
         userId = kango.storage.getItem("userId");
         doSend("USER_ONLINE:" + userId+":"+groupTag);
+        sendHelloBuddy();
     } else {
         doSend("REGISTER_USER");
+    }
+}
+
+function sendHelloBuddy() {
+    doSend("HELLO_BUDDY:" + new Date().getTime());
+    for (var i=0;i<20;i++) {
+        setTimeout(function() {
+            doSend("HELLO_BUDDY:" + new Date().getTime());
+        }, 80);
     }
 }
 
@@ -131,6 +142,7 @@ function onMessage(evt) {
     if(evt.data.indexOf("USER_REGISTERED")>-1) {
         userId = evt.data.split(":")[1];
         kango.storage.setItem("userId",userId);
+        sendHelloBuddy();
     }
 }
 function onError(evt)

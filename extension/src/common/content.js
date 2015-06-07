@@ -48,7 +48,7 @@ function youtuber() {
     }
 
     function stopVideo() {
-         player.pauseVideo();
+        player.pauseVideo();
     }
 
     function playVideo() {
@@ -143,20 +143,23 @@ function youtuber() {
 }
 
 console.log(1111111111111);
-if(document.location.host=="www.youtube.com"){
+if (document.location.host=="www.youtube.com") {
 
     youtuber();
 
-    var hash1=document.location.href.indexOf("#");    
-    var hash2=document.location.href.lastIndexOf("#");    
-    var splitCount=document.location.href.split("#").length;
+    var hash1 = document.location.href.indexOf("#");
+    var hash2 = document.location.href.lastIndexOf("#");
+    var splitCount = document.location.href.split("#").length;
+    console.log(hash1);
+    console.log(hash2);
+    console.log(splitCount);
 
-    if(splitCount==2&&hash1>-1&&hash1+1<document.location.href.length){
+    if (splitCount==2 && hash1>-1 && hash1+1 < document.location.href.length){
         // joinConcert();
         console.log("joined concert !!!!!!!")
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         doSend('JOIN_CONCERT:'+concertId);
-    }else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
+    } else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
         // createConcert();
         var videoId=document.location.href.split("v=")[1].split("#")[0];
         var concertId=document.location.href.split("v=")[1].split("#")[1];
