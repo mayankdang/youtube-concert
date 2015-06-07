@@ -1,6 +1,6 @@
-﻿var IP = "192.168.0.109";
+﻿var IP = "localhost";
 var PORT = "8000";
-
+var userId =-1;
 var flag=0;
 var volume=100;
 var MYID=0;
