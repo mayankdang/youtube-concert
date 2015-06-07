@@ -43,10 +43,11 @@ function doConnect() {
 }
 
 var myip;
+var groupTag;
 function onOpen(evt) {
     if (kango.storage.getItem("userId")) {
         userId = kango.storage.getItem("userId");
-        doSend("USER_ONLINE:" + userId);
+        doSend("USER_ONLINE:" + userId+":"+groupTag);
     } else {
         doSend("REGISTER_USER");
     }
@@ -122,7 +123,6 @@ function onMessage(evt) {
     if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_GROUP")>-1) {
         alert("You already belong to a group, Sire!");
     }
-
 
     if(evt.data.indexOf("USER_REGISTERED")>-1) {
         userId = evt.data.split(":")[1];

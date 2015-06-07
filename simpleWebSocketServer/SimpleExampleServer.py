@@ -64,6 +64,7 @@ class User(object):
             groupTagHashMap[self.groupTag] = None 
             self.groupTag = newGroup.groupTag
             groupTagHashMap[newGroup.groupTag] = newGroup
+            print groupTagHashMap
             return True
         else:
             print "The concert -", self.groupTag, " is already underway. Please use different concert name "
@@ -100,8 +101,8 @@ class SimpleChat(WebSocket):
                         print "changed videoId for user", userId
 
             elif msg.startswith("CREATE_CONCERT"):
-                videoId = msg.split(":")[0]
-                groupTag = msg.split(":")[1]
+                videoId = msg.split(":")[1]
+                groupTag = msg.split(":")[2]
                 success = userIdMainMap[userId].createConcert(groupTag, videoId)
                 if not success:
                     self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
