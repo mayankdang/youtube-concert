@@ -18,7 +18,7 @@ class SimpleEcho(WebSocket):
 
 clients = []
 userIdMainMap = {}
-groupIdHashMap = {}
+groupTagHashMap = {}
 
 SHARING_CODE_LENGTH = 3
 
@@ -26,8 +26,8 @@ def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in xrange(size))
 
 class Group(object):
-    def __init__(self, userId, videoUrl=None):
-        self.groupId = idGenerator(SHARING_CODE_LENGTH)
+    def __init__(self, userId, groupTag, videoUrl=None):
+        self.groupTag = groupTag
         self.ownerId = userId
         self.users = [userId]
         self.groupSize = 0
@@ -46,7 +46,7 @@ class User(object):
         self.networkDelay = 15  # default
         self.recentTime = -1
         self.client = client
-        self.groupId = None
+        self.groupTag = None
 
     def getCurrentTime(self):
         return int(round(time.time() * 1000))
@@ -58,19 +58,16 @@ class User(object):
         self.networkDelay = delay
         print "set network delay as", delay
 
-    def createConcert(self, videoUrl):
-        if self.groupId is None or self.groupId not in groupIdHashMap:
-            newGroup = Group(self.userId, videoUrl)
-            self.groupId = newGroup.groupId
-            groupIdHashMap[newGroup.groupId] = newGroup
+    def createConcert(self, groupTag, videoUrl):
+        if self.groupTag is None or self.groupTag not in groupTagHashMap:
+            newGroup = Group(self.userId, groupTag, videoUrl)
+            groupTagHashMap[self.groupTag] = None 
+            self.groupTag = newGroup.groupTag
+            groupTagHashMap[newGroup.groupTag] = newGroup
             return True
         else:
-            print "The user", self.userId, "is already in group -", self.groupId
+            print "The concert -", self.groupTag, " is already underway. Please use different concert name "
         return False
-
-    def joinToGroup(self, groupId):
-        if groupIdHashMap.get(groupId) is None:
-            self.groupId = groupId
 
 
 class SimpleChat(WebSocket):
@@ -95,40 +92,40 @@ class SimpleChat(WebSocket):
 
             elif msg.startswith("CHANGE_VIDEO_ID"):
                 video_url = msg.split(":")[1]
-                if userIdMainMap[userId].groupId is not None:
-                    group = groupIdHashMap.get(userIdMainMap[userId].groupId)
+                if userIdMainMap[userId].groupTag is not None:
+                    group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
                     group.videoUrl = video_url
                     for userId in group.users:
                         userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + video_url)
                         print "changed videoId for user", userId
 
             elif msg.startswith("CREATE_CONCERT"):
-                success = userIdMainMap[userId].createConcert(msg.split(":")[1])
+                videoId = msg.split(":")[0]
+                groupTag = msg.split(":")[1]
+                success = userIdMainMap[userId].createConcert(groupTag, videoId)
                 if not success:
-                    self.sendMessage(u'YOU_ALREADY_BELONG_TO_A_GROUP')
+                    self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
                 else:
-                    self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupId)
+                    self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupTag)
                 pass
 
             elif msg.startswith("END_CONCERT"):
                 pass
 
             elif msg.startswith("JOIN_CONCERT"):
-                groupId = msg.split(":")[1]
-                group = groupIdHashMap.get(groupId)
+                groupTag = msg.split(":")[1]
+                group = groupTagHashMap.get(groupTag)
                 group.users.append(userId)
-                userIdMainMap[userId].groupId = groupId
                 userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl)
-                print group.users
                 for group_user_id in group.users:
-                    userIdMainMap[group_user_id].client.sendMessage(u'NEW_USER_JOINED:'+str(userId)+':'+groupId)
+                    userIdMainMap[group_user_id].client.sendMessage(u'NEW_USER_JOINED:'+str(userId)+':'+groupTag)
                     print "added new user" + userId
 
             elif msg.startswith("LEAVE_CONCERT"):
                 pass
 
             elif msg.startswith("EVENT_START_IN_5_SEC"):
-                group = groupIdHashMap.get(userIdMainMap[userId].groupId)
+                group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
                 for userId in group.users:
                     userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
                 pass

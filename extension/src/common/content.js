@@ -97,22 +97,16 @@ function youtuber() {
     }
 
     function createConcert() {
-        doSend('CREATE_CONCERT:'+getVideoId());
+     
     }
 
     function joinConcert() {
-        doSend('JOIN_CONCERT:'+getGroupId());
+        var concertId=document.location.href.split("v=")[1].split("#")[1];
+        doSend('JOIN_CONCERT:'+concertId);
     }
 
     function setEventStatus(status){
         document.getElementById("event_status").innerText=status;
-    }
-
-
-    if(evt.data.indexOf("GROUP_CREATED")>-1) {
-        var groupId = evt.data.split(":")[1];
-        document.getElementById("groupId").value = groupId;
-        alert("Group Id:" + groupId);
     }
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
@@ -145,7 +139,23 @@ function youtuber() {
 
 }
 
+console.log(1111111111111);
 if(document.location.host=="www.youtube.com"){
+
+    var hash1=document.location.href.indexOf("#");
+    
+    var hash2=document.location.href.lastIndexOf("#");
+    
+    var splitCount=document.location.href.split("#").length;
+
+    if(splitCount==2&&hash1>-1&&hash1+1<document.location.href.length){
+        joinConcert();
+    }else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
+       var videoId=document.location.href.split("v=")[1].split("#")[0];
+        var concertId=document.location.href.split("v=")[1].split("#")[1];
+        doSend('CREATE_CONCERT:'+videoId+':'+concertId);;
+    }
+
     youtuber();
 }
 
