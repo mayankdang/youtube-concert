@@ -97,10 +97,13 @@ function youtuber() {
     }
 
     function createConcert() {
-     
+        var videoId=document.location.href.split("v=")[1].split("#")[0];
+        var concertId=document.location.href.split("v=")[1].split("#")[1];
+        doSend('CREATE_CONCERT:'+videoId+':'+concertId);
     }
 
     function joinConcert() {
+        console.log("joined concert !!!!!!!")
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         doSend('JOIN_CONCERT:'+concertId);
     }
@@ -149,11 +152,15 @@ if(document.location.host=="www.youtube.com"){
     var splitCount=document.location.href.split("#").length;
 
     if(splitCount==2&&hash1>-1&&hash1+1<document.location.href.length){
-        joinConcert();
+        // joinConcert();
+        console.log("joined concert !!!!!!!")
+        var concertId=document.location.href.split("v=")[1].split("#")[1];
+        doSend('JOIN_CONCERT:'+concertId);
     }else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
+        // createConcert();
         var videoId=document.location.href.split("v=")[1].split("#")[0];
         var concertId=document.location.href.split("v=")[1].split("#")[1];
-        doSend('CREATE_CONCERT:'+videoId+':'+concertId);;
+        doSend('CREATE_CONCERT:'+videoId+':'+concertId);
     }
 
 }
