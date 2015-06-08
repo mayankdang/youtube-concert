@@ -175,4 +175,9 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
     }
 });
 
+kango.addMessageListener("optionsToMain", function(optionEvt) {
+    console.log("optionToMain:" + optionEvt.data.message);
+    doSend(optionEvt.data.message);
+});
+
 doConnect();
