@@ -110,7 +110,7 @@ function youtuber() {
     }
 
     function setEventStatus(status){
-        document.getElementById("event_status").innerText=status;
+        document.getElementById("masthead-search-term").value=status;
     }
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
@@ -161,6 +161,38 @@ function youtuber() {
             } else {
                 window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
             }
+        }
+
+        if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
+            var id=mainEvt.data.split(":")[1];
+
+            player.currentTime=0
+            player.setVolume(0);
+            player.play();
+
+            setTimeout(function() {
+                console.log("CONCERT_START_IN 4_SEC");
+                setEventStatus("CONCERT_START_IN 4_SEC");
+            },1000);
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 3_SEC");
+                setEventStatus ("CONCERT_START_IN 3_SEC");
+            },2000);
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 2_SEC");
+                setEventStatus ("CONCERT_START_IN 2_SEC");
+            },3000);
+            setTimeout(function(){
+                console.log("CONCERT_START_IN 1_SEC");
+                setEventStatus("CONCERT_START_IN 1_SEC");
+            },4000);
+
+            setTimeout(function(){
+                setEventStatus("");
+                player.currentTime=0;
+                player.play();
+                player.setVolume(100);
+            },5000);
         }
     });
 }

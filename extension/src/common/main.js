@@ -79,6 +79,7 @@ function onMessage(evt) {
             || (evt.data.indexOf("VOLUME")>-1)
             || (evt.data.indexOf("GROUP_CREATED")>-1)
             || (evt.data.indexOf("CHANGED_VIDEO_ID")>-1)
+            || (evt.data.indexOf("CONCERT_START_IN_5_SEC")>-1)
         )
     {
         if (evt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
@@ -89,8 +90,12 @@ function onMessage(evt) {
         }
         kango.browser.tabs.getAll(function(tabs){
             for(var i=0;i<tabs.length;i++){
-                tabs[i].dispatchMessage("mainToContent", evt.data);
-                console.log("Sent to Tab:"+ evt.data);
+                try {
+                    tabs[i].dispatchMessage("mainToContent", evt.data);
+                    console.log("Sent to Tab:"+ evt.data);
+                } catch (error) {
+                    console.log(error);
+                }
             }
         });
     }
