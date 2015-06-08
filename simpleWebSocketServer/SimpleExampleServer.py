@@ -100,7 +100,7 @@ class SimpleChat(WebSocket):
                     group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
                     group.videoUrl = video_url
                     for userId in group.users:
-                        userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + video_url)
+                        userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + video_url + ":" + userIdMainMap[userId].groupTag)
                         print "changed videoId for user", userId
 
             elif msg.startswith("CREATE_CONCERT"):
@@ -124,7 +124,7 @@ class SimpleChat(WebSocket):
                 # if userId in groupTagHashMap[userIdMainMap[userId].groupTag].users:
                 #     groupTagHashMap[userIdMainMap[userId].groupTag].users.remove(userId)
                 group.users.append(userId)
-                userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl)
+                userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl + ":" + groupTag)
                 for group_user_id in group.users:
                     userIdMainMap[group_user_id].client.sendMessage(u'NEW_USER_JOINED:'+str(userId)+':'+groupTag)
                     print "added new user" + userId

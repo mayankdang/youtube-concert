@@ -12,6 +12,7 @@ var sent = false;
 //kango.ui.browserButton.addEventListener(kango.ui.browserButton.event.COMMAND, function(event) {
 //
 //})
+
 function saveNetworkDelay(delay) {
     if (!sent) {
         if (delayArray.length>=10) {
@@ -77,8 +78,15 @@ function onMessage(evt) {
             || (evt.data.indexOf("RESET_VIDEO")>-1)
             || (evt.data.indexOf("VOLUME")>-1)
             || (evt.data.indexOf("GROUP_CREATED")>-1)
+            || (evt.data.indexOf("CHANGE_VIDEO_ID")>-1)
         )
     {
+        if (evt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
+            console.log("videoId:" + evt.data.split(":")[1]);
+            console.log("groupTag:" + evt.data.split(":")[2]);
+            kango.storage.setItem("videoId", evt.data.split(":")[1]);
+            kango.storage.setItem("groupTag", evt.data.split(":")[2]);
+        }
         kango.browser.tabs.getAll(function(tabs){
             for(var i=0;i<tabs.length;i++){
                 tabs[i].dispatchMessage("mainToContent", evt.data);

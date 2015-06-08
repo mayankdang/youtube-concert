@@ -148,6 +148,15 @@ function youtuber() {
                 window.close();
             }
         }
+
+        if (mainEvt.data.indexOf("CHANGE_VIDEO_ID")>-1) {
+            console.log("*******************************************");
+            var videoId = kango.storage.getItem("videoId");
+            var groupTag = kango.storage.getItem("groupTag");
+            console.log("Video id:" + videoId);
+            console.log("Group tag:" + groupTag);
+            window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
+        }
     });
 }
 
