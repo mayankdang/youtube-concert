@@ -30,7 +30,7 @@ class Group(object):
         self.groupTag = groupTag
         self.ownerId = userId
         self.users = [userId]
-        self.groupSize = 0
+        self.groupSize = 0  # unused - remove after checking.
         self.maxNetworkDelayOfUsers = 100
         self.videoUrl = videoUrl
 
@@ -60,8 +60,11 @@ class User(object):
 
     def createConcert(self, groupTag, videoUrl):
         if self.groupTag is None or self.groupTag not in groupTagHashMap:
+            print "1", self.groupTag is None
+            print "2", groupTagHashMap
+            print "3", self.groupTag not in groupTagHashMap
             newGroup = Group(self.userId, groupTag, videoUrl)
-            groupTagHashMap[self.groupTag] = None 
+            groupTagHashMap[groupTag] = None
             self.groupTag = newGroup.groupTag
             groupTagHashMap[newGroup.groupTag] = newGroup
             print groupTagHashMap
@@ -102,7 +105,9 @@ class SimpleChat(WebSocket):
 
             elif msg.startswith("CREATE_CONCERT"):
                 videoId = msg.split(":")[1]
+                print "videoId:", videoId
                 groupTag = msg.split(":")[2]
+                print "groupTag:", groupTag
                 success = userIdMainMap[userId].createConcert(groupTag, videoId)
                 if not success:
                     self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')

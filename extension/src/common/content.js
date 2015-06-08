@@ -124,6 +124,10 @@ function youtuber() {
             player.pauseVideo();
         }
 
+        if(mainEvt.data.indexOf("GROUP_CREATED")>-1) {
+            alert("Group Created:" + mainEvt.data.split(":")[1]);
+        }
+
         if(mainEvt.data.indexOf("RESET_VIDEO")>-1) {
             player.currentTime=0;
             player.play();
