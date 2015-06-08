@@ -155,6 +155,7 @@ function youtuber() {
             var groupTag = kango.storage.getItem("groupTag");
             console.log("Video id:" + videoId);
             console.log("Group tag:" + groupTag);
+            alert("http://www.youtube.com/watch?v=" + videoId + "#" + groupTag);
             window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
         }
     });
