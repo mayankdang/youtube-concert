@@ -78,7 +78,7 @@ function onMessage(evt) {
             || (evt.data.indexOf("RESET_VIDEO")>-1)
             || (evt.data.indexOf("VOLUME")>-1)
             || (evt.data.indexOf("GROUP_CREATED")>-1)
-            || (evt.data.indexOf("CHANGE_VIDEO_ID")>-1)
+            || (evt.data.indexOf("CHANGED_VIDEO_ID")>-1)
         )
     {
         if (evt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
