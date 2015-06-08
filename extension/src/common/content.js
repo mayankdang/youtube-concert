@@ -149,7 +149,7 @@ function youtuber() {
             }
         }
 
-        if (mainEvt.data.indexOf("CHANGE_VIDEO_ID")>-1) {
+        if (mainEvt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
             console.log("*******************************************");
             var videoId = kango.storage.getItem("videoId");
             var groupTag = kango.storage.getItem("groupTag");
