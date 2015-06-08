@@ -1,3 +1,4 @@
+var timeScriptLoaded = new Date().getTime();
 function youtuber() {
     var player=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
 
@@ -141,9 +142,17 @@ function youtuber() {
             }
         }
 
-
+        if (mainEvt.data.indexOf("DIE_MOTHERFUCKER_DIE")>-1) {
+            latestTimestamp = parseInt(mainEvt.data.split(":")[1]);
+            if (timeScriptLoaded<latestTimestamp) {
+                window.close();
+            }
+        }
     });
+}
 
+function sendTimestampKillOtherTabs(){
+    doSend("MY_TIMESTAMP:"+timeScriptLoaded);
 }
 
 console.log(1111111111111);
@@ -159,12 +168,14 @@ if (document.location.host=="www.youtube.com") {
     console.log(splitCount);
 
     if (splitCount==2 && hash1>-1 && hash1+1 < document.location.href.length){
+        sendTimestampKillOtherTabs();
         // joinConcert();
         console.log("joined concert !!!!!!!")
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         doSend('JOIN_CONCERT:'+concertId);
     } else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
-        // createConcert();
+        sendTimestampKillOtherTabs();
+//        createConcert();
         var videoId=document.location.href.split("v=")[1].split("#")[0];
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         doSend('CREATE_CONCERT:'+videoId+':'+concertId);

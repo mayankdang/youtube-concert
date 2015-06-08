@@ -59,7 +59,7 @@ class User(object):
         print "set network delay as", delay
 
     def createConcert(self, groupTag, videoUrl):
-        if self.groupTag is None or self.groupTag not in groupTagHashMap:
+        if self.groupTag is None or groupTag not in groupTagHashMap:
             print "1", self.groupTag is None
             print "2", groupTagHashMap
             print "3", self.groupTag not in groupTagHashMap
@@ -121,6 +121,8 @@ class SimpleChat(WebSocket):
             elif msg.startswith("JOIN_CONCERT"):
                 groupTag = msg.split(":")[1]
                 group = groupTagHashMap.get(groupTag)
+                # if userId in groupTagHashMap[userIdMainMap[userId].groupTag].users:
+                #     groupTagHashMap[userIdMainMap[userId].groupTag].users.remove(userId)
                 group.users.append(userId)
                 userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl)
                 for group_user_id in group.users:

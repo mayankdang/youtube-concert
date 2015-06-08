@@ -79,14 +79,13 @@ function onMessage(evt) {
             || (evt.data.indexOf("GROUP_CREATED")>-1)
         )
     {
-        kango.browser._tabs.getAll(function(tabs){
+        kango.browser.tabs.getAll(function(tabs){
             for(var i=0;i<tabs.length;i++){
                 tabs[i].dispatchMessage("mainToContent", evt.data);
-                console.log("Sent to Tab:", evt.data);
+                console.log("Sent to Tab:"+ evt.data);
             }
-        })
+        });
     }
-
 
     if (evt.data.indexOf("HeyYo! ty")>-1) {
         alert("omg");
@@ -163,13 +162,17 @@ function doSend(message)
 
 kango.addMessageListener("contentToMain", function(contentEvt) {
     console.log("contentToMain:" + contentEvt.data.message);
-    doSend(contentEvt.data.message);
-});
-
-kango.addMessageListener("optionsToMain", function(optionEvt) {
-    console.log("optionToMain:" + optionEvt.data.message);
-    doSend(optionEvt.data.message);
+    if (contentEvt.data.message.indexOf("MY_TIMESTAMP")>-1) {
+        var latestWindowTimestamp = contentEvt.data.message.split(":")[1];
+        kango.browser.tabs.getAll(function(tabs){
+            for(var i=0;i<tabs.length;i++){
+                tabs[i].dispatchMessage("mainToContent", "d:"+latestWindowTimestamp);
+                console.log("Sent to Tab:"+ "DIE_MOTHERFUCKER_DIE:" + latestWindowTimestamp);
+            }
+        });
+    } else {
+        doSend(contentEvt.data.message);
+    }
 });
 
 doConnect();
-
