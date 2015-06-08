@@ -6,9 +6,9 @@ function youtuber() {
     var link=document.location.href;
     setInterval(function()
     {
-        if (document.location.href!=link && isOwner){
+        var groupTag = kango.storage.getItem("groupTag");
+        if (document.location.href!=link && isOwner && !(document.location.href.lastIndexOf("#"+groupTag)>-1)){
             link=document.location.href;
-            var groupTag = kango.storage.getItem("groupTag");
             window.location=link+"#"+groupTag+"#";
             link = link+"#"+groupTag+"#";
         }
