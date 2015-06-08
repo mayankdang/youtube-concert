@@ -1,4 +1,4 @@
-﻿var IP = "localhost";
+﻿var IP = "192.168.0.109";
 //var IP = "localhost";
 var PORT = "8000";
 var userId =-1;
