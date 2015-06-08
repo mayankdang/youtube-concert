@@ -160,13 +160,12 @@ function youtuber() {
     });
 }
 
-function sendTimestampKillOtherTabs(){
+function sendTimestampKillOtherTabs() {
     doSend("MY_TIMESTAMP:"+timeScriptLoaded);
 }
 
 console.log(1111111111111);
 if (document.location.host=="www.youtube.com") {
-
     youtuber();
 
     var hash1 = document.location.href.indexOf("#");
