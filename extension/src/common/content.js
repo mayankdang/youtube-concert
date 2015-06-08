@@ -155,8 +155,12 @@ function youtuber() {
             var groupTag = kango.storage.getItem("groupTag");
             console.log("Video id:" + videoId);
             console.log("Group tag:" + groupTag);
-            alert("http://www.youtube.com/watch?v=" + videoId + "#" + groupTag);
-            window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
+            var supposedWindowLocation = "youtube.com/watch?v=" + videoId + "#" + groupTag;
+            if (window.location.href.indexOf(supposedWindowLocation)>-1) {
+
+            } else {
+                window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
+            }
         }
     });
 }
