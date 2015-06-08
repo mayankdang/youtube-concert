@@ -1,6 +1,6 @@
 var timeScriptLoaded = new Date().getTime();
 function youtuber() {
-    var player=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+    var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
 
     function upDowning() {
         try {
@@ -29,7 +29,7 @@ function youtuber() {
                 var projectedSeed = Math.abs(Math.floor(seed * 100));
                 volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
                 console.log("volume=" +volume);
-                player.setVolume(volume);
+                concertPlayer.setVolume(volume);
                 counter++;
             }
 
@@ -49,11 +49,11 @@ function youtuber() {
     }
 
     function stopVideo() {
-        player.pauseVideo();
+        concertPlayer.pauseVideo();
     }
 
     function playVideo() {
-        player.play();
+        concertPlayer.play();
     }
 
     var playing = true;
@@ -68,7 +68,7 @@ function youtuber() {
             document.getElementById("play").src=img_array[1];
         } else {
             doSend('PAUSE_VIDEO');
-            setTimeout(function(){ player.pauseVideo();},15);
+            setTimeout(function(){ concertPlayer.pauseVideo();},15);
             playing = false;
             document.getElementById("play").src=img_array[0];
         }
@@ -118,11 +118,11 @@ function youtuber() {
         console.log("Received message from main:" + mainEvt.data);
 
         if(mainEvt.data.indexOf("START_VIDEO")>-1) {
-            player.play();
+            concertPlayer.play();
         }
 
         if(mainEvt.data.indexOf("PAUSE_VIDEO")>-1) {
-            player.pauseVideo();
+            concertPlayer.pauseVideo();
         }
 
         if(mainEvt.data.indexOf("GROUP_CREATED")>-1) {
@@ -130,15 +130,15 @@ function youtuber() {
         }
 
         if(mainEvt.data.indexOf("RESET_VIDEO")>-1) {
-            player.currentTime=0;
-            player.play();
+            concertPlayer.currentTime=0;
+            concertPlayer.play();
         }
 
         if(mainEvt.data.indexOf("VOLUME")>-1){
             var x=evt.data.split(":")[1];
             var ip=evt.data.split(":")[0].split(" ");
             if(myip==ip){
-                player.setVolume(parseInt(x));
+                concertPlayer.setVolume(parseInt(x));
             }
         }
 
@@ -164,35 +164,39 @@ function youtuber() {
         }
 
         if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
-            var id=mainEvt.data.split(":")[1];
+            try {
+                var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+                console.log("Haanji.");
+                concertPlayer.currentTime=0;
+                concertPlayer.volume = 0;
+                concertPlayer.play();
 
-            player.currentTime=0
-            player.setVolume(0);
-            player.play();
+                setTimeout(function() {
+                    console.log("CONCERT_START_IN 4_SEC");
+                    setEventStatus("CONCERT_START_IN 4_SEC");
+                },1000);
+                setTimeout(function(){
+                    console.log("CONCERT_START_IN 3_SEC");
+                    setEventStatus ("CONCERT_START_IN 3_SEC");
+                },2000);
+                setTimeout(function(){
+                    console.log("CONCERT_START_IN 2_SEC");
+                    setEventStatus ("CONCERT_START_IN 2_SEC");
+                },3000);
+                setTimeout(function(){
+                    console.log("CONCERT_START_IN 1_SEC");
+                    setEventStatus("CONCERT_START_IN 1_SEC");
+                },4000);
 
-            setTimeout(function() {
-                console.log("CONCERT_START_IN 4_SEC");
-                setEventStatus("CONCERT_START_IN 4_SEC");
-            },1000);
-            setTimeout(function(){
-                console.log("CONCERT_START_IN 3_SEC");
-                setEventStatus ("CONCERT_START_IN 3_SEC");
-            },2000);
-            setTimeout(function(){
-                console.log("CONCERT_START_IN 2_SEC");
-                setEventStatus ("CONCERT_START_IN 2_SEC");
-            },3000);
-            setTimeout(function(){
-                console.log("CONCERT_START_IN 1_SEC");
-                setEventStatus("CONCERT_START_IN 1_SEC");
-            },4000);
-
-            setTimeout(function(){
-                setEventStatus("");
-                player.currentTime=0;
-                player.play();
-                player.setVolume(100);
-            },5000);
+                setTimeout(function(){
+                    setEventStatus("");
+                    concertPlayer.currentTime=0;
+                    concertPlayer.play();
+                    concertPlayer.volume = 1;
+                },5000);
+            } catch (error) {
+                console.log(error);
+            }
         }
     });
 }

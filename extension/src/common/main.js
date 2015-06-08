@@ -73,7 +73,7 @@ function onMessage(evt) {
     console.log("response: " + evt.data + '\n');
 
     if (
-        (evt.data.indexOf("START_VIDEO")>-1)
+               (evt.data.indexOf("START_VIDEO")>-1)
             || (evt.data.indexOf("PAUSE_VIDEO")>-1)
             || (evt.data.indexOf("RESET_VIDEO")>-1)
             || (evt.data.indexOf("VOLUME")>-1)
@@ -135,7 +135,6 @@ function onMessage(evt) {
     {
         setTimeout(randomizeSound,13+Math.random()*27);
     }
-
 
     if(evt.data.indexOf("NEW_USER_JOINED")>-1) {
         new_userId = evt.data.split(":")[1];

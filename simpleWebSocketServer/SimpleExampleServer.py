@@ -136,10 +136,16 @@ class SimpleChat(WebSocket):
                 pass
 
             elif msg.startswith("EVENT_START_IN_5_SEC"):
-                group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
-                for userId in group.users:
-                    userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
-                pass
+                try:
+                    print "----------in try of event_start_in_5_sec------"
+                    group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
+                    print "group:", group
+                    for userId in group.users:
+                        print "userId:", userId
+                        userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
+                    pass
+                except Exception, e:
+                    print e
 
             elif msg.startswith("REGISTER_USER"):
                 userId = idGenerator(20)
