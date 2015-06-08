@@ -1,6 +1,18 @@
 var timeScriptLoaded = new Date().getTime();
+var isOwner=false;
 function youtuber() {
     var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+
+    var link=document.location.href;
+    setInterval(function()
+    {
+        if (document.location.href!=link && isOwner){
+            link=document.location.href;
+            var groupTag = kango.storage.getItem("groupTag");
+            window.location=link+"#"+groupTag+"#";
+            link = link+"#"+groupTag+"#";
+        }
+    },300);
 
     function upDowning() {
         try {
@@ -90,12 +102,6 @@ function youtuber() {
     function getGroupId() {
         return document.getElementById("groupId").value;
     }
-    function changeVideoId() {
-        doSend('CHANGE_VIDEO_ID:'+getVideoId());
-        playing = false;
-        document.getElementById("play").src=img_array[0];
-        //setTimeout(function(){window.location=(document.location.href.split('=')[0])+'='+getVideoId()},15);
-    }
 
     function createConcert() {
         var videoId=document.location.href.split("v=")[1].split("#")[0];
@@ -143,7 +149,7 @@ function youtuber() {
         }
 
         if (mainEvt.data.indexOf("DIE_MOTHERFUCKER_DIE")>-1) {
-            latestTimestamp = parseInt(mainEvt.data.split(":")[1]);
+            var latestTimestamp = parseInt(mainEvt.data.split(":")[1]);
             if (timeScriptLoaded<latestTimestamp) {
                 window.close();
             }
@@ -155,7 +161,7 @@ function youtuber() {
             var groupTag = kango.storage.getItem("groupTag");
             console.log("Video id:" + videoId);
             console.log("Group tag:" + groupTag);
-            var supposedWindowLocation = "youtube.com/watch?v=" + videoId + "#" + groupTag;
+            var supposedWindowLocation = "http://youtube.com/watch?v=" + videoId + "#" + groupTag;
             if (window.location.href.indexOf(supposedWindowLocation)>-1) {
 
             } else {
@@ -166,7 +172,6 @@ function youtuber() {
         if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
             try {
                 var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-                console.log("Haanji.");
                 concertPlayer.currentTime=0;
                 concertPlayer.volume = 0;
                 concertPlayer.play();
@@ -228,6 +233,8 @@ if (document.location.host=="www.youtube.com") {
         var videoId=document.location.href.split("v=")[1].split("#")[0];
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         doSend('CREATE_CONCERT:'+videoId+':'+concertId);
+//        doSend("OWNER_ACTIVE_LATEST:"+kango.browser.tabs.getCurrentTab().getId());
+        isOwner = true;
     }
 
 }

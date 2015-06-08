@@ -96,11 +96,13 @@ class SimpleChat(WebSocket):
 
             elif msg.startswith("CHANGE_VIDEO_ID"):
                 video_url = msg.split(":")[1]
-                if userIdMainMap[userId].groupTag is not None:
-                    group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
+                print "video_url change request:", video_url
+                groupTempTag = userIdMainMap[userId].groupTag
+                if groupTempTag is not None and groupTagHashMap[groupTempTag].ownerId == userId:
+                    group = groupTagHashMap.get(groupTempTag)
                     group.videoUrl = video_url
                     for userId in group.users:
-                        userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + video_url + ":" + userIdMainMap[userId].groupTag)
+                        userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + video_url + ":" + groupTempTag)
                         print "changed videoId for user", userId
 
             elif msg.startswith("CREATE_CONCERT"):
