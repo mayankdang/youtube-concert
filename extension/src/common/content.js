@@ -249,28 +249,6 @@ if (document.location.host=="www.youtube.com") {
             }
         }
     },1000);
-
-    setInterval(function()
-    {
-        if(videoChecking){
-            try{
-                var startTime=playTime;
-                var currentTime=new Date().getTime();
-                var diffOnClient=parseInt(player.currentTime*1000);
-
-                if(Math.abs((currentTime-startTime)-diffOnClient)>300){
-
-                }
-
-                console.log("DIff:"+Math.abs((currentTime-startTime)-diffOnClient));
-
-            }catch(err){
-                console.log(err);
-            }
-        }
-    },300);
-
-
 }
 
 function doSend(message)
