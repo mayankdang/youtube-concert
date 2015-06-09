@@ -110,11 +110,19 @@ class SimpleChat(WebSocket):
                 print "videoId:", videoId
                 groupTag = msg.split(":")[2]
                 print "groupTag:", groupTag
-                success = userIdMainMap[userId].createConcert(groupTag, videoId)
-                if not success:
-                    self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
+                
+                if groupTag is not None and userIdMainMap[userId].groupTag == groupTag and groupTagHashMap[groupTag].ownerId == userId:					
+					group = groupTagHashMap.get(groupTag)
+					group.videoUrl = videoId
+					for tempUserId in group.users:
+						userIdMainMap[tempUserId].client.sendMessage(u'CHANGED_VIDEO_ID:' + videoId + ":" + groupTag)
+						print "changed videoId for user", tempUserId
                 else:
-                    self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupTag)
+					success = userIdMainMap[userId].createConcert(groupTag, videoId)
+					if not success:
+						self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
+					else:
+						self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupTag)
                 pass
 
             elif msg.startswith("END_CONCERT"):
