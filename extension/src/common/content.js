@@ -1,6 +1,7 @@
 var timeScriptLoaded = new Date().getTime();
 var isOwner=false;
 var videoChecking=false;
+var playTime=new Date().getTime();
 console.log("helloooooooooooooooooooo");
 var link=window.location.href;
 
@@ -149,6 +150,7 @@ function youtuber() {
         }
 
         if (mainEvt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
+
             console.log("*******************************************");
             var videoId = kango.storage.getItem("videoId");
             var groupTag = kango.storage.getItem("groupTag");
@@ -158,12 +160,13 @@ function youtuber() {
             if (window.location.href.indexOf(supposedWindowLocation)>-1) {
 
             } else {
-                 window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
+                 window.location = window.location.protocol+"//www.youtube.com/watch?v=" + videoId + "#" + groupTag;
             }
         }
 
         if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
             try {
+                playTime=5000+new Date().getTime();
                 var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
                 concertPlayer.currentTime=0;
                 concertPlayer.volume = 0;
@@ -246,6 +249,27 @@ if (document.location.host=="www.youtube.com") {
             }
         }
     },1000);
+
+    setInterval(function()
+    {
+        if(videoChecking){
+            try{
+                var startTime=playTime;
+                var currentTime=new Date().getTime();
+                var diffOnClient=parseInt(player.currentTime*1000);
+
+                if(Math.abs((currentTime-startTime)-diffOnClient)>300){
+
+                }
+
+                console.log("DIff:"+Math.abs((currentTime-startTime)-diffOnClient));
+
+            }catch(err){
+                console.log(err);
+            }
+        }
+    },300);
+
 
 }
 

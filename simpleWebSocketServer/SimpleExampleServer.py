@@ -152,7 +152,10 @@ class SimpleChat(WebSocket):
                     print "group:", group
                     for userId in group.users:
                         print "userId:", userId
-                        userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
+						try:
+							userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
+						except Exception, e:
+							print e
                     pass
                 except Exception, e:
                     print e
