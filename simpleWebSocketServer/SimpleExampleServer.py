@@ -18,18 +18,21 @@ class SimpleEcho(WebSocket):
 # Response Macros
 USER_ID = "userId"
 CONCERT_TAG = "concertTag"
-VIDEO_ID = "videoId"
+VIDEO_URL = "videoUrl"
 VOFFSET = "vOffset"
 VIDEO_STATE = "videoState"
 OWNER_FLAG = "ownerFlag"
 VIDEO_TIME = "videoTime"
 CLIENT_TIMESTAMP = "clientTimeStamp"
 REQUEST_TYPE = "requestType"
+ACK = "ack" # status acknowledgement for request successfully received.
 
 # Request Types
 CREATE_USER = 0
 HANDSHAKING = 1
-VIDEO_UPDATE = 2
+NETWORK_DELAY = 2
+VIDEO_UPDATE = 3
+
 
 
 
@@ -59,7 +62,8 @@ class Group(object):
 
 class User(object):
     def __init__(self, userId, client):
-        self.userId = userId
+        self.id = userId
+        self.concertTag = None
         self.networkDelay = 15  # default
         self.recentTime = -1
         self.client = client
@@ -97,11 +101,13 @@ class SimpleChat(WebSocket):
         responseMap = {
         USER_ID:None,
         CONCERT_TAG:None,
-        VIDEO_ID:None,
+        VIDEO_URL:None,
         VOFFSET:None,
         VIDEO_STATE:None,
         OWNER_FLAG:None,
-        VIDEO_TIME:None # represents the time video started on owner acc to Server.
+        VIDEO_TIME:None, # represents the time video started on owner acc to Server.
+        CLIENT_TIMESTAMP: None
+        ACK = True
           }
 
         try:
@@ -109,7 +115,7 @@ class SimpleChat(WebSocket):
 
             userId = message[USER_ID] 
             concertTag = message[CONCERT_TAG]
-            videoId = message[VIDEO_ID]
+            videoUrl = message[VIDEO_URL]
             vOffset = message[VOFFSET]
             videoState = message[VIDEO_STATE]
             ownerFlag = message[OWNER_FLAG]
@@ -118,6 +124,20 @@ class SimpleChat(WebSocket):
             requestType = message[REQUEST_TYPE]
 
 
+            if requestType == CREATE_USER
+                responseMap[USER_ID]=idGenerator(16)
+                self.sendMessage(json.dumps(responseMap))
+
+            elif requestType == HANDSHAKING
+                responseMap[CLIENT_TIMESTAMP] = clientTimeStamp
+                self.sendMessage(json.dumps[responseMap])
+
+            elif requestType == NETWORK_DELAY
+                user = User(userId, self)
+                responseMap[USER_ID] = user.id
+                self.sendMessage(json.dumps[responseMap])
+
+            msg = ""
             if msg.startswith("HELLO_BUDDY"):
                 self.sendMessage('HEY_BUDDY:' + msg.split(":")[1])
 
