@@ -15,6 +15,23 @@ class SimpleEcho(WebSocket):
     def handleClose(self):
         pass
 
+# Response Macros
+USER_ID = "userId"
+CONCERT_TAG = "concertTag"
+VIDEO_ID = "videoId"
+VOFFSET = "vOffset"
+VIDEO_STATE = "videoState"
+OWNER_FLAG = "ownerFlag"
+VIDEO_TIME = "videoTime"
+CLIENT_TIMESTAMP = "clientTimeStamp"
+REQUEST_TYPE = "requestType"
+
+# Request Types
+CREATE_USER = 0
+HANDSHAKING = 1
+VIDEO_UPDATE = 2
+
+
 
 clients = []
 userIdMainMap = {}
@@ -76,10 +93,30 @@ class User(object):
 
 class SimpleChat(WebSocket):
     def handleMessage(self):
+
+        responseMap = {
+        USER_ID:None,
+        CONCERT_TAG:None,
+        VIDEO_ID:None,
+        VOFFSET:None,
+        VIDEO_STATE:None,
+        OWNER_FLAG:None,
+        VIDEO_TIME:None # represents the time video started on owner acc to Server.
+          }
+
         try:
             message = json.loads(self.data)
-            msg = message["message"]
-            userId = message["id"]
+
+            userId = message[USER_ID] 
+            concertTag = message[CONCERT_TAG]
+            videoId = message[VIDEO_ID]
+            vOffset = message[VOFFSET]
+            videoState = message[VIDEO_STATE]
+            ownerFlag = message[OWNER_FLAG]
+            videoTime = message[VIDEO_TIME]
+            clientTimeStamp = message[CLIENT_TIMESTAMP]
+            requestType = message[REQUEST_TYPE]
+
 
             if msg.startswith("HELLO_BUDDY"):
                 self.sendMessage('HEY_BUDDY:' + msg.split(":")[1])
