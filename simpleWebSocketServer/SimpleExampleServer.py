@@ -137,9 +137,14 @@ class SimpleChat(WebSocket):
                 self.sendingWrapper(responseMap)
 
             elif requestType == R_NETWORK_DELAY:
-                user = User(userId, self)
+                user = None
+                if userId in userIdMainMap:
+                    user = userIdMainMap[userId]
+                else:
+                    user = User(userId, self)
+                    userIdMainMap[userId] = user
                 user.networkDelay = networkDelay
-                print "Network delay set as:", networkDelay
+                print "Network delay set as:", networkDelay, "for userId:", userId
                 responseMap[USER_ID] = user.id
                 responseMap[REQUEST_TYPE] = R_NETWORK_DELAY
                 responseMap[NETWORK_DELAY] = networkDelay
