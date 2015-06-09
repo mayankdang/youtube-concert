@@ -179,8 +179,8 @@ function onMessage(evt) {
         }
 
         if(evt.data.indexOf("GROUP_CREATED")>-1) {
-            groupId = evt.data.split(":")[1];
-            kango.storage.setItem("groupId",groupId);
+            groupTag = evt.data.split(":")[1];
+            kango.storage.setItem("groupTag",groupTag);
         }
 
         if(evt.data.indexOf("PRINT_TIME")>-1) {
@@ -203,9 +203,9 @@ function onMessage(evt) {
 
         if(evt.data.indexOf("NEW_USER_JOINED")>-1) {
             new_userId = evt.data.split(":")[1];
-            var groupId = evt.data.split(":")[2];
+            var groupTag = evt.data.split(":")[2];
             if (userId === new_userId) {
-                alert("Successfully Joined Concert:" + groupId);
+                alert("Successfully Joined Concert:" + groupTag);
             } else {
                 alert("New User "+userId+ " Joined Concert !");
             }

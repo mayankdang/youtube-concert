@@ -1,18 +1,10 @@
 var timeScriptLoaded = new Date().getTime();
 var isOwner=false;
+console.log("helloooooooooooooooooooo");
 function youtuber() {
-    var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+     var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
 
-    var link=document.location.href;
-    setInterval(function()
-    {
-        var groupTag = kango.storage.getItem("groupTag");
-        if (document.location.href!=link && isOwner && !(document.location.href.lastIndexOf("#"+groupTag)>-1)){
-            link=document.location.href;
-            window.location=link+"#"+groupTag+"#";
-            link = link+"#"+groupTag+"#";
-        }
-    },300);
+    var link=window.location.href;
 
     function upDowning() {
         try {
@@ -161,11 +153,11 @@ function youtuber() {
             var groupTag = kango.storage.getItem("groupTag");
             console.log("Video id:" + videoId);
             console.log("Group tag:" + groupTag);
-            var supposedWindowLocation = "http://youtube.com/watch?v=" + videoId + "#" + groupTag;
+            var supposedWindowLocation = "youtube.com/watch?v=" + videoId + "#" + groupTag;
             if (window.location.href.indexOf(supposedWindowLocation)>-1) {
 
             } else {
-                window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
+                 window.location = "http://www.youtube.com/watch?v=" + videoId + "#" + groupTag;
             }
         }
 
@@ -204,6 +196,31 @@ function youtuber() {
             }
         }
     });
+    
+    // i =0;
+    // setInterval(function()
+    // {
+    //     console.log(i+1);
+    //     try{
+    //                     console.log("sdfkjkjkjk:");
+
+    //         var groupTag = kango.storage.getItem("groupTag");
+    //         console.log("grouptag:"+groupTag);
+    //          if (document.location.href!=link && isOwner && !(document.location.href.lastIndexOf("#"+groupTag)>-1)){
+    //              link=document.location.href;
+    //              document.location=link+"#"+groupTag+"#";
+    //              console.log("document.location.href"+document.location.href+"link="link+"#"+groupTag+"#");
+    //              doSend("CHANGE_VIDEO_ID:"+videoId+":"+groupTag)
+    //              link = link+"#"+groupTag+"#";
+    //          }
+
+    //     }catch(err){
+
+    //     }
+    // },1000);
+
+
+   
 }
 
 function sendTimestampKillOtherTabs() {
