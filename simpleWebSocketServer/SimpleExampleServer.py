@@ -23,7 +23,7 @@ groupTagHashMap = {}
 SHARING_CODE_LENGTH = 3
 
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
-        return ''.join(random.choice(chars) for _ in xrange(size))
+    return ''.join(random.choice(chars) for _ in xrange(size))
 
 class Group(object):
     def __init__(self, userId, groupTag, videoUrl=None):
@@ -110,13 +110,13 @@ class SimpleChat(WebSocket):
                 print "videoId:", videoId
                 groupTag = msg.split(":")[2]
                 print "groupTag:", groupTag
-                
-                if groupTag is not None and userIdMainMap[userId].groupTag == groupTag and groupTagHashMap[groupTag].ownerId == userId:					
-					group = groupTagHashMap.get(groupTag)
-					group.videoUrl = videoId
-					for tempUserId in group.users:
-						userIdMainMap[tempUserId].client.sendMessage(u'CHANGED_VIDEO_ID:' + videoId + ":" + groupTag)
-						print "changed videoId for user", tempUserId
+
+                if groupTag is not None and userIdMainMap[userId].groupTag == groupTag and groupTagHashMap[groupTag].ownerId == userId:
+                    group = groupTagHashMap.get(groupTag)
+                    group.videoUrl = videoId
+                    for tempUserId in group.users:
+                        userIdMainMap[tempUserId].client.sendMessage(u'CHANGED_VIDEO_ID:' + videoId + ":" + groupTag)
+                        print "changed videoId for user", tempUserId
                 else:
 					success = userIdMainMap[userId].createConcert(groupTag, videoId)
 					if not success:
@@ -132,7 +132,7 @@ class SimpleChat(WebSocket):
                 groupTag = msg.split(":")[1]
                 group = groupTagHashMap.get(groupTag)
                 # if userId in groupTagHashMap[userIdMainMap[userId].groupTag].users:
-                #     groupTagHashMap[userIdMainMap[userId].groupTag].users.remove(userId)
+                # groupTagHashMap[userIdMainMap[userId].groupTag].users.remove(userId)
                 group.users.append(userId)
                 userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl + ":" + groupTag)
                 # for group_user_id in group.users:
@@ -152,13 +152,14 @@ class SimpleChat(WebSocket):
                     print "group:", group
                     for userId in group.users:
                         print "userId:", userId
-						try:
-							userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
-						except Exception, e:
-							print e
-                    pass
-                except Exception, e:
-                    print e
+                        try:
+                            userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
+                        except Exception, esss:
+                            print esss
+
+                except Exception, essss:
+                    print essss
+                pass
 
             elif msg.startswith("REGISTER_USER"):
                 userId = idGenerator(20)
