@@ -99,6 +99,7 @@ function doConnect() {
         var messageToSend = new Object();
         messageToSend[REQUEST_TYPE] = R_NETWORK_DELAY;
         messageToSend[NETWORK_DELAY] = networkDelay;
+        messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
         doSend(messageToSend);
         console.log("delayArray:" + JSON.stringify(delayArray));
     }
