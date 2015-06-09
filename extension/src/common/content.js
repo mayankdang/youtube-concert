@@ -1,11 +1,12 @@
 var timeScriptLoaded = new Date().getTime();
 var isOwner=false;
+var videoChecking=false;
 console.log("helloooooooooooooooooooo");
+var link=window.location.href;
+
 function youtuber() {
-     var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-
-    var link=window.location.href;
-
+    videoChecking=true;
+    var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
     function upDowning() {
         try {
             MYID=parseInt(document.getElementById('name').value);
@@ -196,31 +197,6 @@ function youtuber() {
             }
         }
     });
-    
-    // i =0;
-    // setInterval(function()
-    // {
-    //     console.log(i+1);
-    //     try{
-    //                     console.log("sdfkjkjkjk:");
-
-    //         var groupTag = kango.storage.getItem("groupTag");
-    //         console.log("grouptag:"+groupTag);
-    //          if (document.location.href!=link && isOwner && !(document.location.href.lastIndexOf("#"+groupTag)>-1)){
-    //              link=document.location.href;
-    //              document.location=link+"#"+groupTag+"#";
-    //              console.log("document.location.href"+document.location.href+"link="link+"#"+groupTag+"#");
-    //              doSend("CHANGE_VIDEO_ID:"+videoId+":"+groupTag)
-    //              link = link+"#"+groupTag+"#";
-    //          }
-
-    //     }catch(err){
-
-    //     }
-    // },1000);
-
-
-   
 }
 
 function sendTimestampKillOtherTabs() {
@@ -229,8 +205,6 @@ function sendTimestampKillOtherTabs() {
 
 console.log(1111111111111);
 if (document.location.host=="www.youtube.com") {
-    youtuber();
-
     var hash1 = document.location.href.indexOf("#");
     var hash2 = document.location.href.lastIndexOf("#");
     var splitCount = document.location.href.split("#").length;
@@ -239,12 +213,14 @@ if (document.location.host=="www.youtube.com") {
     console.log(splitCount);
 
     if (splitCount==2 && hash1>-1 && hash1+1 < document.location.href.length){
+        youtuber();
         sendTimestampKillOtherTabs();
         // joinConcert();
         console.log("joined concert !!!!!!!")
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         doSend('JOIN_CONCERT:'+concertId);
     } else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
+        youtuber();
         sendTimestampKillOtherTabs();
 //        createConcert();
         var videoId=document.location.href.split("v=")[1].split("#")[0];
@@ -253,6 +229,23 @@ if (document.location.host=="www.youtube.com") {
 //        doSend("OWNER_ACTIVE_LATEST:"+kango.browser.tabs.getCurrentTab().getId());
         isOwner = true;
     }
+
+    setInterval(function()
+    {
+        if(videoChecking){
+            try{
+                var groupTag = kango.storage.getItem("groupTag");
+                if (isOwner && !(document.location.href.lastIndexOf("#"+groupTag)>-1)){
+                    link=document.location.href;
+                    document.location=link+"#"+groupTag+"#";
+                    console.log("document.location.href"+document.location.href+"link="+link+"#"+groupTag+"#");
+                    doSend("CHANGE_VIDEO_ID:"+videoId+":"+groupTag)
+                }
+            }catch(err){
+                console.log(err);
+            }
+        }
+    },1000);
 
 }
 
