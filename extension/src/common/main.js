@@ -201,6 +201,29 @@ function doConnect() {
         websocket.close();
     }
 
+    function concert_parser(url){
+        try{
+            if(url.indexOf("youtube.com")>-1){
+                if(url.lastIndexOf("#")==url.length-1){
+                    var turl=url.substring(0,url.length-1);
+                    var arr=turl.split("#");
+                    if(arr.length>=1){
+                        return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                    }
+                }
+                else if(url.lastIndexOf("#")>-1){
+                    var turl=url.substring(0,url.length-1);
+                    var arr=turl.split("#");
+                    if(arr.length>=1){
+                        return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                    }
+                }
+            }
+        }catch (err){
+        }
+        return null;
+    }
+
     var concertLink="";
     setInterval(function(){
         kango.browser.tabs.getAll(function(tabs) {
@@ -213,12 +236,13 @@ function doConnect() {
                         var newVideoId=youtube_parser(concertLink);
 
                         //if(newVideoId!=youtube_parser(getParameterFromStorage(VIDEO_URL))){
-                        var message=new Object();
-                        message[USER_ID]=userId;
-                        message[VIDEO_URL]=youtube_parser(concertLink);
-                        message[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
-                        message[CONCERT_TAG] = getParameterFromStorage(CONCERT_TAG);
-                        doSend(message);
+                        var messageToSend=new Object();
+                        messageToSend[USER_ID]=userId;
+                        messageToSend[VIDEO_URL]=youtube_parser(concertLink);
+                        messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
+                        messageToSend[CONCERT_TAG] = getParameterFromStorage(CONCERT_TAG);
+                        messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+                        doSend(messageToSend);
                         //}
                     }
                 }
