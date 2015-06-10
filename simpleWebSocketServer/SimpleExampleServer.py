@@ -178,14 +178,20 @@ class SimpleChat(WebSocket):
                         pass
                         # JOINEE ko machane do, hum kuchh ni kar re, katwa lia usne apna.
                 else:
-                    success = userIdMainMap[userId].createConcert(groupTag, videoId)
+                    success = userIdMainMap[userId].createConcert(groupTag, videoUrl)
                     # TODO: HOW TO TELL OWNER IF GROUP WAS SUCCESSFULLY CREATED OR NOT?
                     if not success:
-                        self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
+                        self.sendingWrapper(u'CONCERT_ALREADY_UNDERWAY')
                     else:
-                        self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupTag)
-
-
+						responseMap[USER_ID] = user.id
+						responseMap[CONCERT_TAG] = groupTag
+						responseMap[VIDEO_URL] = videoUrl
+						responseMap[VIDEO_STATE] = videoState		
+						responseMap[CONCERT_TAG] = groupTag
+						responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE						
+						responseMap[OWNER_FLAG] = True
+						self.sendingWrapper(reponseMap)
+						
 
         #     msg = ""
         #     if msg.startswith("HELLO_BUDDY"):
@@ -286,7 +292,8 @@ class SimpleChat(WebSocket):
             print e
 
     def sendingWrapper(self, responseMap):
-        self.sendMessage(u"" + json.dumps(responseMap))
+		print "responseMap",responseMap
+		self.sendMessage(u"" + json.dumps(responseMap))
 
     def handleConnected(self):
         print self.address, 'connected'
