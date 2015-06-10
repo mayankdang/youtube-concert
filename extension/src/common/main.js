@@ -275,7 +275,7 @@ setInterval(function(){
                         }
                     }
                 }
-                console.log(tabs[i].getUrl());
+                //console.log(tabs[i].getUrl());
             }
             if(!success){
                 concertTabId=-1;
@@ -312,7 +312,6 @@ setInterval(function(){
                             break;
                         }
                     }
-                    console.log(tabs[i].getUrl());
                 }catch (er){
                 }
             }
