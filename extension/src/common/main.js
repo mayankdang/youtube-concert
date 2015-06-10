@@ -1,4 +1,4 @@
-﻿var IP = "localhost";
+﻿var IP = "192.168.0.109";
 var PORT = "8000";
 var websocket;
 
@@ -136,6 +136,41 @@ function doConnect() {
             console.log("******* Network Delay is: " + networkDelay + " *******");
             setParameterInStorage(NETWORK_DELAY, networkDelay);
         }
+
+        if (requestType == R_VIDEO_UPDATE){
+            var concertTagPrev = getParameterFromStorage(CONCERT_TAG);
+            var videoUrlPrev = getParameterFromStorage(VIDEO_URL);
+            var ownerFlagPrev = getParameterFromStorage(OWNER_FLAG)
+
+            if(ownerFlag==null){
+                //can be null
+
+            }else{
+                setParameterInStorage(OWNER_FLAG,ownerFlag);
+                if(ownerFlag){
+                    //video owner
+
+                }
+                else{
+                    //video joinee
+                    if(vOffset!=null){
+                        //forward it to content js
+                    }
+
+                    if(videoState!=null){
+                        //forward it to content js
+                    }
+
+                    if(videoUrl!=null&&videoUrlPrev!=videoUrl){
+                        setParameterInStorage(VIDEO_URL,videoUrl);
+                    }
+
+                    if(concertTag!=null&&concertTagPrev!=concertTag){
+                        setParameterInStorage(CONCERT_TAG,concertTag);
+                    }
+                }
+            }
+        }
     }
 
     function getParameterFromStorage(parameter) {
@@ -143,7 +178,21 @@ function doConnect() {
     }
 
     function setParameterInStorage(parameter, value) {
-    kango.storage.setItem(parameter, value);
+        kango.browser.tabs.getAll(function(tabs){
+                    for(var i=0;i<tabs.length;i++){
+                        try {
+                            if(tabs[i].getUrl().indexOf("youtube.com")>-1)
+                                tabs[i].dispatchMessage("mainToContent",{
+
+                                });
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                });
+
+
+            kango.storage.setItem(parameter, value);
     }
 
     function doDisconnect() {
