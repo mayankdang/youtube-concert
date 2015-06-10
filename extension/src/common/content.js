@@ -260,7 +260,7 @@ if (document.location.host=="www.youtube.com") {
         var concertId=document.location.href.split("v=")[1].split("#")[1];
         //doSend('JOIN_CONCERT:'+concertId);
     } else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
-        youtuber();
+        //youtuber();
         sendTimestampKillOtherTabs();
 //        createConcert();
         var videoId=document.location.href.split("v=")[1].split("#")[0];
