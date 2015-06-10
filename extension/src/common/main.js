@@ -263,13 +263,19 @@ setInterval(function(){
                             tabs[i].dispatchMessage("mainToContent","UPDATE_HASH");
                         }
 
+                        var createRequest=false;
+                        var url=tabs[i].getUrl();
+                        if(url.lastIndexOf("#")==url.length-1){
+                            createRequest=true;
+                        }
+
                         if(newVideoId!=null){
                             var messageToSend=new Object();
                             messageToSend[USER_ID]=getParameterFromStorage(USER_ID);
                             messageToSend[VIDEO_URL]=newVideoId;
                             messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
                             messageToSend[CONCERT_TAG] = concertTag;
-                            messageToSend[OWNER_FLAG] = true;
+                            messageToSend[OWNER_FLAG] = (createRequest);
                             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
                             doSend(messageToSend);
                         }

@@ -203,15 +203,18 @@ class SimpleChat(WebSocket):
 
                 # JOIN CONCERT
                 else:
-                    concert = concertTagHashMap[concertTag].users.append(userId)
+                    concertToJoin = concertTagHashMap[concertTag]
+                    concertToJoin.users.append(userId)
                     userIdMainMap[userId].concertTag = concertTag
+
+
                     responseMap[USER_ID] = user.id
                     responseMap[CONCERT_TAG] = concertTag
-                    responseMap[VIDEO_URL] = videoUrl
-                    responseMap[VIDEO_STATE] = videoState
+                    responseMap[VIDEO_URL] = concertToJoin.videoUrl
+                    responseMap[VIDEO_STATE] = concertToJoin.videoState
                     responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                     responseMap[RESPONSE_TYPE] = CONCERT_JOINED
-                    ownerDelay = userIdMainMap[concertTagHashMap[concertTag].ownerId].networkDelay
+                    ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
                     responseMap[OWNER_FLAG] = False
                     responseMap[OWNER_DELAY] = ownerDelay
                     self.sendingWrapper(responseMap)

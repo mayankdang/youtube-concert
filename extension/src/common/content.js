@@ -162,7 +162,7 @@ function youtuber() {
 
         if(mainEvt.data.indexOf("UPDATE_HASH")>-1) {
             if(kango.storage.getItem(CONCERT_TAG)){
-                window.location.href = window.location.href+"#"+CONCERT_TAG;
+//                window.location.href = window.location.href+"#"+CONCERT_TAG;
             }
         }
 
