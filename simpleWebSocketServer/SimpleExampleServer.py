@@ -60,8 +60,8 @@ class Group(object):
 
     def groupRelay(self, responseMap):
         ownerDelay = userIdMainMap[self.ownerId].networkDelay
-		responseMap[OWNER_FLAG] = False
-		responseMap[OWNER_DELAY] = ownerDelay
+        responseMap[OWNER_FLAG] = False
+        responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
 			if tempUserId != self.ownerId:
 				userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
