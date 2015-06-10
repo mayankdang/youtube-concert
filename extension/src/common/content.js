@@ -152,9 +152,17 @@ function youtuber() {
             var response=mainEvt.data.response;
             console.log("...............Response from main:" + JSON.stringify(response));
 
-            if(mainEvt.data.response[OWNER_FLAG]==false){
+            if (mainEvt.data.response[OWNER_FLAG]==false) {
                 console.log("Bakchodi - Not owner dude!");
                 // joinee handle this
+                if (
+                       response[CONCERT_TAG]
+                    && response[VIDEO_URL]
+                    && ( youtube_parser(window.location.href)!=response[VIDEO_URL] || concert_parser(window.location.href)!=response[CONCERT_TAG])
+                    ) {
+                    window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+response[VIDEO_URL]+"#"+response[CONCERT_TAG];
+                }
+
             } else {
                 console.log("Bakchodi - Owner dude!");
             }
