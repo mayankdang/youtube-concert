@@ -27,6 +27,7 @@ CLIENT_TIMESTAMP = "clientTimeStamp"
 REQUEST_TYPE = "requestType"
 ACK = "ack"                             # status acknowledgement for request successfully received.
 NETWORK_DELAY = "networkDelay"
+OWNER_DELAY = "ownerDelay"
 GROUP_CREATED = "groupCreated"
 RESPONSE_TYPE = "responseType"
 
@@ -54,19 +55,15 @@ class Group(object):
         self.ownerId = userId
         self.users = [userId]
         self.groupSize = 0  # unused - remove after checking.
-        self.maxNetworkDelayOfUsers = 100
         self.videoUrl = videoUrl
-
-    def setMaxNetworkDelayOfUsers(self):
-        maxDelay = 0
-        for key, value in self.users.iteritems():
-            maxDelay = max(maxDelay, value.networkDelay)
-        self.maxNetworkDelayOfUsers = maxDelay
+        
 
     def groupRelay(self, responseMap):
+        ownerDelay = userIdMainMap[self.ownerId].networkDelay
+		responseMap[OWNER_FLAG] = False
+		responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
-            if tempUserId != self.ownerId:
-				responseMap[OWNER_FLAG] = False
+			if tempUserId != self.ownerId:
 				userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
 
 class User(object):
