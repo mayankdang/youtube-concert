@@ -268,7 +268,7 @@ setInterval(function(){
                         if(url.lastIndexOf("#")==url.length-1){
                             createRequest=true;
                         }
-
+///////
                         if(newVideoId!=null){
                             var messageToSend=new Object();
                             messageToSend[USER_ID]=getParameterFromStorage(USER_ID);
@@ -280,6 +280,8 @@ setInterval(function(){
                             doSend(messageToSend);
                         }
                     }
+                    break;
+
                 }
                 //console.log(tabs[i].getUrl());
             }
@@ -307,11 +309,17 @@ setInterval(function(){
                         if(tabs[i].getUrl()!=concertLink){
                             concertLink=tabs[i].getUrl();
                             var messageToSend=new Object();
+                            var url=tabs[i].getUrl();
+                            var createRequest=false;
+                            if(url.lastIndexOf("#")==url.length-1){
+                                createRequest=true;
+                            }
+
                             messageToSend[USER_ID]=getParameterFromStorage(USER_ID);
                             messageToSend[VIDEO_URL]=videoTag;
                             messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
                             messageToSend[CONCERT_TAG] = concertTag;
-                            messageToSend[OWNER_FLAG] = true;
+                            messageToSend[OWNER_FLAG] = createRequest;
                             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
                             doSend(messageToSend);
                             concertTabId=tabs[i].getId();
