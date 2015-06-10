@@ -41,6 +41,7 @@ R_USER_ONLINE = 4
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
+clients = []
 userIdMainMap = {}
 concertTagHashMap = {}
 
@@ -110,7 +111,6 @@ class SimpleChat(WebSocket):
             VOFFSET: None,
             VIDEO_STATE: None,
             OWNER_FLAG: None,
-            VIDEO_TIME: None,           # represents the time video started on owner acc to Server.
             CLIENT_TIMESTAMP: None,
             REQUEST_TYPE: None,
             ACK: True,
@@ -203,7 +203,7 @@ class SimpleChat(WebSocket):
 
                 # JOIN CONCERT
                 else:
-                    conert = concertTagHashMap[concertTag].users.append(userId)
+                    concert = concertTagHashMap[concertTag].users.append(userId)
                     userIdMainMap[userId].concertTag = concertTag
                     responseMap[USER_ID] = user.id
                     responseMap[CONCERT_TAG] = concertTag
@@ -211,7 +211,7 @@ class SimpleChat(WebSocket):
                     responseMap[VIDEO_STATE] = videoState
                     responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                     responseMap[RESPONSE_TYPE] = CONCERT_JOINED
-                    ownerDelay = userIdMainMap[self.ownerId].networkDelay
+                    ownerDelay = userIdMainMap[concertTagHashMap[concertTag].ownerId].networkDelay
                     responseMap[OWNER_FLAG] = False
                     responseMap[OWNER_DELAY] = ownerDelay
                     self.sendingWrapper(responseMap)

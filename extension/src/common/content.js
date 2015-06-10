@@ -148,6 +148,18 @@ function youtuber() {
 
         console.log("Received message from main:" + mainEvt.data);
 
+        if(mainEvt.data.response){
+            var response=mainEvt.data.response;
+
+            if(mainEvt.data.response[OWNER_FLAG]==false){
+
+                // joinee handle this
+
+            }
+
+
+        }
+
         if(mainEvt.data.indexOf("UPDATE_HASH")>-1) {
             if(kango.storage.getItem(CONCERT_TAG)){
                 window.location.href = window.location.href+"#"+CONCERT_TAG;
@@ -186,20 +198,41 @@ function youtuber() {
             }
         }
 
-        if (mainEvt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
 
-            console.log("*******************************************");
-            var videoId = kango.storage.getItem("videoId");
-            var groupTag = kango.storage.getItem("groupTag");
-            console.log("Video id:" + videoId);
-            console.log("Group tag:" + groupTag);
-            var supposedWindowLocation = "youtube.com/watch?v=" + videoId + "#" + groupTag;
-            if (window.location.href.indexOf(supposedWindowLocation)>-1) {
-
-            } else {
-                 window.location = window.location.protocol+"//www.youtube.com/watch?v=" + videoId + "#" + groupTag;
+        function youtube_parser(url){
+            var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+            var match = url.match(regExp);
+            if (match&&match[7].length==11){
+                return match[7];
+            }else{
+                return null;
             }
         }
+
+
+        function concert_parser(url){
+            try{
+                if(url.indexOf("youtube.com")>-1){
+                    if(url.lastIndexOf("#")==url.length-1){
+                        var turl=url.substring(0,url.length-1);
+                        var arr=turl.split("#");
+                        if(arr.length>=1){
+                            return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                        }
+                    }
+                    else if(url.lastIndexOf("#")>-1){
+                        var turl=url.substring(url.lastIndexOf("#")+1,url.length);
+                        var arr=turl.split("#");
+                        if(arr.length>=1){
+                            return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                        }
+                    }
+                }
+            }catch (err){
+            }
+            return null;
+        }
+
 
         if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
             try {

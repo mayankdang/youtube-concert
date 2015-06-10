@@ -269,6 +269,7 @@ setInterval(function(){
                             messageToSend[VIDEO_URL]=newVideoId;
                             messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
                             messageToSend[CONCERT_TAG] = concertTag;
+                            messageToSend[OWNER_FLAG] = true;
                             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
                             doSend(messageToSend);
                         }
@@ -304,6 +305,7 @@ setInterval(function(){
                             messageToSend[VIDEO_URL]=videoTag;
                             messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
                             messageToSend[CONCERT_TAG] = concertTag;
+                            messageToSend[OWNER_FLAG] = true;
                             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
                             doSend(messageToSend);
                             concertTabId=tabs[i].getId();
