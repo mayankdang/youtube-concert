@@ -22,13 +22,13 @@ VIDEO_URL = "videoUrl"
 VOFFSET = "vOffset"
 VIDEO_STATE = "videoState"
 OWNER_FLAG = "ownerFlag"
-VIDEO_TIME = "videoTime"
 CLIENT_TIMESTAMP = "clientTimeStamp"
 REQUEST_TYPE = "requestType"
 ACK = "ack"                             # status acknowledgement for request successfully received.
 NETWORK_DELAY = "networkDelay"
 OWNER_DELAY = "ownerDelay"
-GROUP_CREATED = "groupCreated"
+CONCERT_CREATED = "concertCreated"
+CONCERT_JOINED = "concertJoined"
 RESPONSE_TYPE = "responseType"
 
 # Request Types
@@ -38,27 +38,26 @@ R_NETWORK_DELAY = 2
 R_VIDEO_UPDATE = 3
 R_USER_ONLINE = 4
 
-# VIDEO STATES
 
+current_milli_time = lambda: int(round(time.time() * 1000))
 
-
-
-clients = []
 userIdMainMap = {}
-groupTagHashMap = {}
+concertTagHashMap = {}
 
 SHARING_CODE_LENGTH = 3
 
-class Group(object):
-    def __init__(self, userId, groupTag, videoUrl=None):
-        self.groupTag = groupTag
+class Concert(object):
+    def __init__(self, userId, concertTag, videoUrl=None):
+        self.concertTag = concertTag
         self.ownerId = userId
         self.users = [userId]
-        self.groupSize = 0  # unused - remove after checking.
+        self.concertSize = 0  # unused - remove after checking.
         self.videoUrl = videoUrl
+        self.createdAt = current_milli_time()
+        self.updatedAt = current_milli_time()
         
 
-    def groupRelay(self, responseMap):
+    def concertRelay(self, responseMap):
         ownerDelay = userIdMainMap[self.ownerId].networkDelay
         responseMap[OWNER_FLAG] = False
         responseMap[OWNER_DELAY] = ownerDelay
@@ -73,7 +72,8 @@ class User(object):
         self.networkDelay = 15  # default
         self.recentTime = -1
         self.client = client
-        self.groupTag = None
+        self.createdAt = current_milli_time()
+        self.updatedAt = current_milli_time()
 
     def getCurrentTime(self):
         return int(round(time.time() * 1000))
@@ -85,18 +85,18 @@ class User(object):
         self.networkDelay = delay
         print "set network delay as", delay
 
-    def createConcert(self, groupTag, videoUrl):
-        if self.groupTag is None or groupTag not in groupTagHashMap:
-            print "1. groupTag is None? ", self.groupTag is None
-            print "2. groupTagHashMap =", groupTagHashMap
-            print "3. groupTag not in groupTagHashMap", self.groupTag not in groupTagHashMap
-            newGroup = Group(self.id, groupTag, videoUrl)
-            self.groupTag = newGroup.groupTag
-            groupTagHashMap[newGroup.groupTag] = newGroup
-            print "4. Latest groupTagHashMap =", groupTagHashMap
+    def createConcert(self, concertTag, videoUrl):
+        if self.concertTag is None or concertTag not in concertTagHashMap:
+            print "1. concertTag is None? ", self.concertTag is None
+            print "2. concertTagHashMap =", concertTagHashMap
+            print "3. concertTag not in concertTagHashMap", self.concertTag not in concertTagHashMap
+            newConcert = Concert(self.id, concertTag, videoUrl)
+            self.concertTag = newConcert.concertTag
+            concertTagHashMap[newConcert.concertTag] = newConcert
+            print "4. Latest concertTagHashMap =", concertTagHashMap
             return True
         else:
-            print "The concert -", self.groupTag, " is already underway. Please use different concert name "
+            print "The concert -", self.concertTag, " is already underway. Please use different concert name "
         return False
 
 
@@ -126,7 +126,6 @@ class SimpleChat(WebSocket):
             vOffset = getH(message, VOFFSET)
             videoState = getH(message, VIDEO_STATE)
             ownerFlag = getH(message, OWNER_FLAG)
-            videoTime = getH(message, VIDEO_TIME)
             clientTimeStamp = getH(message, CLIENT_TIMESTAMP)
             requestType = getH(message, REQUEST_TYPE)
             networkDelay = getH(message, NETWORK_DELAY)
@@ -160,30 +159,37 @@ class SimpleChat(WebSocket):
                 pass
 
             elif requestType == R_VIDEO_UPDATE:
-                owner = False
-                user = userIdMainMap[userId]
-                current_user_group=None
-                
-                if user.groupTag:
-					current_user_group = groupTagHashMap[user.groupTag]
-                if current_user_group:
-                    if current_user_group.ownerId == userId:
-                        if videoUrl != current_user_group.videoUrl:
-                            current_user_group.videoUrl = videoId
-                            # TODO: CREATE RESPONSE MAP
-                            # TODO: owner's shit
-                            current_user_group.groupRelay(responseMap)
-                        else:
-                            pass
-                            # TODO: HANDLE Cases for same video actions by owner.
-                            # TODO: TIMING SYNCS, BUFFERING SYNCS etc.
 
+                firstTimeUsersConcert = False
+                owner = False
+                if ownerFlag:
+                    if concertTag in concertTagHashMap
+                        if concertTagHashMap[concertTag].ownerId == userId
+                            owner = True
+                        else:
+                            print "chutiya bana raha hai"
                     else:
-                        pass
-                        # JOINEE ko machane do, hum kuchh ni kar re, katwa lia usne apna.
-                else:
+                        firstTimeUsersConcert = True
+                        # TODO: naya concert banana chah ra hai launda
+
+                user = userIdMainMap[userId]
+                current_user_concert=None
+
+
+				current_user_concert = userIdMainMap[userId].concertTag == concertTag
+
+                # BROADCAST
+                if owner and current_user_concert:
+                    responseMap[VOFFSET] = vOffset if vOffset else None
+                    responseMap[VIDEO_STATE] =videoState
+                    responseMap[VIDEO_URL] = videoUrl
+                    responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                    concertTagHashMap[concertTag].concertRelay(responseMap)
+
+                # CREATE CONCERT
+                elif owner or firstTimeUsersConcert:
                     success = userIdMainMap[userId].createConcert(concertTag, videoUrl)
-                    # TODO: HOW TO TELL OWNER IF GROUP WAS SUCCESSFULLY CREATED OR NOT?
+                    # TODO: HOW TO TELL OWNER IF CONCERT WAS SUCCESSFULLY CREATED OR NOT?
                     if not success:
                         self.sendingWrapper(u'CONCERT_ALREADY_UNDERWAY')
                     else:
@@ -193,105 +199,24 @@ class SimpleChat(WebSocket):
 						responseMap[VIDEO_STATE] = videoState		
 						responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE						
 						responseMap[OWNER_FLAG] = True
-						responseMap[RESPONSE_TYPE] = GROUP_CREATED
+						responseMap[RESPONSE_TYPE] = CONCERT_CREATED
 						self.sendingWrapper(responseMap)
-						
 
-        #     msg = ""
-        #     if msg.startswith("HELLO_BUDDY"):
-        #         self.sendMessage('HEY_BUDDY:' + msg.split(":")[1])
-        #
-        #     elif msg.startswith("NETWORK_DELAY"):
-        #         delay = msg.split(":")[1]
-        #         print "Handshaking done", delay, "Sending confirmation to client."
-        #         self.sendMessage(u"HANDSHAKING_DONE:" + msg.split(":")[1])
-        #         if userIdMainMap.get(userId) is None:
-        #             userIdMainMap[userId] = User(userId, self)
-        #             # print "putting in map"
-        #         userIdMainMap[userId].setNetworkDelay(delay)
-        #         # userIdMainMap[userId].client.sendMessage(u'client wala send message')
-        #
-        #     elif msg.startswith("CHANGE_VIDEO_ID"):
-        #         video_url = msg.split(":")[1]
-        #         print "video_url change request:", video_url
-        #         groupTempTag = userIdMainMap[userId].groupTag
-        #         if groupTempTag is not None and groupTagHashMap[groupTempTag].ownerId == userId:
-        #             group = groupTagHashMap.get(groupTempTag)
-        #             group.videoUrl = video_url
-        #             for userId in group.users:
-        #                 userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + video_url + ":" + groupTempTag)
-        #                 print "changed videoId for user", userId
-        #
-        #     elif msg.startswith("CREATE_CONCERT"):
-        #         videoId = msg.split(":")[1]
-        #         print "videoId:", videoId
-        #         groupTag = msg.split(":")[2]
-        #         print "groupTag:", groupTag
-        #
-        #         if groupTag is not None and userIdMainMap[userId].groupTag == groupTag and groupTagHashMap[groupTag].ownerId == userId:
-        #             group = groupTagHashMap.get(groupTag)
-        #             group.videoUrl = videoId
-        #             for tempUserId in group.users:
-        #                 userIdMainMap[tempUserId].client.sendMessage(u'CHANGED_VIDEO_ID:' + videoId + ":" + groupTag)
-        #                 print "changed videoId for user", tempUserId
-        #         else:
-        #             success = userIdMainMap[userId].createConcert(groupTag, videoId)
-        #             if not success:
-        #                 self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
-        #             else:
-        #                 self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupTag)
-        #         pass
-        #
-        #     elif msg.startswith("END_CONCERT"):
-        #         pass
-        #
-        #     elif msg.startswith("JOIN_CONCERT"):
-        #         groupTag = msg.split(":")[1]
-        #         group = groupTagHashMap.get(groupTag)
-        #         # if userId in groupTagHashMap[userIdMainMap[userId].groupTag].users:
-        #         # groupTagHashMap[userIdMainMap[userId].groupTag].users.remove(userId)
-        #         group.users.append(userId)
-        #         userIdMainMap[userId].client.sendMessage(u'CHANGED_VIDEO_ID:' + group.videoUrl + ":" + groupTag)
-        #         # for group_user_id in group.users:
-        #         #     print "group.users", group.users
-        #         #     userIdMainMap[group_user_id].client.sendMessage(u'NEW_USER_JOINED:'+str(userId)+':'+groupTag)
-        #         #     print "added new user" + userId, "--------------"
-        #         print ".............."
-        #
-        #
-        #     elif msg.startswith("LEAVE_CONCERT"):
-        #         pass
-        #
-        #     elif msg.startswith("EVENT_START_IN_5_SEC"):
-        #         try:
-        #             print "----------in try of event_start_in_5_sec------"
-        #             group = groupTagHashMap.get(userIdMainMap[userId].groupTag)
-        #             print "group:", group
-        #             for userId in group.users:
-        #                 print "userId:", userId
-        #                 try:
-        #                     userIdMainMap[userId].client.sendMessage(u'CONCERT_START_IN_5_SEC:' + group.videoUrl)
-        #                 except Exception, esss:
-        #                     print esss
-        #
-        #         except Exception, essss:
-        #             print essss
-        #         pass
-        #
-        #     elif msg.startswith("REGISTER_USER"):
-        #         userId = idGenerator(20)
-        #         self.sendMessage(u"USER_REGISTERED:" + userId)
-        #         print "New user registered:", userId
-        #         pass
-        #
-        #     elif msg.startswith("USER_ONLINE"):
-        #         pass
-        #
-        #     else:
-        #         for client in list(clients):
-        #             if client != self:
-        #                 client.sendMessage(self.address[0] + ' - ' + msg)
-        #
+                # JOIN CONCERT
+                else:
+                    conert = concertTagHashMap[concertTag].users.append(userId)
+                    userIdMainMap[userId].concertTag = concertTag
+                    responseMap[USER_ID] = user.id
+					responseMap[CONCERT_TAG] = concertTag
+					responseMap[VIDEO_URL] = videoUrl
+					responseMap[VIDEO_STATE] = videoState
+					responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+					responseMap[RESPONSE_TYPE] = CONCERT_JOINED
+                    ownerDelay = userIdMainMap[self.ownerId].networkDelay
+                    responseMap[OWNER_FLAG] = False
+                    responseMap[OWNER_DELAY] = ownerDelay
+					self.sendingWrapper(responseMap)
+
         except Exception, e:
             print e
 

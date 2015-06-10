@@ -11,12 +11,12 @@ var VIDEO_URL = "videoUrl";
 var VOFFSET = "vOffset";
 var VIDEO_STATE = "videoState";
 var OWNER_FLAG = "ownerFlag";
-var VIDEO_TIME = "videoTime";
 var CLIENT_TIMESTAMP = "clientTimeStamp";
 var REQUEST_TYPE = "requestType";
 var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
-var GROUP_CREATED = "groupCreated"
+var CONCERT_CREATED = "concertCreated"
+var CONCERT_JOINED = "concertJoined"
 var RESPONSE_TYPE = "responseType"
 
 // Request Types
@@ -113,7 +113,6 @@ function doConnect() {
         var vOffset = response[VOFFSET];
         var videoState = response[VIDEO_STATE];
         var ownerFlag = response[OWNER_FLAG];
-        var videoTime = response[VIDEO_TIME];
         var clientTimeStamp = response[CLIENT_TIMESTAMP];
         var requestType = response[REQUEST_TYPE];
         var ack = response[ACK];
@@ -163,7 +162,7 @@ function doConnect() {
                 setParameterInStorage(OWNER_FLAG,ownerFlag);
                 if(ownerFlag){
                     //video owner
-                    if(responseType==GROUP_CREATED){
+                    if(responseType==CONCERT_CREATED){
                         //forward it to content js
                         if(videoUrl!=null&&videoUrlPrev!=videoUrl){
                             setParameterInStorage(VIDEO_URL,videoUrl);
@@ -347,16 +346,16 @@ function youtube_parser(url){
 //                    || (evt.data.indexOf("PAUSE_VIDEO")>-1)
 //                    || (evt.data.indexOf("RESET_VIDEO")>-1)
 //                    || (evt.data.indexOf("VOLUME")>-1)
-//                    || (evt.data.indexOf("GROUP_CREATED")>-1)
+//                    || (evt.data.indexOf("CONCERT_CREATED")>-1)
 //                    || (evt.data.indexOf("CHANGED_VIDEO_ID")>-1)
 //                    || (evt.data.indexOf("CONCERT_START_IN_5_SEC")>-1)
 //                )
 //            {
 //                if (evt.data.indexOf("CHANGED_VIDEO_ID")>-1) {
 //                    console.log("videoId:" + evt.data.split(":")[1]);
-//                    console.log("groupTag:" + evt.data.split(":")[2]);
+//                    console.log("concertTag:" + evt.data.split(":")[2]);
 //                    kango.storage.setItem("videoId", evt.data.split(":")[1]);
-//                    kango.storage.setItem("groupTag", evt.data.split(":")[2]);
+//                    kango.storage.setItem("concertTag", evt.data.split(":")[2]);
 //                }
 //                kango.browser.tabs.getAll(function(tabs){
 //                    for(var i=0;i<tabs.length;i++){
@@ -383,9 +382,9 @@ function youtube_parser(url){
 //                saveNetworkDelay(diff);
 //            }
 //
-//            if(evt.data.indexOf("GROUP_CREATED")>-1) {
-//                groupTag = evt.data.split(":")[1];
-//                kango.storage.setItem("groupTag",groupTag);
+//            if(evt.data.indexOf("CONCERT_CREATED")>-1) {
+//                concertTag = evt.data.split(":")[1];
+//                kango.storage.setItem("concertTag",concertTag);
 //            }
 //
 //            if(evt.data.indexOf("PRINT_TIME")>-1) {
@@ -408,16 +407,16 @@ function youtube_parser(url){
 //
 //            if(evt.data.indexOf("NEW_USER_JOINED")>-1) {
 //                new_userId = evt.data.split(":")[1];
-//                var groupTag = evt.data.split(":")[2];
+//                var concertTag = evt.data.split(":")[2];
 //                if (userId === new_userId) {
-//                    alert("Successfully Joined Concert:" + groupTag);
+//                    alert("Successfully Joined Concert:" + concertTag);
 //                } else {
 //                    alert("New User "+userId+ " Joined Concert !");
 //                }
 //            }
 //
-//            if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_GROUP")>-1) {
-//                alert("You already belong to a group, Sire!");
+//            if(evt.data.indexOf("YOU_ALREADY_BELONG_TO_A_CONCERT")>-1) {
+//                alert("You already belong to a concert, Sire!");
 //            }
 //
 //            if(evt.data.indexOf("USER_REGISTERED")>-1) {
@@ -480,7 +479,7 @@ function youtube_parser(url){
 ////    }
 ////
 ////    var videoId=kango.storage.getItem("videoId");
-////    var groupTag=kango.storage.getItem("groupTag");
+////    var concertTag=kango.storage.getItem("concertTag");
 ////
 ////    alert("concertActiveTabId:" + concertActiveTabId);
 ////    alert("event.target.getId():" + event.target.getId());
@@ -490,10 +489,10 @@ function youtube_parser(url){
 ////       (concertActiveTabId)
 ////    && (event.target.getId()==concertActiveTabId)
 ////    && (event.target.getUrl().indexOf("youtube.com")>-1)
-////    && (event.browser.tabs.getCurrentTab().getUrl().indexOf("#"+groupTag+"#")>-1)
+////    && (event.browser.tabs.getCurrentTab().getUrl().indexOf("#"+concertTag+"#")>-1)
 ////        ) {
 ////        kango.storage.setItem("videoId", newVideoId);
-////        event.target.navigate(event.url + "#" + groupTag + "#");
+////        event.target.navigate(event.url + "#" + concertTag + "#");
 ////    }
 ////
 //////    var concertFound=false;
@@ -501,17 +500,17 @@ function youtube_parser(url){
 //////    kango.browser.tabs.getAll(function(tabs){
 //////        for(var i=0;i<tabs.length;i++){
 //////            if(tabs[i].getId()==concertActiveTabId) {
-//////                if(tabs[i].getUrl().indexOf("youtube.com")>-1&&tabs[i].getUrl().indexOf(videoId + "#" + groupTag)>-1){
+//////                if(tabs[i].getUrl().indexOf("youtube.com")>-1&&tabs[i].getUrl().indexOf(videoId + "#" + concertTag)>-1){
 //////                    concertFound=true;
 //////                }
 //////            }
 //////        }
 //////    });
 //////
-//////    if (!concertFound&&videoId&&groupTag) {
+//////    if (!concertFound&&videoId&&concertTag) {
 //////        if( event.target.getUrl().indexOf("youtube.com")>-1){
 //////            kango.storage.setItem("videoId", newVideoId);
-//////            event.target.navigate(event.url.split("youtube.com")[0]+"youtube.com/watch?v="+newVideoId + "#" + groupTag + "#");
+//////            event.target.navigate(event.url.split("youtube.com")[0]+"youtube.com/watch?v="+newVideoId + "#" + concertTag + "#");
 //////        }
 //////    }
 ////
@@ -522,7 +521,7 @@ function youtube_parser(url){
 ////})
 //
 //var myip;
-//var groupTag;
+//var concertTag;
 //
 //
 //
