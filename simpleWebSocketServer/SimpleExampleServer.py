@@ -35,6 +35,8 @@ R_NETWORK_DELAY = 2
 R_VIDEO_UPDATE = 3
 R_USER_ONLINE = 4
 
+# VIDEO STATES
+
 
 
 
@@ -59,6 +61,10 @@ class Group(object):
             maxDelay = max(maxDelay, value.networkDelay)
         self.maxNetworkDelayOfUsers = maxDelay
 
+    def groupRelay(self, responseMap):
+        for tempUserId in self.users:
+            userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
+
 class User(object):
     def __init__(self, userId, client):
         self.id = userId
@@ -80,14 +86,13 @@ class User(object):
 
     def createConcert(self, groupTag, videoUrl):
         if self.groupTag is None or groupTag not in groupTagHashMap:
-            print "1", self.groupTag is None
-            print "2", groupTagHashMap
-            print "3", self.groupTag not in groupTagHashMap
+            print "1. groupTag is None? ", self.groupTag is None
+            print "2. groupTagHashMap =", groupTagHashMap
+            print "3. groupTag not in groupTagHashMap", self.groupTag not in groupTagHashMap
             newGroup = Group(self.userId, groupTag, videoUrl)
-            groupTagHashMap[groupTag] = None
             self.groupTag = newGroup.groupTag
             groupTagHashMap[newGroup.groupTag] = newGroup
-            print groupTagHashMap
+            print "4. Latest groupTagHashMap =", groupTagHashMap
             return True
         else:
             print "The concert -", self.groupTag, " is already underway. Please use different concert name "
@@ -152,6 +157,34 @@ class SimpleChat(WebSocket):
 
             elif requestType == R_USER_ONLINE:
                 pass
+
+            elif requestType == R_VIDEO_UPDATE:
+                owner = False
+                user = userIdMainMap[userId]
+                current_user_group = groupTagHashMap[user.groupTag]
+                if current_user_group:
+                    if current_user_group.ownerId == userId:
+                        if videoUrl != current_user_group.videoUrl:
+                            current_user_group.videoUrl = videoId
+                            # TODO: CREATE RESPONSE MAP
+                            # TODO: owner's shit
+                            current_user_group.groupRelay(responseMap)
+                        else:
+                            pass
+                            # TODO: HANDLE Cases for same video actions by owner.
+                            # TODO: TIMING SYNCS, BUFFERING SYNCS etc.
+
+                    else:
+                        pass
+                        # JOINEE ko machane do, hum kuchh ni kar re, katwa lia usne apna.
+                else:
+                    success = userIdMainMap[userId].createConcert(groupTag, videoId)
+                    # TODO: HOW TO TELL OWNER IF GROUP WAS SUCCESSFULLY CREATED OR NOT?
+                    if not success:
+                        self.sendMessage(u'CONCERT_ALREADY_UNDERWAY')
+                    else:
+                        self.sendMessage(u'GROUP_CREATED:' + userIdMainMap[userId].groupTag)
+
 
 
         #     msg = ""
