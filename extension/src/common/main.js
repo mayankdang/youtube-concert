@@ -2,6 +2,8 @@
 var PORT = "8000";
 var websocket;
 
+var concertTabId=-1;
+
 // response macros
 var USER_ID = "userId";
 var CONCERT_TAG = "concertTag";
@@ -198,22 +200,44 @@ function doConnect() {
     function doDisconnect() {
         websocket.close();
     }
+
+    var concertLink="";
+    setInterval(function(){
+        kango.browser.tabs.getAll(function(tabs) {
+            // tabs is Array of KangoBrowserTab
+            for(var i = 0; i < tabs.length; i++){
+                if(tabs[i].getId()==concertTabId){
+                    if(tabs[i].getUrl()!=concertLink){
+                        concertLink=tabs[i].getUrl();
+                        var concertTag=concert_parser(concertLink) || getParameterFromStorage(CONCERT_TAG);
+                        var newVideoId=youtube_parser(concertLink);
+
+                        //if(newVideoId!=youtube_parser(getParameterFromStorage(VIDEO_URL))){
+                        var message=new Object();
+                        message[USER_ID]=userId;
+                        message[VIDEO_URL]=youtube_parser(concertLink);
+                        message[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
+                        message[CONCERT_TAG] = getParameterFromStorage(CONCERT_TAG);
+                        doSend(message);
+                        //}
+                    }
+                }
+            }
+        });
+    },1000);
+
 }
 doConnect();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+function youtube_parser(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match&&match[7].length==11){
+        return match[7];
+    }else{
+        return null;
+    }
+}
 
 
 
