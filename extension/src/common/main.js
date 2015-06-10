@@ -231,16 +231,26 @@ function setParameterInStorage(parameter, value) {
 
 
 var concertLink="";
+var concertYoutubeTab;
 setInterval(function(){
     if(concertTabId!=-1){
+        var success=false;
         kango.browser.tabs.getAll(function(tabs) {
             // tabs is Array of KangoBrowserTab
             for(var i = 0; i < tabs.length; i++){
                 if(tabs[i].getId()==concertTabId){
+                    success=true;
                     if(tabs[i].getUrl()!=concertLink){
                         concertLink=tabs[i].getUrl();
                         var concertTag=concert_parser(concertLink)||getParameterFromStorage(CONCERT_TAG);
                         var newVideoId=youtube_parser(concertLink);
+
+                        if(concert_parser(CONCERT_TAG)){
+
+                        }else{
+                            tabs[i].dispatchMessage("mainToContent","UPDATE_HASH");
+                        }
+
                         if(newVideoId!=null){
                             var messageToSend=new Object();
                             messageToSend[USER_ID]=getParameterFromStorage(USER_ID);
@@ -254,7 +264,12 @@ setInterval(function(){
                 }
                 console.log(tabs[i].getUrl());
             }
+            if(!success){
+                concertTabId=-1;
+                concertYoutubeTab=null;
+            }
         });
+
 
     }else{
         kango.browser.tabs.getAll(function(tabs) {
@@ -280,6 +295,7 @@ setInterval(function(){
                             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
                             doSend(messageToSend);
                             concertTabId=tabs[i].getId();
+                            concertYoutubeTab=tabs[i];
                             break;
                         }
                     }
