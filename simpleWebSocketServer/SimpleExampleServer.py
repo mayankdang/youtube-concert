@@ -163,8 +163,8 @@ class SimpleChat(WebSocket):
                 firstTimeUsersConcert = False
                 owner = False
                 if ownerFlag:
-                    if concertTag in concertTagHashMap
-                        if concertTagHashMap[concertTag].ownerId == userId
+                    if concertTag in concertTagHashMap:
+                        if concertTagHashMap[concertTag].ownerId == userId:
                             owner = True
                         else:
                             print "chutiya bana raha hai"
@@ -175,8 +175,7 @@ class SimpleChat(WebSocket):
                 user = userIdMainMap[userId]
                 current_user_concert=None
 
-
-				current_user_concert = userIdMainMap[userId].concertTag == concertTag
+                current_user_concert = userIdMainMap[userId].concertTag == concertTag
 
                 # BROADCAST
                 if owner and current_user_concert:
@@ -207,15 +206,15 @@ class SimpleChat(WebSocket):
                     conert = concertTagHashMap[concertTag].users.append(userId)
                     userIdMainMap[userId].concertTag = concertTag
                     responseMap[USER_ID] = user.id
-					responseMap[CONCERT_TAG] = concertTag
-					responseMap[VIDEO_URL] = videoUrl
-					responseMap[VIDEO_STATE] = videoState
-					responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
-					responseMap[RESPONSE_TYPE] = CONCERT_JOINED
+                    responseMap[CONCERT_TAG] = concertTag
+                    responseMap[VIDEO_URL] = videoUrl
+                    responseMap[VIDEO_STATE] = videoState
+                    responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                    responseMap[RESPONSE_TYPE] = CONCERT_JOINED
                     ownerDelay = userIdMainMap[self.ownerId].networkDelay
                     responseMap[OWNER_FLAG] = False
                     responseMap[OWNER_DELAY] = ownerDelay
-					self.sendingWrapper(responseMap)
+                    self.sendingWrapper(responseMap)
 
         except Exception, e:
             print e
