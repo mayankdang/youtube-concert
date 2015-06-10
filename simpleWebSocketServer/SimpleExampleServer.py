@@ -56,15 +56,15 @@ class Concert(object):
         self.videoUrl = videoUrl
         self.createdAt = current_milli_time()
         self.updatedAt = current_milli_time()
-        
+        self.videoState = None
 
     def concertRelay(self, responseMap):
         ownerDelay = userIdMainMap[self.ownerId].networkDelay
         responseMap[OWNER_FLAG] = False
         responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
-			if tempUserId != self.ownerId:
-				userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
+            if tempUserId != self.ownerId:
+                userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
 
 class User(object):
     def __init__(self, userId, client):
@@ -192,14 +192,14 @@ class SimpleChat(WebSocket):
                     if not success:
                         self.sendingWrapper(u'CONCERT_ALREADY_UNDERWAY')
                     else:
-						responseMap[USER_ID] = user.id
-						responseMap[CONCERT_TAG] = concertTag
-						responseMap[VIDEO_URL] = videoUrl
-						responseMap[VIDEO_STATE] = videoState		
-						responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE						
-						responseMap[OWNER_FLAG] = True
-						responseMap[RESPONSE_TYPE] = CONCERT_CREATED
-						self.sendingWrapper(responseMap)
+                        responseMap[USER_ID] = user.id
+                        responseMap[CONCERT_TAG] = concertTag
+                        responseMap[VIDEO_URL] = videoUrl
+                        responseMap[VIDEO_STATE] = videoState
+                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[OWNER_FLAG] = True
+                        responseMap[RESPONSE_TYPE] = CONCERT_CREATED
+                        self.sendingWrapper(responseMap)
 
                 # JOIN CONCERT
                 else:
@@ -223,8 +223,8 @@ class SimpleChat(WebSocket):
             print e
 
     def sendingWrapper(self, responseMap):
-		print "responseMap",responseMap
-		self.sendMessage(u"" + json.dumps(responseMap))
+        print "responseMap",responseMap
+        self.sendMessage(u"" + json.dumps(responseMap))
 
     def handleConnected(self):
         print self.address, 'connected'

@@ -148,16 +148,16 @@ function youtuber() {
 
         console.log("Received message from main:" + mainEvt.data);
 
-        if(mainEvt.data.response){
+        if (mainEvt.data.response) {
             var response=mainEvt.data.response;
+            console.log("...............Response from main:" + JSON.stringify(response));
 
             if(mainEvt.data.response[OWNER_FLAG]==false){
-
+                console.log("Bakchodi - Not owner dude!");
                 // joinee handle this
-
+            } else {
+                console.log("Bakchodi - Owner dude!");
             }
-
-
         }
 
         if(mainEvt.data.indexOf("UPDATE_HASH")>-1) {

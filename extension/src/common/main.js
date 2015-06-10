@@ -145,9 +145,9 @@ function doConnect() {
                 else{
                     if(!ownerFlag)
                     {
-                        concertYoutubeTab.dispatchMessage("mainToContent",{
-                            response:response
-                        });
+                        try {
+                            concertYoutubeTab.dispatchMessage("mainToContent",{response:response});
+                        } catch (exception) {}
                     }
                 }
             } catch (error) {
@@ -407,14 +407,14 @@ function youtube_parser(url){
 //                console.log(evt.data + " "+ new Date().getTime());
 //            }
 
-            //        TODO
-            //        if(evt.data.indexOf("CHANGED_VIDEO_ID")>-1){
-            //            var id=evt.data.split(":")[1];
-            //            document.getElementById("videoId").value = id;
-            //            player.loadVideoById(id);
-            //            player.seekTo(0);
-            //            player.pauseVideo();
-            //        }
+//        TODO
+//        if(evt.data.indexOf("CHANGED_VIDEO_ID")>-1){
+//            var id=evt.data.split(":")[1];
+//            document.getElementById("videoId").value = id;
+//            player.loadVideoById(id);
+//            player.seekTo(0);
+//            player.pauseVideo();
+//        }
 
 //            if(evt.data.indexOf("RANDOMIZE_SOUND")>-1)
 //            {
