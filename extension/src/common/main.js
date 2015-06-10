@@ -16,6 +16,8 @@ var CLIENT_TIMESTAMP = "clientTimeStamp";
 var REQUEST_TYPE = "requestType";
 var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
+var GROUP_CREATED = "groupCreated"
+var RESPONSE_TYPE = "responseType"
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -116,6 +118,7 @@ function doConnect() {
         var requestType = response[REQUEST_TYPE];
         var ack = response[ACK];
         var networkDelay = response[NETWORK_DELAY];
+        var responseType=response[RESPONSE_TYPE];
 
         if (requestType == R_CREATE_USER) {
             setParameterInStorage(USER_ID, userId);
@@ -136,7 +139,22 @@ function doConnect() {
         if (requestType == R_VIDEO_UPDATE){
             var concertTagPrev = getParameterFromStorage(CONCERT_TAG);
             var videoUrlPrev = getParameterFromStorage(VIDEO_URL);
-            var ownerFlagPrev = getParameterFromStorage(OWNER_FLAG)
+            var ownerFlagPrev = getParameterFromStorage(OWNER_FLAG);
+
+            try {
+                if(ownerFlag==null){}
+                else{
+                    if(!ownerFlag)
+                    {
+                        concertYoutubeTab.dispatchMessage("mainToContent",{
+                            response:response
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            }
+
 
             if(ownerFlag==null){
                 //can be null
@@ -145,7 +163,16 @@ function doConnect() {
                 setParameterInStorage(OWNER_FLAG,ownerFlag);
                 if(ownerFlag){
                     //video owner
+                    if(responseType==GROUP_CREATED){
+                        //forward it to content js
+                        if(videoUrl!=null&&videoUrlPrev!=videoUrl){
+                            setParameterInStorage(VIDEO_URL,videoUrl);
+                        }
 
+                        if(concertTag!=null&&concertTagPrev!=concertTag){
+                            setParameterInStorage(CONCERT_TAG,concertTag);
+                        }
+                    }
                 }
                 else{
                     //video joinee
@@ -212,20 +239,6 @@ function getParameterFromStorage(parameter) {
 }
 
 function setParameterInStorage(parameter, value) {
-    kango.browser.tabs.getAll(function(tabs){
-        for(var i=0;i<tabs.length;i++){
-            try {
-                if(tabs[i].getUrl().indexOf("youtube.com")>-1)
-                    tabs[i].dispatchMessage("mainToContent",{
-
-                    });
-            } catch (error) {
-                console.log(error);
-            }
-        }
-    });
-
-
     kango.storage.setItem(parameter, value);
 }
 

@@ -27,6 +27,8 @@ CLIENT_TIMESTAMP = "clientTimeStamp"
 REQUEST_TYPE = "requestType"
 ACK = "ack"                             # status acknowledgement for request successfully received.
 NETWORK_DELAY = "networkDelay"
+GROUP_CREATED = "groupCreated"
+RESPONSE_TYPE = "responseType"
 
 # Request Types
 R_CREATE_USER = 0
@@ -63,7 +65,9 @@ class Group(object):
 
     def groupRelay(self, responseMap):
         for tempUserId in self.users:
-            userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
+            if tempUserId != self.ownerId:
+				responseMap[OWNER_FLAG] = False
+				userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
 
 class User(object):
     def __init__(self, userId, client):
@@ -89,7 +93,7 @@ class User(object):
             print "1. groupTag is None? ", self.groupTag is None
             print "2. groupTagHashMap =", groupTagHashMap
             print "3. groupTag not in groupTagHashMap", self.groupTag not in groupTagHashMap
-            newGroup = Group(self.userId, groupTag, videoUrl)
+            newGroup = Group(self.id, groupTag, videoUrl)
             self.groupTag = newGroup.groupTag
             groupTagHashMap[newGroup.groupTag] = newGroup
             print "4. Latest groupTagHashMap =", groupTagHashMap
@@ -161,7 +165,10 @@ class SimpleChat(WebSocket):
             elif requestType == R_VIDEO_UPDATE:
                 owner = False
                 user = userIdMainMap[userId]
-                current_user_group = groupTagHashMap[user.groupTag]
+                current_user_group=None
+                
+                if user.groupTag:
+					current_user_group = groupTagHashMap[user.groupTag]
                 if current_user_group:
                     if current_user_group.ownerId == userId:
                         if videoUrl != current_user_group.videoUrl:
@@ -178,19 +185,19 @@ class SimpleChat(WebSocket):
                         pass
                         # JOINEE ko machane do, hum kuchh ni kar re, katwa lia usne apna.
                 else:
-                    success = userIdMainMap[userId].createConcert(groupTag, videoUrl)
+                    success = userIdMainMap[userId].createConcert(concertTag, videoUrl)
                     # TODO: HOW TO TELL OWNER IF GROUP WAS SUCCESSFULLY CREATED OR NOT?
                     if not success:
                         self.sendingWrapper(u'CONCERT_ALREADY_UNDERWAY')
                     else:
 						responseMap[USER_ID] = user.id
-						responseMap[CONCERT_TAG] = groupTag
+						responseMap[CONCERT_TAG] = concertTag
 						responseMap[VIDEO_URL] = videoUrl
 						responseMap[VIDEO_STATE] = videoState		
-						responseMap[CONCERT_TAG] = groupTag
 						responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE						
 						responseMap[OWNER_FLAG] = True
-						self.sendingWrapper(reponseMap)
+						responseMap[RESPONSE_TYPE] = GROUP_CREATED
+						self.sendingWrapper(responseMap)
 						
 
         #     msg = ""
