@@ -98,8 +98,8 @@ function youtuber() {
                 }
 
                 if (response[VOFFSET]) {
+                    seekToCurrentVideo(2000+response[VOFFSET]+ response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY));
                     pauseCurrentVideo();
-                    seekToCurrentVideo(2000+response[VOFFSET]+ response[OWNER_DELAY] + response[NETWORK_DELAY]);
                     setTimeout(function(){
                         if (response[VIDEO_STATE] == 1) {
                             playCurrentVideo();
@@ -260,7 +260,7 @@ if (document.location.host=="www.youtube.com") {
                 // owner induced change
                 if ( Math.abs( differenceOfDifferences ) > 500) {
                     var correctOffset = getCurrentVideoOffsetInMillis();
-                    doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: correctOffset,
+                    doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(correctOffset),
                         vs: (isVideoPaused() ? 2 : 1)});
                     ownerPlayerOffset = getCurrentVideoOffsetInMillis();
                     ownerUpdatedTimestamp = new Date().getTime();
