@@ -1,4 +1,4 @@
-﻿var IP = "192.168.0.109";
+﻿var IP = "192.168.0.104";
 var PORT = "8000";
 var websocket;
 var videoChecking=false;
