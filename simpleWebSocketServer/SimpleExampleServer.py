@@ -64,7 +64,10 @@ class Concert(object):
         responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
             if tempUserId != self.ownerId:
-                userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
+                try:
+                    userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
+                except Exception, e:
+                    print "Exception: ", e
 
 class User(object):
     def __init__(self, userId, client):

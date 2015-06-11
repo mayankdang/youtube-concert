@@ -12,7 +12,7 @@ var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
 var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
-var bufferDelay = 500;
+var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
 
 // response macros
@@ -106,8 +106,8 @@ function youtuber() {
                     seekToCurrentVideo(goTo + bufferDelay - preloadDuration);
                     setVolume(0);
                     playCurrentVideo();
-                    setTimeout(function(){
-                        seekToCurrentVideo(goTo + bufferDelay);
+                    setTimeout(function() {
+                        seekToCurrentVideo(goTo + bufferDelay + 300);
                         if (response[VIDEO_STATE] == 1) {
                             playCurrentVideo();
                         } else if (response[VIDEO_STATE] == 2) {
