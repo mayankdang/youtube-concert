@@ -557,7 +557,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
     var videoId = contentEvt.data.v;
     var concertTag = contentEvt.data.c;
     var correctVideoOffset = contentEvt.data.o;
-    var videoState = concertTag.data.vs;
+    var videoState = contentEvt.data.vs;
 
     var messageToSend = new Object();
     messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
