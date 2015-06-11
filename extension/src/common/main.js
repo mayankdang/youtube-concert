@@ -565,6 +565,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
     messageToSend[VIDEO_URL] = videoId;
     messageToSend[CONCERT_TAG] = concertTag;
     messageToSend[VIDEO_STATE] = videoState;
+    messageToSend[VOFFSET] = correctVideoOffset;
     messageToSend[OWNER_FLAG] = true;
     doSend(messageToSend);
 });
