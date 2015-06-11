@@ -1,26 +1,9 @@
-
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////var timeScriptLoaded = new Date().getTime();
+var timeScriptLoaded = new Date().getTime();
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
 console.log("helloooooooooooooooooooo");
 var link=window.location.href;
-
-
 
 // response macros
 var USER_ID = "userId";
@@ -35,113 +18,79 @@ var REQUEST_TYPE = "requestType";
 var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
 
-
 function youtuber() {
+
     videoChecking=true;
-    var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-    function upDowning() {
-        try {
-            MYID=parseInt(document.getElementById('name').value);
-        } catch (err) {
 
-        }
+//    function upDowning() {
+//        try {
+//            MYID=parseInt(document.getElementById('name').value);
+//        } catch (err) {
+//
+//        }
+//
+//        if (flag === 0) {
+//            var interval = 30.0;  // in ms
+//            var tid = setInterval(mycode, interval);
+//            var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
+//            var counter = 1;
+//
+//            function mycode() {
+//                flag = 1;
+//                console.log("counter" + counter);
+//                console.log("interval" + interval);
+//                console.log("period" + period);
+//
+//                // do some stuff...
+//                // no need to recall the function (it's an interval, it'll loop forever)
+//                // The value of seed should lie between -1 to 1
+//                var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
+//                console.log("seed=" + seed);
+//                var projectedSeed = Math.abs(Math.floor(seed * 100));
+//                volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
+//                console.log("volume=" +volume);
+//                concertPlayer.setVolume(volume);
+//                counter++;
+//            }
+//
+//            function abortTimer() { // to be called when you want to stop the timer
+//                clearInterval(tid);
+//            }
+//
+//            setTimeout(function () {
+//                abortTimer();
+//                flag = 0;
+//            }, 20000);  // abort after 20 seconds..
+//        }
+//    }
+//
+//    function randomizeSound() {
+//        console.log("Randomize Sound called!");
+//        setTimeout( upDowning , MYID*15)
+//    }
 
-        if (flag === 0) {
-            var interval = 30.0;  // in ms
-            var tid = setInterval(mycode, interval);
-            var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
-            var counter = 1;
-
-            function mycode() {
-                flag = 1;
-                console.log("counter" + counter);
-                console.log("interval" + interval);
-                console.log("period" + period);
-
-                // do some stuff...
-                // no need to recall the function (it's an interval, it'll loop forever)
-                // The value of seed should lie between -1 to 1
-                var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
-                console.log("seed=" + seed);
-                var projectedSeed = Math.abs(Math.floor(seed * 100));
-                volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
-                console.log("volume=" +volume);
-                concertPlayer.setVolume(volume);
-                counter++;
-            }
-
-            function abortTimer() { // to be called when you want to stop the timer
-                clearInterval(tid);
-            }
-
-            setTimeout(function () {
-                abortTimer();
-                flag = 0;
-            }, 20000);  // abort after 20 seconds..
-        }
-    }
-
-    function randomizeSound() {
-        setTimeout( upDowning , MYID*15)
-    }
-
-    function stopVideo() {
+    function pauseCurrentVideo() {
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
         concertPlayer.pauseVideo();
     }
 
-    function playVideo() {
+    function playCurrentVideo() {
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
         concertPlayer.play();
     }
 
-    var playing = true;
-    var img_array;
-    img_array= new Array('images/play_32x32.png','images/pause_32x32.png');
-    function playPauseVideo() {
-
-        if (playing === false) {
-            doSend('START_VIDEO');
-            setTimeout(function(){playVideo()},15);
-            playing = true;
-            document.getElementById("play").src=img_array[1];
-        } else {
-            doSend('PAUSE_VIDEO');
-            setTimeout(function(){ concertPlayer.pauseVideo();},15);
-            playing = false;
-            document.getElementById("play").src=img_array[0];
-        }
+    function seekToCurrentVideo(timeInMillis) {
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        concertPlayer.currentTime=timeInMillis/1000;
     }
 
-    function resetVideo() {
-        doSend("EVENT_START_IN_5_SEC");
+    function getPlayerState() {
+
     }
 
-    function randomizeSound() {
-        doSend('RANDOMIZE_SOUND:'+MYID);
-        setTimeout(function(){randomizeSound()},15);
-    }
-
-    function getVideoId() {
-        return document.getElementById("videoId").value;
-    }
-
-    function getGroupId() {
-        return document.getElementById("groupId").value;
-    }
-
-    function createConcert() {
-        var videoId=document.location.href.split("v=")[1].split("#")[0];
-        var concertId=document.location.href.split("v=")[1].split("#")[1];
-        doSend('CREATE_CONCERT:'+videoId+':'+concertId);
-    }
-
-    function joinConcert() {
-        console.log("joined concert !!!!!!!")
-        var concertId=document.location.href.split("v=")[1].split("#")[1];
-        doSend('JOIN_CONCERT:'+concertId);
-    }
-
-    function setEventStatus(status){
-        document.getElementById("masthead-search-term").value=status;
+    function setVolume(volume) {
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        concertPlayer.setVolume(parseInt(volume));
     }
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
@@ -161,176 +110,106 @@ function youtuber() {
                     && ( youtube_parser(window.location.href)!=response[VIDEO_URL] || concert_parser(window.location.href)!=response[CONCERT_TAG])
                     ) {
                     window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+response[VIDEO_URL]+"#"+response[CONCERT_TAG];
+//                    response[]
                 }
-
             } else {
                 console.log("Bakchodi - Owner dude!");
             }
         }
 
-        if(mainEvt.data.indexOf("UPDATE_HASH")>-1) {
-            if(kango.storage.getItem(CONCERT_TAG)){
-//                window.location.href = window.location.href+"#"+CONCERT_TAG;
-            }
-        }
+//        if (mainEvt.data.indexOf("DIE_MOTHERFUCKER_DIE")>-1) {
+//            var latestTimestamp = parseInt(mainEvt.data.split(":")[1]);
+//            if (timeScriptLoaded<latestTimestamp) {
+//                window.close();
+//            }
+//        }
 
-        if(mainEvt.data.indexOf("START_VIDEO")>-1) {
-            concertPlayer.play();
-        }
-
-        if(mainEvt.data.indexOf("PAUSE_VIDEO")>-1) {
-            concertPlayer.pauseVideo();
-        }
-
-        if(mainEvt.data.indexOf("GROUP_CREATED")>-1) {
-            alert("Group Created:" + mainEvt.data.split(":")[1]);
-        }
-
-        if(mainEvt.data.indexOf("RESET_VIDEO")>-1) {
-            concertPlayer.currentTime=0;
-            concertPlayer.play();
-        }
-
-        if(mainEvt.data.indexOf("VOLUME")>-1){
-            var x=evt.data.split(":")[1];
-            var ip=evt.data.split(":")[0].split(" ");
-            if(myip==ip){
-                concertPlayer.setVolume(parseInt(x));
-            }
-        }
-
-        if (mainEvt.data.indexOf("DIE_MOTHERFUCKER_DIE")>-1) {
-            var latestTimestamp = parseInt(mainEvt.data.split(":")[1]);
-            if (timeScriptLoaded<latestTimestamp) {
-                window.close();
-            }
-        }
-
-
-        function youtube_parser(url){
-            var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
-            var match = url.match(regExp);
-            if (match&&match[7].length==11){
-                return match[7];
-            }else{
-                return null;
-            }
-        }
-
-
-        function concert_parser(url){
-            try{
-                if(url.indexOf("youtube.com")>-1){
-                    if(url.lastIndexOf("#")==url.length-1){
-                        var turl=url.substring(0,url.length-1);
-                        var arr=turl.split("#");
-                        if(arr.length>=1){
-                            return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
-                        }
-                    }
-                    else if(url.lastIndexOf("#")>-1){
-                        var turl=url.substring(url.lastIndexOf("#")+1,url.length);
-                        var arr=turl.split("#");
-                        if(arr.length>=1){
-                            return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
-                        }
-                    }
-                }
-            }catch (err){
-            }
-            return null;
-        }
-
-
-        if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
-            try {
-                playTime=5000+new Date().getTime();
-                var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-                concertPlayer.currentTime=0;
-                concertPlayer.volume = 0;
-                concertPlayer.play();
-
-                setTimeout(function() {
-                    console.log("CONCERT_START_IN 4_SEC");
-                    setEventStatus("CONCERT_START_IN 4_SEC");
-                },1000);
-                setTimeout(function(){
-                    console.log("CONCERT_START_IN 3_SEC");
-                    setEventStatus ("CONCERT_START_IN 3_SEC");
-                },2000);
-                setTimeout(function(){
-                    console.log("CONCERT_START_IN 2_SEC");
-                    setEventStatus ("CONCERT_START_IN 2_SEC");
-                },3000);
-                setTimeout(function(){
-                    console.log("CONCERT_START_IN 1_SEC");
-                    setEventStatus("CONCERT_START_IN 1_SEC");
-                },4000);
-
-                setTimeout(function(){
-                    setEventStatus("");
-                    concertPlayer.currentTime=0;
-                    concertPlayer.play();
-                    concertPlayer.volume = 1;
-                },5000);
-            } catch (error) {
-                console.log(error);
-            }
-        }
+//        if (mainEvt.data.indexOf("CONCERT_START_IN_5_SEC")>-1) {
+//            try {
+//                playTime=5000+new Date().getTime();
+//
+//                concertPlayer.currentTime=0;
+//                concertPlayer.volume = 0;
+//                concertPlayer.play();
+//
+//                setTimeout(function() {
+//                    console.log("CONCERT_START_IN 4_SEC");
+//                    setEventStatus("CONCERT_START_IN 4_SEC");
+//                },1000);
+//                setTimeout(function(){
+//                    console.log("CONCERT_START_IN 3_SEC");
+//                    setEventStatus ("CONCERT_START_IN 3_SEC");
+//                },2000);
+//                setTimeout(function(){
+//                    console.log("CONCERT_START_IN 2_SEC");
+//                    setEventStatus ("CONCERT_START_IN 2_SEC");
+//                },3000);
+//                setTimeout(function(){
+//                    console.log("CONCERT_START_IN 1_SEC");
+//                    setEventStatus("CONCERT_START_IN 1_SEC");
+//                },4000);
+//
+//                setTimeout(function(){
+//                    setEventStatus("");
+//                    concertPlayer.currentTime=0;
+//                    concertPlayer.play();
+//                    concertPlayer.volume = 1;
+//                },5000);
+//            } catch (error) {
+//                console.log(error);
+//            }
+//        }
     });
 }
 
-function sendTimestampKillOtherTabs() {
-    doSend("MY_TIMESTAMP:"+timeScriptLoaded);
+function setEventStatus(status){
+    document.getElementById("masthead-search-term").value=status;
 }
+
+function youtube_parser(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match&&match[7].length==11){
+        return match[7];
+    }else{
+        return null;
+    }
+}
+
+function concert_parser(url){
+    try {
+        if (url.indexOf("youtube.com")>-1) {
+            if (url.lastIndexOf("#")==url.length-1) {
+                var turl = url.substring(0,url.length-1);
+                var arr = turl.split("#");
+                if (arr.length>=1) {
+                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                }
+            }
+            else if(url.lastIndexOf("#")>-1) {
+                var turl = url.substring(url.lastIndexOf("#")+1,url.length);
+                var arr = turl.split("#");
+                if (arr.length>=1) {
+                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                }
+            }
+        }
+    } catch (err) { }
+    return null;
+}
+
+//function sendTimestampKillOtherTabs() {
+//    doSend("MY_TIMESTAMP:"+timeScriptLoaded);
+//}
 
 console.log(1111111111111);
+
 if (document.location.host=="www.youtube.com") {
     youtuber();
-    var hash1 = document.location.href.indexOf("#");
-    var hash2 = document.location.href.lastIndexOf("#");
-    var splitCount = document.location.href.split("#").length;
-    console.log(hash1);
-    console.log(hash2);
-    console.log(splitCount);
-
-    if (splitCount==2 && hash1>-1 && hash1+1 < document.location.href.length){
-        sendTimestampKillOtherTabs();
-        // joinConcert();
-        console.log("joined concert !!!!!!!")
-        var concertId=document.location.href.split("v=")[1].split("#")[1];
-        //doSend('JOIN_CONCERT:'+concertId);
-    } else if(splitCount==3&&hash1>-1&&hash2>-1&&hash1+1<hash2&&hash2==document.location.href.length-1){
-        //youtuber();
-        sendTimestampKillOtherTabs();
-//        createConcert();
-        var videoId=document.location.href.split("v=")[1].split("#")[0];
-        var concertId=document.location.href.split("v=")[1].split("#")[1];
-        //doSend('CREATE_CONCERT:'+videoId+':'+concertId);
-//        doSend("OWNER_ACTIVE_LATEST:"+kango.browser.tabs.getCurrentTab().getId());
-        isOwner = true;
-    }
-
-    //setInterval(function()
-    //{
-    //    if(videoChecking){
-    //        try{
-    //            var groupTag = kango.storage.getItem("groupTag");
-    //            if (isOwner && !(document.location.href.lastIndexOf("#"+groupTag)>-1)){
-    //                link=document.location.href;
-    //                document.location=link+"#"+groupTag+"#";
-    //                console.log("document.location.href"+document.location.href+"link="+link+"#"+groupTag+"#");
-    //                doSend("CHANGE_VIDEO_ID:"+videoId+":"+groupTag)
-    //            }
-    //        }catch(err){
-    //            console.log(err);
-    //        }
-    //    }
-    //},1000);
 }
 
-function doSend(message)
-{
-    console.log("sending to main: " + message + '\n');
-    kango.dispatchMessage("contentToMain", {message:message});
-}
+//function doSend(message)
+//{
+//    console.log("Sending to main: " + message + '\n');
+//    kango.dispatchMessage("contentToMain", {message:message});
+//}
