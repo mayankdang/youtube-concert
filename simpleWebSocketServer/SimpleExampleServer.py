@@ -41,7 +41,6 @@ R_USER_ONLINE = 4
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
-clients = []
 userIdMainMap = {}
 concertTagHashMap = {}
 
@@ -226,20 +225,18 @@ class SimpleChat(WebSocket):
             print e
 
     def sendingWrapper(self, responseMap):
-        print "responseMap",responseMap
-        self.sendMessage(u"" + json.dumps(responseMap))
+        try:
+            print "Sending responseMap from sendingWrapper: ", json.dumps(responseMap)
+            self.sendMessage(u"" + json.dumps(responseMap))
+        except Exception, e:
+            print "Exception while sending responseMap:", e
+
 
     def handleConnected(self):
         print self.address, 'connected'
-        for client in list(clients):
-            client.sendMessage(self.address[0] + u' - connected')
-        clients.append(self)
 
     def handleClose(self):
-        clients.remove(self)
         print self.address, 'closed'
-        for client in list(clients):
-            client.sendMessage(self.address[0] + u' - disconnected')
 
 def getH(hash, key):
     if key in hash:
