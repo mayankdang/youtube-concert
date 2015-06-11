@@ -12,6 +12,8 @@ var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
 var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
+var bufferDelay = 500;
+var preloadDuration = 50;
 
 // response macros
 var USER_ID = "userId";
@@ -98,16 +100,21 @@ function youtuber() {
                 }
 
                 if (response[VOFFSET]) {
-                    seekToCurrentVideo(response[VOFFSET]+ response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY));
-                    pauseCurrentVideo();
-//                    setTimeout(function(){
+//                    seekToCurrentVideo(response[VOFFSET]+ response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY));
+
+                    var goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
+                    seekToCurrentVideo(goTo + bufferDelay - preloadDuration);
+                    setVolume(0);
+                    playCurrentVideo();
+                    setTimeout(function(){
+                        seekToCurrentVideo(goTo + bufferDelay);
                         if (response[VIDEO_STATE] == 1) {
                             playCurrentVideo();
                         } else if (response[VIDEO_STATE] == 2) {
                             pauseCurrentVideo();
                         }
-
-                    
+                        setVolume(100);
+                    }, bufferDelay);
                 }
 
             } else {
