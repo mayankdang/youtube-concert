@@ -550,22 +550,22 @@ function youtube_parser(url){
 //
 //
 //
-//kango.addMessageListener("contentToMain", function(contentEvt) {
-//    console.log("contentToMain:" + contentEvt.data.message);
-//    if (contentEvt.data.message.indexOf("MY_TIMESTAMP")>-1) {
-//        var latestWindowTimestamp = contentEvt.data.message.split(":")[1];
-//        kango.browser.tabs.getAll(function(tabs){
-//            for(var i=0;i<tabs.length;i++){
-//                tabs[i].dispatchMessage("mainToContent", "d:"+latestWindowTimestamp);
-//                console.log("Sent to Tab:"+ "DIE_MOTHERFUCKER_DIE:" + latestWindowTimestamp);
-//            }
-//        });
-////    } else if (contentEvt.data.message.indexOf("OWNER_ACTIVE_LATEST")>-1) {
-////        concertActiveTabId = contentEvt.data.message.split(":")[1];
-//    } else {
-//        doSend(contentEvt.data.message);
-//    }
-//});
+kango.addMessageListener("contentToMain", function(contentEvt) {
+
+    console.log("contentToMain:" + contentEvt.data);
+
+    var videoId = contentEvt.data.v;
+    var concertTag = contentEvt.data.c;
+    var correctVideoOffset = contentEvt.data.o;
+
+    var messageToSend = new Object();
+    messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
+    messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+    messageToSend[VIDEO_URL] = videoId;
+    messageToSend[CONCERT_TAG] = concertTag;
+    messageToSend[OWNER_FLAG] = true;
+    doSend(messageToSend);
+});
 //
 //kango.addMessageListener("optionsToMain", function(optionEvt) {
 //    console.log("optionToMain:" + optionEvt.data.message);
