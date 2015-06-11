@@ -1,5 +1,5 @@
 var timeScriptLoaded = new Date().getTime();
-var threshold = 10;
+var threshold = 30;
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
@@ -19,6 +19,7 @@ var CLIENT_TIMESTAMP = "clientTimeStamp";
 var REQUEST_TYPE = "requestType";
 var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
+var OWNER_DELAY = "ownerDelay"
 
 function youtuber() {
 
@@ -90,6 +91,19 @@ function youtuber() {
                     concertRole = 2;
                     window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+response[VIDEO_URL]+"#"+response[CONCERT_TAG];
                 }
+
+                if (response[VOFFSET]){
+                    pauseCurrentVideo();
+                    seekToCurrentVideo(2000+response[VOFFSET]+ response[OWNER_DELAY] + response[NETWORK_DELAY]);
+                    setTimeout(function(){
+                        if (response[VIDEO_STATE] == 1) {
+                            playCurrentVideo();
+                        } else if (response[VIDEO_STATE] == 2) {
+                            pauseCurrentVideo();
+                        }
+                    },2000)
+                }
+
             } else {
                 console.log("Bakchodi - Owner dude!");
                 if ( true
@@ -211,6 +225,14 @@ function getCurrentVideoOffsetInMillis() {
     }
 }
 
+function isVideoPaused() {
+    try {
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        return concertPlayer.paused;
+    } catch (exception) {}
+    return true;
+}
+
 function setVolume(volume) {
     try {
         var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
@@ -252,22 +274,36 @@ if (document.location.host=="www.youtube.com") {
             try {document.getElementsByClassName("html5-progress-bar ytp-force-transform")[0].style.display = "none";} catch (exception) {}
             console.log("2000 ;) ");
 
-            updatedTimestamp = rightNowTimestamp;
+            updatedTimestamp = new Date().getTime();
+            playerOffset = getCurrentVideoOffsetInMillis();
         }
     }, 2000);
 
-    var playerOffset2 = getCurrentVideoOffsetInMillis();
-    var updatedTimestamp2 = new Date().getTime();
+
+    var playerOffset3 = -1;
+    var updatedTimestamp3 = -1;
 
     setInterval(function() {
         // only if owner.
-        if (kango.storage.getItem(OWNER_FLAG)==true) {
-            var rightNowTimestamp = new Date().getTime();
-            if ( Math.abs( ((getCurrentVideoOffsetInMillis() - playerOffset2) - (rightNowTimestamp - updatedTimestamp2)) ) > 2000) {
-                var correctOffset = getCurrentVideoOffsetInMillis();
-                doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: correctOffset});
+        if (kango.storage.getItem(OWNER_FLAG) == true) {
+            if ( (playerOffset3 == -1) || (updatedTimestamp3 == -1) ) {
+                if (!isVideoPaused()) {
+                    playerOffset3 = getCurrentVideoOffsetInMillis();
+                    updatedTimestamp3 = new Date().getTime();
+                }
+            } else {
+                var rightNowTimestamp = new Date().getTime();
+                var currentVideoOffset = getCurrentVideoOffsetInMillis();
+                var differenceOfDifferences = ((currentVideoOffset - playerOffset3) - (rightNowTimestamp - updatedTimestamp3));
+                console.log("Difference of differences:" + differenceOfDifferences);
+                if ( Math.abs( differenceOfDifferences ) > 2000) {
+                    var correctOffset = getCurrentVideoOffsetInMillis();
+                    doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: correctOffset,
+                        vs: (isVideoPaused() ? 2 : 1)});
+                    playerOffset3 = getCurrentVideoOffsetInMillis();
+                    updatedTimestamp3 = new Date().getTime();
+                }
             }
-            updatedTimestamp2 = rightNowTimestamp;
         }
 
         if(kango.storage.getItem(OWNER_FLAG)==false){
@@ -276,14 +312,14 @@ if (document.location.host=="www.youtube.com") {
             }
         }
 
-//        console.log("200: "+concertRole);
+//        console.log("500: "+concertRole);
 
-    }, 200);
+    }, 2000);
 
 }
 
 function doSend(message)
 {
-    console.log("Sending to main: " + message + '\n');
+    console.log("Sending to main: " + JSON.stringify(message) + '\n');
     kango.dispatchMessage("contentToMain", message);
 }
