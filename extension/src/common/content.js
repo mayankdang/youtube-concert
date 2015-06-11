@@ -296,7 +296,8 @@ if (document.location.host=="www.youtube.com") {
                 var currentVideoOffset = getCurrentVideoOffsetInMillis();
                 var differenceOfDifferences = ((currentVideoOffset - playerOffset3) - (rightNowTimestamp - updatedTimestamp3));
                 console.log("Difference of differences:" + differenceOfDifferences);
-                if ( Math.abs( differenceOfDifferences ) > 2000) {
+                // owner induced change
+                if ( Math.abs( differenceOfDifferences ) > 500) {
                     var correctOffset = getCurrentVideoOffsetInMillis();
                     doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: correctOffset,
                         vs: (isVideoPaused() ? 2 : 1)});
