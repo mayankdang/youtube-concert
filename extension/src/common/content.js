@@ -252,28 +252,45 @@ if (document.location.host=="www.youtube.com") {
 //        }
 //    }, 2000);
 
+
+    function sendUpdatedPlayerInfoToServer() {
+        doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
+            vs: (isVideoPaused() ? 2 : 1)});
+    }
+
     setInterval(function() {
         // only if owner.
         if (kango.storage.getItem(OWNER_FLAG) == true) {
-            if ( (ownerPlayerOffset == -1) || (ownerUpdatedTimestamp == -1) ) {
-                if (!isVideoPaused()) {
-                    ownerPlayerOffset = getCurrentVideoOffsetInMillis();
-                    ownerUpdatedTimestamp = new Date().getTime();
-                }
-            } else {
-                var rightNowTimestamp = new Date().getTime();
-                var currentVideoOffset = getCurrentVideoOffsetInMillis();
-                var differenceOfDifferences = ((currentVideoOffset - ownerPlayerOffset) - (rightNowTimestamp - ownerUpdatedTimestamp));
-                console.log("Difference of differences:" + differenceOfDifferences);
-                // owner induced change
-                if ( Math.abs( differenceOfDifferences ) > 500) {
-                    var correctOffset = getCurrentVideoOffsetInMillis();
-                    doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(correctOffset),
-                        vs: (isVideoPaused() ? 2 : 1)});
-                    ownerPlayerOffset = getCurrentVideoOffsetInMillis();
-                    ownerUpdatedTimestamp = new Date().getTime();
-                }
-            }
+            var videoElement = document.getElementsByTagName("video")[0];
+
+            videoElement.onpause = sendUpdatedPlayerInfoToServer;
+            videoElement.onplay = sendUpdatedPlayerInfoToServer;
+            // if owner is chutiya (slow internet - buffering)... then don't bother sending UPDATE_VIDEO request to other users...
+            // this is a feature as well as a convenience.
+            // videoElement.onbufferingEndedVideoStarted = sendUpdatedPlayerInfoToServer;        //// NOT to be defined ////
+
+            // the above is the better implementation of below...
+            // the below code just has one more functionality - it detects the scenarios where owner is so chutiya
+            // that its speed is less than what would enable him to play at a constant speed.
+//            if ( (ownerPlayerOffset == -1) || (ownerUpdatedTimestamp == -1) ) {
+//                if (!isVideoPaused()) {
+//                    ownerPlayerOffset = getCurrentVideoOffsetInMillis();
+//                    ownerUpdatedTimestamp = new Date().getTime();
+//                }
+//            } else {
+//                var rightNowTimestamp = new Date().getTime();
+//                var currentVideoOffset = getCurrentVideoOffsetInMillis();
+//                var differenceOfDifferences = ((currentVideoOffset - ownerPlayerOffset) - (rightNowTimestamp - ownerUpdatedTimestamp));
+//                console.log("Difference of differences:" + differenceOfDifferences);
+//                // owner induced change
+//                if ( Math.abs( differenceOfDifferences ) > 500) {
+//                    var correctOffset = getCurrentVideoOffsetInMillis();
+//                    doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(correctOffset),
+//                        vs: (isVideoPaused() ? 2 : 1)});
+//                    ownerPlayerOffset = getCurrentVideoOffsetInMillis();
+//                    ownerUpdatedTimestamp = new Date().getTime();
+//                }
+//            }
         }
 
         if(kango.storage.getItem(OWNER_FLAG)==false){

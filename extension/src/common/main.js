@@ -276,6 +276,7 @@ setInterval (function() {
                             messageToSend[USER_ID]=getParameterFromStorage(USER_ID);
                             messageToSend[VIDEO_URL]=newVideoId;
                             messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
+                            messageToSend[VOFFSET] = 0;
                             messageToSend[CONCERT_TAG] = concertTag;
                             messageToSend[OWNER_FLAG] = (createRequest);
                             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
@@ -311,12 +312,15 @@ setInterval (function() {
                             var messageToSend=new Object();
                             var url=tabs[i].getUrl();
                             var createRequest=false;
+
                             if(url.lastIndexOf("#")==url.length-1){
                                 createRequest=true;
                             }
 
+                            //todo: Video play/pause update offset
                             messageToSend[USER_ID]=getParameterFromStorage(USER_ID);
                             messageToSend[VIDEO_URL]=videoTag;
+                            messageToSend[VOFFSET]=0;
                             messageToSend[VIDEO_STATE] = 0;//0 buffering 1 play  2 pause  3 end
                             messageToSend[CONCERT_TAG] = concertTag;
                             messageToSend[OWNER_FLAG] = createRequest;
@@ -557,12 +561,12 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 
     var messageToSend = new Object();
     messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
-    messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
     messageToSend[VIDEO_URL] = videoId;
     messageToSend[CONCERT_TAG] = concertTag;
     messageToSend[VIDEO_STATE] = videoState;
     messageToSend[VOFFSET] = correctVideoOffset;
     messageToSend[OWNER_FLAG] = true;
+    messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
     doSend(messageToSend);
 });
 //

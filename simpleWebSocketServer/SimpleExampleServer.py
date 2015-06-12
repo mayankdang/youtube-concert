@@ -51,11 +51,13 @@ class Concert(object):
         self.concertTag = concertTag
         self.ownerId = userId
         self.users = [userId]
+        self._updatedVOffsetTime = None
         self.concertSize = 0  # unused - remove after checking.
         self.videoUrl = videoUrl
+        self._vOffset = None
+        self._videoState = None
         self.createdAt = current_milli_time()
         self.updatedAt = current_milli_time()
-        self.videoState = None
 
     def concertRelay(self, responseMap):
         ownerDelay = userIdMainMap[self.ownerId].networkDelay
@@ -67,6 +69,23 @@ class Concert(object):
                     userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
                 except Exception, e:
                     print "Exception: ", e
+
+    def getCurrentTime(self):
+        return int(round(time.time() * 1000))
+
+    def getCurrentPlayTime(self):
+        if self._updatedVOffsetTime and self._vOffset:
+            return self._vOffset + self.getCurrentTime() - self._updatedVOffsetTime
+        return 0
+
+    def syncVideoAttributes(self, vOffset, videoState):
+        self._vOffset = vOffset
+        self._updatedVOffsetTime = self.getCurrentTime()
+        self._videoState = videoState
+        print "VOFFSET set in concert: ",
+        print "_vOffset = ", vOffset,
+        print "updatedVOffsetTime = ", self._updatedVOffsetTime
+
 
 class User(object):
     def __init__(self, userId, client):
@@ -181,8 +200,11 @@ class SimpleChat(WebSocket):
 
                 # BROADCAST
                 if owner and current_user_concert:
+                    if vOffset and videoState:
+                        concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
+
                     responseMap[VOFFSET] = vOffset if vOffset else None
-                    responseMap[VIDEO_STATE] =videoState
+                    responseMap[VIDEO_STATE] = videoState
                     responseMap[VIDEO_URL] = videoUrl
                     responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                     concertTagHashMap[concertTag].concertRelay(responseMap)
@@ -213,9 +235,10 @@ class SimpleChat(WebSocket):
                     responseMap[USER_ID] = user.id
                     responseMap[CONCERT_TAG] = concertTag
                     responseMap[VIDEO_URL] = concertToJoin.videoUrl
-                    responseMap[VIDEO_STATE] = concertToJoin.videoState
+                    responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
                     responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                     responseMap[RESPONSE_TYPE] = CONCERT_JOINED
+                    responseMap[VOFFSET] = concertToJoin.getCurrentPlayTime()
                     ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
                     responseMap[OWNER_FLAG] = False
                     responseMap[OWNER_DELAY] = ownerDelay
