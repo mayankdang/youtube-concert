@@ -51,9 +51,9 @@ class Concert(object):
         self.concertTag = concertTag
         self.ownerId = userId
         self.users = [userId]
-        self._updatedVOffsetTime = None
         self.concertSize = 0  # unused - remove after checking.
         self.videoUrl = videoUrl
+        self._updatedVOffsetTime = None
         self._vOffset = None
         self._videoState = None
         self.createdAt = current_milli_time()
@@ -86,6 +86,8 @@ class Concert(object):
         print "_vOffset = ", vOffset,
         print "updatedVOffsetTime = ", self._updatedVOffsetTime
 
+    def getVideoState(self):
+        return self._videoState
 
 class User(object):
     def __init__(self, userId, client):
@@ -200,6 +202,9 @@ class SimpleChat(WebSocket):
 
                 # BROADCAST
                 if owner and current_user_concert:
+
+                    print "vOffset:", vOffset
+                    print "videoState:", videoState
                     if vOffset and videoState:
                         concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
 
