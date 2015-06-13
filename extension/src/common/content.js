@@ -36,8 +36,8 @@ var videoState=null;
 var goTo = null;
 var controlFlag = true;
 
-function getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState){
-    return {vstf:videoSynchronizedFlag,vsst:videoSynchronizedSystemTime,vs:videoState};
+function getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,videoId){
+    return {vstf:videoSynchronizedFlag,vsst:videoSynchronizedSystemTime,vs:videoState,vid:videoId};
 }
 
 function youtuber() {
@@ -123,7 +123,7 @@ function youtuber() {
                         console.log("Setting the timeout...");
                         videoSynchronizedSystemTime = new Date().getTime();
 
-                        var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState);
+                        var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,response[VIDEO_URL]);
                         eventQueue.push(event);
 
                         console.log("Paused the video.");

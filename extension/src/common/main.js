@@ -248,25 +248,22 @@ var concertYoutubeTab;
 setInterval (function() {
     console.log("concertTabId :"+concertTabId);
     if(concertTabId!=-1) {
-        var success = false;
-        kango.browser.tabs.getAll (function(tabs) {
-            // tabs is Array of KangoBrowserTab
-            for (var i = 0; i < tabs.length; i++) {
-                if (tabs[i].getId()==concertTabId) {
+        var success = true;
+                if (concertYoutubeTab.getId()==concertTabId) {
                     success=true;
-                    if (tabs[i].getUrl()!=concertLink) {
-                        concertLink=tabs[i].getUrl();
+                    if (concertYoutubeTab.getUrl()!=concertLink) {
+                        concertLink=concertYoutubeTab.getUrl();
                         var concertTag=concert_parser(concertLink)||getParameterFromStorage(CONCERT_TAG);
                         var newVideoId=youtube_parser(concertLink);
 
                         if (concert_parser(CONCERT_TAG)) {
 
                         } else {
-                            tabs[i].dispatchMessage("mainToContent","UPDATE_HASH");
+                            concertYoutubeTab.dispatchMessage("mainToContent","UPDATE_HASH");
                         }
 
                         var createRequest=false;
-                        var url=tabs[i].getUrl();
+                        var url=concertYoutubeTab.getUrl();
                         if(url.lastIndexOf("#")==url.length-1){
                             createRequest=true;
                         }
@@ -283,20 +280,13 @@ setInterval (function() {
                             doSend(messageToSend);
                         }
                     }
-                    break;
 
                 }
-                //console.log(tabs[i].getUrl());
-            }
-            if(!success){
-                concertTabId=-1;
-                concertYoutubeTab=null;
-            }
-        });
+
     } else {
         kango.browser.tabs.getAll(function(tabs) {
             // tabs is Array of KangoBrowserTab
-            for(var i = 0; i < tabs.length; i++){
+            for(var i = 0; i <tabs.length; i++){
                 try {
                     var url=tabs[i].getUrl();
                     var success=false;
