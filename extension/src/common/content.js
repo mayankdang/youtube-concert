@@ -6,7 +6,6 @@ var playTime=new Date().getTime();
 console.log("helloooooooooooooooooooo");
 var link=window.location.href;
 var concertRole= -1 // -1 initially, 1 for owner, 2 for joinee.
-
 // for sync-ers
 var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
@@ -29,10 +28,17 @@ var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
 var OWNER_DELAY = "ownerDelay"
 
+var eventQueue=[];
 var videoSynchronizedFlag = true;
 var videoSynchronizedSystemTime = null;
+var videoState=null;
+
 var goTo = null;
 var controlFlag = true;
+
+function getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState){
+    return {vstf:videoSynchronizedFlag,vsst:videoSynchronizedSystemTime,vs:videoState};
+}
 
 function youtuber() {
 
@@ -111,6 +117,15 @@ function youtuber() {
 
                     if (response[VIDEO_STATE] == 2) {
                         pauseCurrentVideo();
+
+                        videoSynchronizedFlag = false;
+                        videoState=response[VIDEO_STATE];
+                        console.log("Setting the timeout...");
+                        videoSynchronizedSystemTime = new Date().getTime();
+
+                        var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState);
+                        eventQueue.push(event);
+
                         console.log("Paused the video.");
                     } else if (response[VIDEO_STATE] == 1) {
 
@@ -125,8 +140,12 @@ function youtuber() {
 
                         // the setInterval in the outer loop will take the required action.
                         videoSynchronizedFlag = false;
+                        videoState=response[VIDEO_STATE];
                         console.log("Setting the timeout...");
                         videoSynchronizedSystemTime = new Date().getTime();
+
+                        var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState);
+                        eventQueue.push(event);
                     }
                 }
 
@@ -181,7 +200,7 @@ function genericFunctionCallOnPlayerStateChange() {
 function pauseCurrentVideo() {
     try {
         var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-        concertPlayer.pauseVideo();
+        concertPlayer.pause();
         genericFunctionCallOnPlayerStateChange();
     } catch (exception) {}
 }
@@ -320,10 +339,29 @@ function doSend(message)
     kango.dispatchMessage("contentToMain", message);
 }
 
+
+
 setInterval( function() {
-    if (kango.storage.getItem(OWNER_FLAG)==false) {
-        console.log("...........................SetInterval chutiyaapa...........................");
-        if (videoSynchronizedFlag===false && controlFlag===true) {
+    if (eventQueue.length>0&&kango.storage.getItem(OWNER_FLAG)==false) {
+        console.log("...........................SetInterval chutiyaapa..........................."+videoSynchronizedFlag);
+        var lastUpdatedTime=eventQueue[0].vstf;
+
+        var index=0;
+        for(var i=0;i<eventQueue.length;i++){
+            var event=eventQueue[i];
+            if(event.vsst>=lastUpdatedTime){
+                index=i;
+            }
+        }
+
+        var event=eventQueue[index];
+        var videoSynchronizedFlag=event.vstf;
+        var videoState=event.vs;
+        var videoSynchronizedSystemTime=event.vsst;
+
+        if(videoState==2){
+            pauseCurrentVideo();
+        }else if (videoSynchronizedFlag === false&&controlFlag===true) {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
             for (var i=0;i<concertPlayer.buffered.length;i++){
@@ -334,7 +372,6 @@ setInterval( function() {
                         playCurrentVideo();
                         setVolume(100);
                         console.log("Played the video ~~ finally.");
-
                         videoSynchronizedFlag = true;
 //                        videoSynchronizedSystemTime = null;
 //                        goTo = null;
@@ -345,5 +382,7 @@ setInterval( function() {
                 }
             }
         }
+
+        eventQueue=[];
     }
 }, 200);
