@@ -1,0 +1,19 @@
+ ✔ join concert -> sync @done (15-06-13 06:20)
+ ☐ double enter in url to join ->> single
+ ☐ I am a user in a group, I cannot change the video
+ ☐ retry websocket connection on destroy (loop forever)
+ ☐ permissions and url changes - what if I am not the owner replace #gId# by #gId
+ ☐ Stop redundant messages when video stops/ends
+ ☐ 
+ ☐ multiple group support
+ ☐ hosting - ec2
+ ☐ code on demand
+ ☐ 
+ ☐ joinee ke controls hide karo
+ ☐ client side syncing
+ ☐ 
+ ☐ adblock
+ ☐ theatre mode
+ ☐ 
+ ☐ code obfuscation
+ ☐ 
