@@ -236,7 +236,6 @@ class SimpleChat(WebSocket):
                     concertToJoin.users.append(userId)
                     userIdMainMap[userId].concertTag = concertTag
 
-
                     responseMap[USER_ID] = user.id
                     responseMap[CONCERT_TAG] = concertTag
                     responseMap[VIDEO_URL] = concertToJoin.videoUrl

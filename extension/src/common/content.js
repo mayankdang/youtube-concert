@@ -99,7 +99,10 @@ function youtuber() {
                     window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+response[VIDEO_URL]+"#"+response[CONCERT_TAG];
                 }
 
-                if (response[VOFFSET]) {
+                if (
+                       response[VOFFSET]
+                    && response[VIDEO_STATE]
+                    ) {
 //                    seekToCurrentVideo(response[VOFFSET]+ response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY));
 
                     var goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
@@ -260,11 +263,19 @@ if (document.location.host=="www.youtube.com") {
         }
     }
 
+    function getPlayerInfoFromServer() {
+        if (kango.storage.getItem(OWNER_FLAG) == false) {
+            doSend({c:concert_parser(window.location.href)});
+        }
+    }
+
     try {
-        var videoElement = document.getElementsByTagName("video")[0];
-        videoElement.onpause = sendUpdatedPlayerInfoToServer;
-        videoElement.onplay = sendUpdatedPlayerInfoToServer;
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
+        concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
+        concertPlayer.onseek = sendUpdatedPlayerInfoToServer;
         sendUpdatedPlayerInfoToServer();
+        getPlayerInfoFromServer();
     } catch (exception) {
         console.log("Exception-" + exception);
     }

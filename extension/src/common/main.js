@@ -554,20 +554,31 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 
     console.log("contentToMain:" + contentEvt.data);
 
-    var videoId = contentEvt.data.v;
-    var concertTag = contentEvt.data.c;
-    var correctVideoOffset = contentEvt.data.o;
-    var videoState = contentEvt.data.vs;
+    if (getParameterFromStorage(OWNER_FLAG) == false) {
+        var concertTag = contentEvt.data.c;
 
-    var messageToSend = new Object();
-    messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
-    messageToSend[VIDEO_URL] = videoId;
-    messageToSend[CONCERT_TAG] = concertTag;
-    messageToSend[VIDEO_STATE] = videoState;
-    messageToSend[VOFFSET] = correctVideoOffset;
-    messageToSend[OWNER_FLAG] = true;
-    messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
-    doSend(messageToSend);
+        var messageToSend = new Object();
+        messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
+        messageToSend[CONCERT_TAG] = concertTag;
+        messageToSend[OWNER_FLAG] = false;
+        messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+        doSend(messageToSend);
+    } else {
+        var videoId = contentEvt.data.v;
+        var concertTag = contentEvt.data.c;
+        var correctVideoOffset = contentEvt.data.o;
+        var videoState = contentEvt.data.vs;
+
+        var messageToSend = new Object();
+        messageToSend[USER_ID] = getParameterFromStorage(USER_ID);
+        messageToSend[VIDEO_URL] = videoId;
+        messageToSend[CONCERT_TAG] = concertTag;
+        messageToSend[VIDEO_STATE] = videoState;
+        messageToSend[VOFFSET] = correctVideoOffset;
+        messageToSend[OWNER_FLAG] = true;
+        messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+        doSend(messageToSend);
+    }
 });
 //
 //kango.addMessageListener("optionsToMain", function(optionEvt) {
