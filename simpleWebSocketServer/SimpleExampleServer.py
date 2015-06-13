@@ -84,7 +84,8 @@ class Concert(object):
         self._videoState = videoState
         print "VOFFSET set in concert: ",
         print "_vOffset = ", vOffset,
-        print "updatedVOffsetTime = ", self._updatedVOffsetTime
+        print "updatedVOffsetTime = ", self._updatedVOffsetTime,
+        print "_videoState = ", self._videoState
 
     def getVideoState(self):
         return self._videoState
