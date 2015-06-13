@@ -30,6 +30,10 @@ OWNER_DELAY = "ownerDelay"
 CONCERT_CREATED = "concertCreated"
 CONCERT_JOINED = "concertJoined"
 RESPONSE_TYPE = "responseType"
+CHUTIYA_KATA = "chutiyaKata"
+NO_CONCERT = "noConcert"
+I_AM_ALREADY_OWNER = "iAmAlreadyOwner"
+
 
 # Request Types
 R_CREATE_USER = 0
@@ -188,6 +192,7 @@ class SimpleChat(WebSocket):
                 pass
 
             elif requestType == R_VIDEO_UPDATE:
+                userIdMainMap[userId].setClient(self)
 
                 firstTimeUsersConcert = False
                 owner = False
@@ -199,11 +204,8 @@ class SimpleChat(WebSocket):
                             print "chutiya bana raha hai"
                     else:
                         firstTimeUsersConcert = True
-                        # TODO: naya concert banana chah ra hai launda
 
                 user = userIdMainMap[userId]
-                current_user_concert=None
-
                 current_user_concert = userIdMainMap[userId].concertTag == concertTag
 
                 # BROADCAST
@@ -222,38 +224,67 @@ class SimpleChat(WebSocket):
 
                 # CREATE CONCERT
                 elif owner or firstTimeUsersConcert:
+
                     success = userIdMainMap[userId].createConcert(concertTag, videoUrl)
-                    # TODO: HOW TO TELL OWNER IF CONCERT WAS SUCCESSFULLY CREATED OR NOT?
+
                     if not success:
-                        self.sendingWrapper(u'CONCERT_ALREADY_UNDERWAY')
+                        responseMap[RESPONSE_TYPE] = CHUTIYA_KATA
+                        responseMap[USER_ID] = user.id
+                        responseMap[CONCERT_TAG] = concertTag
+                        responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
+                        responseMap[VIDEO_STATE] = videoState
+                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[OWNER_FLAG] = False
+                        self.sendingWrapper(responseMap)
                     else:
+                        responseMap[RESPONSE_TYPE] = CONCERT_CREATED
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
                         responseMap[VIDEO_URL] = videoUrl
                         responseMap[VIDEO_STATE] = videoState
                         responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                         responseMap[OWNER_FLAG] = True
-                        responseMap[RESPONSE_TYPE] = CONCERT_CREATED
                         self.sendingWrapper(responseMap)
 
                 # JOIN CONCERT
                 else:
-                    concertToJoin = concertTagHashMap[concertTag]
-                    concertToJoin.users.add(userId)
-                    userIdMainMap[userId].setClient(self)
-                    userIdMainMap[userId].concertTag = concertTag
+                    concertToJoin = concertTagHashMap.get(concertTag)
 
-                    responseMap[USER_ID] = user.id
-                    responseMap[CONCERT_TAG] = concertTag
-                    responseMap[VIDEO_URL] = concertToJoin.videoUrl
-                    responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
-                    responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
-                    responseMap[RESPONSE_TYPE] = CONCERT_JOINED
-                    responseMap[VOFFSET] = concertToJoin.getCurrentPlayTime()
-                    ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
-                    responseMap[OWNER_FLAG] = False
-                    responseMap[OWNER_DELAY] = ownerDelay
-                    self.sendingWrapper(responseMap)
+                    if concertToJoin is not None:
+                        if concertToJoin.ownerId == userId:
+                            # owner asked to join as non - owner. Owner bakchodi kar raha hai ab!
+                            responseMap[USER_ID] = user.id
+                            responseMap[CONCERT_TAG] = concertTag
+                            responseMap[VIDEO_URL] = concertToJoin.videoUrl
+                            responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
+                            responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                            responseMap[RESPONSE_TYPE] = I_AM_ALREADY_OWNER
+                            responseMap[OWNER_FLAG] = True
+                            responseMap[OWNER_DELAY] = user.networkDelay
+                            self.sendingWrapper(responseMap)
+                        else:
+                            # ideal case - concert join.
+                            concertToJoin.users.add(userId)
+                            userIdMainMap[userId].concertTag = concertTag
+
+                            responseMap[USER_ID] = user.id
+                            responseMap[CONCERT_TAG] = concertTag
+                            responseMap[VIDEO_URL] = concertToJoin.videoUrl
+                            responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
+                            responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                            responseMap[RESPONSE_TYPE] = CONCERT_JOINED
+                            responseMap[VOFFSET] = concertToJoin.getCurrentPlayTime()
+                            ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
+                            responseMap[OWNER_FLAG] = False
+                            responseMap[OWNER_DELAY] = ownerDelay
+                            self.sendingWrapper(responseMap)
+                    else:
+                        # no concert found.
+                        responseMap[USER_ID] = user.id
+                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[RESPONSE_TYPE] = NO_CONCERT
+                        responseMap[OWNER_FLAG] = False
+                        self.sendingWrapper(responseMap)
 
         except Exception, e:
             print e
