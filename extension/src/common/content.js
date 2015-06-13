@@ -321,25 +321,27 @@ function doSend(message)
 }
 
 setInterval( function() {
-    console.log("...........................SetInterval chutiyaapa...........................");
-    if (!videoSynchronizedFlag && videoSynchronizedSystemTime && goTo && controlFlag) {
-        console.log("Inside if condition");
-        var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-        for (var i=0;i<concertPlayer.buffered.length;i++){
-            var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo;
-            if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
-                try {
-                    seekToCurrentVideo(whereIShouldBeRightNow);
-                    playCurrentVideo();
-                    setVolume(100);
-                    console.log("Played the video ~~ finally.");
+    if (kango.storage.getItem(OWNER_FLAG)==false) {
+        console.log("...........................SetInterval chutiyaapa...........................");
+        if (!videoSynchronizedFlag && videoSynchronizedSystemTime && goTo && controlFlag) {
+            console.log("Inside if condition");
+            var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+            for (var i=0;i<concertPlayer.buffered.length;i++){
+                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo;
+                if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
+                    try {
+                        seekToCurrentVideo(whereIShouldBeRightNow);
+                        playCurrentVideo();
+                        setVolume(100);
+                        console.log("Played the video ~~ finally.");
 
-                    videoSynchronizedFlag = true;
-                    videoSynchronizedSystemTime = null;
-                    goTo = null;
-                    break;
-                } catch (exception) {
-                    console.log(exception);
+                        videoSynchronizedFlag = true;
+                        videoSynchronizedSystemTime = null;
+                        goTo = null;
+                        break;
+                    } catch (exception) {
+                        console.log(exception);
+                    }
                 }
             }
         }
