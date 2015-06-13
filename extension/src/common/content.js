@@ -32,6 +32,7 @@ var OWNER_DELAY = "ownerDelay"
 var videoSynchronizedFlag = true;
 var videoSynchronizedSystemTime = null;
 var goTo = null;
+var controlFlag = true;
 
 function youtuber() {
 
@@ -320,7 +321,9 @@ function doSend(message)
 }
 
 setInterval( function() {
-    if (!videoSynchronizedFlag && videoSynchronizedSystemTime && goTo) {
+    console.log("...........................SetInterval chutiyaapa...........................");
+    if (!videoSynchronizedFlag && videoSynchronizedSystemTime && goTo && controlFlag) {
+        console.log("Inside if condition");
         var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
         for (var i=0;i<concertPlayer.buffered.length;i++){
             var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo;
@@ -334,6 +337,7 @@ setInterval( function() {
                     videoSynchronizedFlag = true;
                     videoSynchronizedSystemTime = null;
                     goTo = null;
+                    break;
                 } catch (exception) {
                     console.log(exception);
                 }
