@@ -365,7 +365,7 @@ setInterval( function() {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
             for (var i=0;i<concertPlayer.buffered.length;i++){
-                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo;
+                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo + 300;
                 if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
                     try {
                         seekToCurrentVideo(whereIShouldBeRightNow);
