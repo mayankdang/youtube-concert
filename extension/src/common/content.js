@@ -121,25 +121,6 @@ function youtuber() {
                             setVolume(100);
                         }, bufferDelay);
                     }
-
-                    var goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
-                    console.log("Goto: " + goTo);
-                    seekToCurrentVideo(goTo + bufferDelay - preloadDuration);
-                    setVolume(0);
-                    playCurrentVideo();
-                    console.log("Setting the timeout...");
-                    setTimeout(function() {
-                        seekToCurrentVideo(goTo + bufferDelay + 300);
-                        console.log(response[VIDEO_STATE]);
-                        if (response[VIDEO_STATE] == 1) {
-                            playCurrentVideo();
-                            console.log("Played the video.");
-                        } else if (response[VIDEO_STATE] == 2) {
-                            pauseCurrentVideo();
-                            console.log("Paused the video.");
-                        }
-                        setVolume(100);
-                    }, bufferDelay);
                 }
 
             } else {
