@@ -262,7 +262,9 @@ if (document.location.host=="www.youtube.com") {
 
 
     function sendUpdatedPlayerInfoToServer() {
+        console.log("Sending updated player info to server...");
         if (kango.storage.getItem(OWNER_FLAG) == true) {
+            console.log("Owner Flag:" + kango.storage.getItem(OWNER_FLAG));
             doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
                 vs: (isVideoPaused() ? 2 : 1)});
         }
@@ -286,6 +288,16 @@ if (document.location.host=="www.youtube.com") {
     }
 
     setInterval(function() {
+
+        try {
+            var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+            concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
+            concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
+            concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
+        } catch (exception) {
+            console.log("Exception-" + exception);
+        }
+
         // only if non-owner.
         if (kango.storage.getItem(OWNER_FLAG)==false) {
             if(youtube_parser(window.location.href)!=kango.storage.getItem(VIDEO_URL)||concert_parser(window.location.href)!=kango.storage.getItem(CONCERT_TAG)){
