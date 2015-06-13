@@ -29,6 +29,10 @@ var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
 var OWNER_DELAY = "ownerDelay"
 
+var videoSynchronizedFlag = true;
+var videoSynchronizedSystemTime = null;
+var goTo = null;
+
 function youtuber() {
 
     videoChecking=true;
@@ -108,18 +112,20 @@ function youtuber() {
                         pauseCurrentVideo();
                         console.log("Paused the video.");
                     } else if (response[VIDEO_STATE] == 1) {
-                        var goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
+
+                        // assume that you shall have to buffer the video before playing.
+
+                        // goTo = The position where it should have been right now.
+                        goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
                         console.log("Goto: " + goTo);
-                        seekToCurrentVideo(goTo + bufferDelay - preloadDuration);
+                        seekToCurrentVideo(goTo - preloadDuration);
                         setVolume(0);
                         playCurrentVideo();
+
+                        // the setInterval in the outer loop will take the required action.
+                        videoSynchronizedFlag = false;
                         console.log("Setting the timeout...");
-                        setTimeout(function() {
-                            seekToCurrentVideo(goTo + bufferDelay + 300);
-                            playCurrentVideo();
-                            console.log("Played the video.");
-                            setVolume(100);
-                        }, bufferDelay);
+                        videoSynchronizedSystemTime = new Date().getTime();
                     }
                 }
 
@@ -312,3 +318,26 @@ function doSend(message)
     console.log("Sending to main: " + JSON.stringify(message) + '\n');
     kango.dispatchMessage("contentToMain", message);
 }
+
+setInterval( function() {
+    if (!videoSynchronizedFlag && videoSynchronizedSystemTime && goTo) {
+        var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        for (var i=0;i<concertPlayer.buffered.length;i++){
+            var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo;
+            if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
+                try {
+                    seekToCurrentVideo(whereIShouldBeRightNow);
+                    playCurrentVideo();
+                    setVolume(100);
+                    console.log("Played the video ~~ finally.");
+
+                    videoSynchronizedFlag = true;
+                    videoSynchronizedSystemTime = null;
+                    goTo = null;
+                } catch (exception) {
+                    console.log(exception);
+                }
+            }
+        }
+    }
+}, 200);
