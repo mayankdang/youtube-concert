@@ -41,6 +41,7 @@ R_HANDSHAKING = 1
 R_NETWORK_DELAY = 2
 R_VIDEO_UPDATE = 3
 R_USER_ONLINE = 4
+R_PAGE_LOADED = 5
 
 
 current_milli_time = lambda: int(round(time.time() * 1000))
@@ -191,41 +192,13 @@ class SimpleChat(WebSocket):
             elif requestType == R_USER_ONLINE:
                 pass
 
-            elif requestType == R_VIDEO_UPDATE:
-                userIdMainMap[userId].setClient(self)
-
-                firstTimeUsersConcert = False
-                owner = False
-                if ownerFlag:
-                    if concertTag in concertTagHashMap:
-                        if concertTagHashMap[concertTag].ownerId == userId:
-                            owner = True
-                        else:
-                            print "chutiya bana raha hai"
-                    else:
-                        firstTimeUsersConcert = True
-
+            elif requestType == R_PAGE_LOADED:
                 user = userIdMainMap[userId]
-                current_user_concert = userIdMainMap[userId].concertTag == concertTag
-
-                # BROADCAST
-                if owner and current_user_concert:
-
-                    print "vOffset:", vOffset
-                    print "videoState:", videoState
-                    if vOffset is not None and videoState is not None:
-                        concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
-
-                    responseMap[VOFFSET] = vOffset if vOffset is not None else None
-                    responseMap[VIDEO_STATE] = videoState
-                    responseMap[VIDEO_URL] = videoUrl
-                    responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
-                    concertTagHashMap[concertTag].concertRelay(responseMap)
 
                 # CREATE CONCERT
-                elif owner or firstTimeUsersConcert:
+                if ownerFlag:
 
-                    success = userIdMainMap[userId].createConcert(concertTag, videoUrl)
+                    success = user.createConcert(concertTag, videoUrl)
 
                     if not success:
                         responseMap[RESPONSE_TYPE] = CHUTIYA_KATA
@@ -233,7 +206,7 @@ class SimpleChat(WebSocket):
                         responseMap[CONCERT_TAG] = concertTag
                         responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
                         responseMap[VIDEO_STATE] = videoState
-                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
                     else:
@@ -242,7 +215,7 @@ class SimpleChat(WebSocket):
                         responseMap[CONCERT_TAG] = concertTag
                         responseMap[VIDEO_URL] = videoUrl
                         responseMap[VIDEO_STATE] = videoState
-                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                         responseMap[OWNER_FLAG] = True
                         self.sendingWrapper(responseMap)
 
@@ -257,7 +230,7 @@ class SimpleChat(WebSocket):
                             responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_URL] = concertToJoin.videoUrl
                             responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
-                            responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                            responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = I_AM_ALREADY_OWNER
                             responseMap[OWNER_FLAG] = True
                             responseMap[OWNER_DELAY] = user.networkDelay
@@ -271,7 +244,7 @@ class SimpleChat(WebSocket):
                             responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_URL] = concertToJoin.videoUrl
                             responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
-                            responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                            responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = CONCERT_JOINED
                             responseMap[VOFFSET] = concertToJoin.getCurrentPlayTime()
                             ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
@@ -281,10 +254,30 @@ class SimpleChat(WebSocket):
                     else:
                         # no concert found.
                         responseMap[USER_ID] = user.id
-                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                         responseMap[RESPONSE_TYPE] = NO_CONCERT
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
+
+            elif requestType == R_VIDEO_UPDATE:
+                userIdMainMap[userId].setClient(self)
+
+                if ownerFlag:
+                    if concertTag in concertTagHashMap and videoUrl is not None:
+                        if concertTagHashMap[concertTag].ownerId == userId:
+                            # BROADCAST
+                            print "vOffset:", vOffset
+                            print "videoState:", videoState
+                            if vOffset is not None and videoState is not None:
+                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
+
+                            responseMap[VOFFSET] = vOffset if vOffset is not None else None
+                            responseMap[VIDEO_STATE] = videoState
+                            responseMap[VIDEO_URL] = videoUrl
+                            responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                            concertTagHashMap[concertTag].concertRelay(responseMap)
+                        else:
+                            print "chutiya bana raha hai"
 
         except Exception, e:
             print e

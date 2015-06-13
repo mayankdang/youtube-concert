@@ -26,7 +26,11 @@ var CLIENT_TIMESTAMP = "clientTimeStamp";
 var REQUEST_TYPE = "requestType";
 var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
-var OWNER_DELAY = "ownerDelay"
+var OWNER_DELAY = "ownerDelay";
+
+// contentToMainActions
+var PAGE_LOADED = "pageLoaded";
+var SYNC_VIDEO = "syncVideo";
 
 var eventQueue=[];
 var videoSynchronizedFlag = true;
@@ -95,7 +99,8 @@ function youtuber() {
 
         console.log("Received message from main:" + mainEvt.data);
 
-        if (mainEvt.data.response) {
+
+        if (mainEvt.data.response&&mainEvt.data.response[REQUEST_TYPE]==R_VIDEO_UPDATE) {
             var response=mainEvt.data.response;
             console.log("...............Response from main:" + JSON.stringify(response));
 
@@ -123,7 +128,7 @@ function youtuber() {
                         console.log("Setting the timeout...");
                         videoSynchronizedSystemTime = new Date().getTime();
 
-                        var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,response[VIDEO_URL]);
+                        var event = getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,response[VIDEO_URL]);
                         eventQueue.push(event);
 
                         console.log("Paused the video.");
@@ -149,9 +154,21 @@ function youtuber() {
                     }
                 }
 
-            } else {
-                console.log("------------------------------------- Bakchodi - Owner dude - AISA KABHI NAHI HONA CHAHIYE -------------------------------------");
             }
+        }
+        else if(mainEvt.data.response&&mainEvt.data.response[REQUEST_TYPE]==R_PAGE_LOADED){
+            if (responseType==CONCERT_CREATED) {
+
+            } else if (responseType==CHUTIYA_KATA) {
+
+            } else if (responseType==CONCERT_JOINED) {
+
+            } else if (responseType==NO_CONCERT) {
+
+            } else if (responseType==I_AM_ALREADY_OWNER) {
+
+            }
+            alert(responseType);
         }
     });
 }
@@ -287,16 +304,13 @@ if (document.location.host=="www.youtube.com") {
 
     function sendUpdatedPlayerInfoToServer() {
         console.log("Sending updated player info to server...");
-        if (kango.storage.getItem(OWNER_FLAG) == true) {
-            console.log("Owner Flag:" + kango.storage.getItem(OWNER_FLAG));
-            doSend({v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
-                vs: (isVideoPaused() ? 2 : 1)});
-        }
+        doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
+            vs: (isVideoPaused() ? 2 : 1)});
     }
 
     function getPlayerInfoFromServer() {
         if (kango.storage.getItem(OWNER_FLAG) == false) {
-            doSend({c:concert_parser(window.location.href)});
+            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href)});
         }
     }
 
@@ -339,8 +353,6 @@ function doSend(message)
     kango.dispatchMessage("contentToMain", message);
 }
 
-
-
 setInterval( function() {
     if (eventQueue.length>0&&kango.storage.getItem(OWNER_FLAG)==false) {
         console.log("...........................SetInterval chutiyaapa..........................."+videoSynchronizedFlag);
@@ -353,6 +365,7 @@ setInterval( function() {
                 index=i;
             }
         }
+
 
         var event=eventQueue[index];
         var videoSynchronizedFlag=event.vstf;
