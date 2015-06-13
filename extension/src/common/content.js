@@ -12,8 +12,8 @@ var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
 var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
-var bufferDelay = 1800;      // can be something more than 500.
-var preloadDuration = 500;
+var bufferDelay = 800;      // can be something more than 500.
+var preloadDuration = 50;
 
 // response macros
 var USER_ID = "userId";
@@ -303,14 +303,6 @@ if (document.location.host=="www.youtube.com") {
             if(youtube_parser(window.location.href)!=kango.storage.getItem(VIDEO_URL)||concert_parser(window.location.href)!=kango.storage.getItem(CONCERT_TAG)){
                 window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+kango.storage.getItem(VIDEO_URL)+"#"+kango.storage.getItem(CONCERT_TAG);
             }
-            var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-            concertPlayer.pauseVideo = null;
-            concertPlayer.pause = null;
-            concertPlayer.play = null;
-            try {document.getElementsByClassName("ytp-button ytp-button-pause")[0].style.display = "none";} catch (exception) {}
-            try {document.getElementsByClassName("ytp-button ytp-button-next")[0].style.display = "none";} catch (exception) {}
-            try {document.getElementsByClassName("ytp-button ytp-button-prev")[0].style.display = "none";} catch (exception) {}
-            try {document.getElementsByClassName("html5-progress-bar ytp-force-transform")[0].style.display = "none";} catch (exception) {}
         }
 
 //        console.log("500: "+concertRole);
