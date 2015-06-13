@@ -323,7 +323,7 @@ function doSend(message)
 setInterval( function() {
     if (kango.storage.getItem(OWNER_FLAG)==false) {
         console.log("...........................SetInterval chutiyaapa...........................");
-        if (!videoSynchronizedFlag && videoSynchronizedSystemTime && goTo && controlFlag) {
+        if (videoSynchronizedFlag===false && controlFlag===true) {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
             for (var i=0;i<concertPlayer.buffered.length;i++){
@@ -336,8 +336,8 @@ setInterval( function() {
                         console.log("Played the video ~~ finally.");
 
                         videoSynchronizedFlag = true;
-                        videoSynchronizedSystemTime = null;
-                        goTo = null;
+//                        videoSynchronizedSystemTime = null;
+//                        goTo = null;
                         break;
                     } catch (exception) {
                         console.log(exception);
