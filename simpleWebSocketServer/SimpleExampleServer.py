@@ -74,7 +74,7 @@ class Concert(object):
         return int(round(time.time() * 1000))
 
     def getCurrentPlayTime(self):
-        if self._updatedVOffsetTime and self._vOffset:
+        if self._updatedVOffsetTime is not None and self._vOffset is not None:
             return self._vOffset + self.getCurrentTime() - self._updatedVOffsetTime
         return 0
 
@@ -205,10 +205,10 @@ class SimpleChat(WebSocket):
 
                     print "vOffset:", vOffset
                     print "videoState:", videoState
-                    if vOffset and videoState:
+                    if vOffset is not None and videoState is not None:
                         concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
 
-                    responseMap[VOFFSET] = vOffset if vOffset else None
+                    responseMap[VOFFSET] = vOffset if vOffset is not None else None
                     responseMap[VIDEO_STATE] = videoState
                     responseMap[VIDEO_URL] = videoUrl
                     responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
