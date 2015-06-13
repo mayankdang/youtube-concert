@@ -103,7 +103,24 @@ function youtuber() {
                        response[VOFFSET]
                     && response[VIDEO_STATE]
                     ) {
-//                    seekToCurrentVideo(response[VOFFSET]+ response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY));
+
+                    if (response[VIDEO_STATE] == 2) {
+                        pauseCurrentVideo();
+                        console.log("Paused the video.");
+                    } else if (response[VIDEO_STATE] == 1) {
+                        var goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
+                        console.log("Goto: " + goTo);
+                        seekToCurrentVideo(goTo + bufferDelay - preloadDuration);
+                        setVolume(0);
+                        playCurrentVideo();
+                        console.log("Setting the timeout...");
+                        setTimeout(function() {
+                            seekToCurrentVideo(goTo + bufferDelay + 300);
+                            playCurrentVideo();
+                            console.log("Played the video.");
+                            setVolume(100);
+                        }, bufferDelay);
+                    }
 
                     var goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
                     console.log("Goto: " + goTo);
