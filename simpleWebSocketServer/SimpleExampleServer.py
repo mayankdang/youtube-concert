@@ -50,7 +50,7 @@ class Concert(object):
     def __init__(self, userId, concertTag, videoUrl=None):
         self.concertTag = concertTag
         self.ownerId = userId
-        self.users = [userId]
+        self.users = {userId}
         self.concertSize = 0  # unused - remove after checking.
         self.videoUrl = videoUrl
         self._updatedVOffsetTime = None
@@ -64,6 +64,7 @@ class Concert(object):
         responseMap[OWNER_FLAG] = False
         responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
+            responseMap[USER_ID] = tempUserId
             if tempUserId != self.ownerId:
                 try:
                     userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
@@ -99,6 +100,10 @@ class User(object):
         self.client = client
         self.createdAt = current_milli_time()
         self.updatedAt = current_milli_time()
+
+
+    def setClient(self, client):
+        self.client = client
 
     def getCurrentTime(self):
         return int(round(time.time() * 1000))
@@ -234,7 +239,8 @@ class SimpleChat(WebSocket):
                 # JOIN CONCERT
                 else:
                     concertToJoin = concertTagHashMap[concertTag]
-                    concertToJoin.users.append(userId)
+                    concertToJoin.users.add(userId)
+                    userIdMainMap[userId].setClient(self)
                     userIdMainMap[userId].concertTag = concertTag
 
                     responseMap[USER_ID] = user.id
