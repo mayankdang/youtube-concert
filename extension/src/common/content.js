@@ -273,7 +273,7 @@ if (document.location.host=="www.youtube.com") {
         var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
         concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
         concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
-        concertPlayer.onseek = sendUpdatedPlayerInfoToServer;
+        concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
         sendUpdatedPlayerInfoToServer();
         getPlayerInfoFromServer();
     } catch (exception) {
