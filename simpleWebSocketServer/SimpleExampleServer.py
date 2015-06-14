@@ -122,7 +122,7 @@ class User(object):
         print "set network delay as", delay
 
     def createConcert(self, concertTag, videoUrl):
-        if self.concertTag is None or concertTag not in concertTagHashMap:
+        if concertTag not in concertTagHashMap:
             print "1. concertTag is None? ", self.concertTag is None
             print "2. concertTagHashMap =", concertTagHashMap
             print "3. concertTag not in concertTagHashMap", self.concertTag not in concertTagHashMap
@@ -130,6 +130,10 @@ class User(object):
             self.concertTag = newConcert.concertTag
             concertTagHashMap[newConcert.concertTag] = newConcert
             print "4. Latest concertTagHashMap =", concertTagHashMap
+            return True
+        elif concertTagHashMap[concertTag].ownerId == self.id:
+            print "I am owner. I can change the video, bitch."
+            concertTagHashMap[concertTag].videoUrl = videoUrl
             return True
         else:
             print "The concert -", self.concertTag, " is already underway. Please use different concert name "
@@ -200,7 +204,7 @@ class SimpleChat(WebSocket):
 
                     success = user.createConcert(concertTag, videoUrl)
 
-                    if (not success) and (userId != concertTagHashMap[concertTag].ownerId):
+                    if not success:
                         responseMap[RESPONSE_TYPE] = CHUTIYA_KATA
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
@@ -210,7 +214,7 @@ class SimpleChat(WebSocket):
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
                     else:
-                        # Either he was successful in creating the group or he was the master himself.
+                        # Either he was successful in creating the group or he was the master himself (cool cool).
                         responseMap[RESPONSE_TYPE] = CONCERT_CREATED
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
