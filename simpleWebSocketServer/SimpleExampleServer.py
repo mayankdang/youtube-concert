@@ -200,7 +200,7 @@ class SimpleChat(WebSocket):
 
                     success = user.createConcert(concertTag, videoUrl)
 
-                    if not success:
+                    if (not success) and (userId != concertTagHashMap[concertTag].ownerId):
                         responseMap[RESPONSE_TYPE] = CHUTIYA_KATA
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
@@ -210,6 +210,7 @@ class SimpleChat(WebSocket):
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
                     else:
+                        # Either he was successful in creating the group or he was the master himself.
                         responseMap[RESPONSE_TYPE] = CONCERT_CREATED
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
