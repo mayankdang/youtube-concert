@@ -1,4 +1,4 @@
-﻿var IP = "192.168.0.104";
+﻿var IP = "192.168.0.110";
 var PORT = "8000";
 var websocket;
 var videoChecking=false;
@@ -245,8 +245,9 @@ var ownerFlag = null;
 function handleEvent(event){
     if (
     // koi naya url...
-            concertYoutubeTab==null||event.url !== currentUrl
-       )
+    //        concertYoutubeTab==null||event.url !== currentUrl
+    true
+    )
         {
             if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
                 currentUrl = event.url;
@@ -272,7 +273,7 @@ kango.browser.addEventListener(kango.browser.event.BEFORE_NAVIGATE, function(eve
     handleEvent(event);
 });
 
-kango.browser.addEventListener(kango.browser.event.TAB_CREATED, function(event){
+kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
     handleEvent(event);
 });
 

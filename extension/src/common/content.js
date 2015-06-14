@@ -31,6 +31,21 @@ var OWNER_DELAY = "ownerDelay";
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
 var SYNC_VIDEO = "syncVideo";
+var CONCERT_CREATED = "concertCreated";
+var CONCERT_JOINED = "concertJoined";
+var RESPONSE_TYPE = "responseType";
+var CHUTIYA_KATA = "chutiyaKata";
+var NO_CONCERT = "noConcert";
+var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
+
+
+// Request Types
+var R_CREATE_USER = 0;
+var R_HANDSHAKING = 1;
+var R_NETWORK_DELAY = 2;
+var R_VIDEO_UPDATE = 3;
+var R_USER_ONLINE = 4;
+var R_PAGE_LOADED = 5;
 
 var eventQueue=[];
 var videoSynchronizedFlag = true;
@@ -99,7 +114,8 @@ function youtuber() {
 
         console.log("Received message from main:" + mainEvt.data);
 
-        if (mainEvt.data.response&&mainEvt.data.response[REQUEST_TYPE]==R_VIDEO_UPDATE) {
+
+        if (mainEvt.data.response!=null&&mainEvt.data.response[REQUEST_TYPE] == R_VIDEO_UPDATE) {
             var response=mainEvt.data.response;
             console.log("...............Response from main:" + JSON.stringify(response));
 
@@ -155,7 +171,7 @@ function youtuber() {
 
             }
         }
-        else if (mainEvt.data.response && mainEvt.data.response[REQUEST_TYPE]==R_PAGE_LOADED) {
+        else if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE]== R_PAGE_LOADED) {
 
             var responseType = mainEvt.data.response[RESPONSE_TYPE];
 
