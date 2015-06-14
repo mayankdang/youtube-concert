@@ -248,7 +248,7 @@ function handleEvent(event){
             concertYoutubeTab==null||event.url !== currentUrl
        )
         {
-            if ( youtube_parser(currentUrl)!==null && concert_parser(currentUrl)!==null ) {
+            if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
                 currentUrl = event.url;
                 videoId = youtube_parser(currentUrl);
                 concertTag = concert_parser(currentUrl);
