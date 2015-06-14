@@ -213,7 +213,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         var c2mOwnerFlag = contentEvt.data.of;
         var c2mVOffset = contentEvt.data.o;
         var c2mVideoState = contentEvt.data.vs;
-        if (concertYoutubeTab!==null&&contentEvt.data.a == SYNC_VIDEO && ownerFlag===true) {
+        if (concertYoutubeTab!==null && c2mAction == SYNC_VIDEO) {
             var messageToSend = new Object();
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
             messageToSend[VIDEO_URL] = c2mVideoId;

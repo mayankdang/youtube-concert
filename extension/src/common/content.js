@@ -54,6 +54,7 @@ var videoState=null;
 
 var goTo = null;
 var controlFlag = true;
+var ownerFlag = false;
 
 function getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,videoId){
     return {vstf:videoSynchronizedFlag,vsst:videoSynchronizedSystemTime,vs:videoState,vid:videoId};
@@ -283,8 +284,12 @@ function setVolume(volume) {
 console.log(1111111111111);
 
 if (document.location.host=="www.youtube.com") {
+
     youtuber();
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////// THIS IS FOR CLIENT SIDE SYNCING ////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //    setInterval(function() {
 //        // only if joinee.
 //        if (kango.storage.getItem(OWNER_FLAG)==false) {
@@ -319,51 +324,45 @@ if (document.location.host=="www.youtube.com") {
 //        }
 //    }, 2000);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////// THIS IS FOR BINDING PAUSE / PLAY EVENTS SO THEY CAN SAY VIDEO SYNCING MESSAGES ////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function sendUpdatedPlayerInfoToServer() {
-        console.log("Sending updated player info to server...");
-        doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
-            vs: (isVideoPaused() ? 2 : 1)});
+        if (ownerFlag) {
+            console.log("Sending updated player info to server...");
+            doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
+                vs: (isVideoPaused() ? 2 : 1), of: ownerFlag});
+        }
     }
 
     function getPlayerInfoFromServer() {
-        if (kango.storage.getItem(OWNER_FLAG) == false) {
-            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href)});
+        if (!ownerFlag) {
+            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href), of: !ownerFlag});
         }
     }
 
-    try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-        concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
-        concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
-        concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
-        sendUpdatedPlayerInfoToServer();
-        getPlayerInfoFromServer();
-    } catch (exception) {
-        console.log("Exception-" + exception);
-    }
-
+    var bootingVideoFlag = false;
     setInterval(function() {
-
-        try {
-            var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-            concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
-            concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
-            concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
-        } catch (exception) {
-            console.log("Exception-" + exception);
-        }
-
-        // only if non-owner.
-        if (kango.storage.getItem(OWNER_FLAG)==false) {
-            if(youtube_parser(window.location.href)!=kango.storage.getItem(VIDEO_URL)||concert_parser(window.location.href)!=kango.storage.getItem(CONCERT_TAG)){
-                window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+kango.storage.getItem(VIDEO_URL)+"#"+kango.storage.getItem(CONCERT_TAG);
+        if (ownerFlag) {
+            try {
+                var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+                concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
+                concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
+                concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
+            } catch (exception) {
+                console.log("Exception-" + exception);
             }
         }
-
-//        console.log("500: "+concertRole);
-    }, 2000);
+        if (!bootingVideoFlag) {
+            sendUpdatedPlayerInfoToServer();
+            getPlayerInfoFromServer();
+            bootingVideoFlag = true;
+        }
+    }, 200);
 }
+
+//        window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+kango.storage.getItem(VIDEO_URL)+"#"+kango.storage.getItem(CONCERT_TAG);
 
 function doSend(message)
 {
