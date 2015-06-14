@@ -51,6 +51,7 @@ concertTagHashMap = {}
 
 SHARING_CODE_LENGTH = 3
 
+
 class Concert(object):
     def __init__(self, userId, concertTag, videoUrl=None):
         self.concertTag = concertTag
@@ -96,6 +97,7 @@ class Concert(object):
     def getVideoState(self):
         return self._videoState
 
+
 class User(object):
     def __init__(self, userId, client):
         self.id = userId
@@ -105,7 +107,6 @@ class User(object):
         self.client = client
         self.createdAt = current_milli_time()
         self.updatedAt = current_milli_time()
-
 
     def setClient(self, client):
         self.client = client
@@ -137,7 +138,6 @@ class User(object):
 
 class SimpleChat(WebSocket):
     def handleMessage(self):
-
         responseMap = {
             USER_ID: None,
             CONCERT_TAG: None,
@@ -273,6 +273,7 @@ class SimpleChat(WebSocket):
                                 concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
 
                             responseMap[VOFFSET] = vOffset if vOffset is not None else None
+                            responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_STATE] = videoState
                             responseMap[VIDEO_URL] = videoUrl
                             responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
@@ -290,20 +291,22 @@ class SimpleChat(WebSocket):
         except Exception, e:
             print "Exception while sending responseMap:", e
 
-
     def handleConnected(self):
         print self.address, 'connected'
 
     def handleClose(self):
         print self.address, 'closed'
 
-def getH(hash, key):
-    if key in hash:
-        return hash[key]
+
+def getH(hashMap, key):
+    if key in hashMap:
+        return hashMap[key]
     return None
+
 
 def idGenerator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in xrange(size))
+
 
 if __name__ == "__main__":
 
