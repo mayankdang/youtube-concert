@@ -38,7 +38,7 @@ var CHUTIYA_KATA = "chutiyaKata";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 
-var EXTRA_DELAY=300;
+var EXTRA_DELAY=1300;
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -356,6 +356,7 @@ if (document.location.host=="www.youtube.com") {
 
     var bootingVideoFlag = false;
     setInterval(function() {
+        EXTRA_DELAY=(kango.storage.getItem("EXTRA_DELAY")===null?300:kango.storage.getItem("EXTRA_DELAY"));
         if (ownerFlag) {
             try {
                 var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
