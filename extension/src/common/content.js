@@ -13,7 +13,7 @@ var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
 var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
-var EXTRA_DELAY=300;
+var EXTRA_DELAY=0;
 
 // response macros
 var USER_ID = "userId";
