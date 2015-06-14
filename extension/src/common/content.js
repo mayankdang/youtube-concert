@@ -13,6 +13,7 @@ var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
 var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
+var EXTRA_DELAY=300;
 
 // response macros
 var USER_ID = "userId";
@@ -37,8 +38,6 @@ var RESPONSE_TYPE = "responseType";
 var CHUTIYA_KATA = "chutiyaKata";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
-
-var EXTRA_DELAY=1300;
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -167,7 +166,7 @@ function youtuber() {
                     // goTo = The position where it should have been right now.
                     goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
                     console.log("Goto: " + goTo);
-                    seekToCurrentVideo(goTo - preloadDuration);
+                    seekToCurrentVideo(goTo + EXTRA_DELAY - preloadDuration);
                     setVolume(0);
                     playCurrentVideo();
 
