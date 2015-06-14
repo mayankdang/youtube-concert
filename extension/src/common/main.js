@@ -269,10 +269,6 @@ function handleEvent(event){
          }
 }
 
-kango.browser.addEventListener(kango.browser.event.BEFORE_NAVIGATE, function(event){
-    handleEvent(event);
-});
-
 kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
     handleEvent(event);
 });
