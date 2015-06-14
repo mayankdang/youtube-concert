@@ -99,7 +99,6 @@ function youtuber() {
 
         console.log("Received message from main:" + mainEvt.data);
 
-
         if (mainEvt.data.response&&mainEvt.data.response[REQUEST_TYPE]==R_VIDEO_UPDATE) {
             var response=mainEvt.data.response;
             console.log("...............Response from main:" + JSON.stringify(response));
@@ -156,8 +155,11 @@ function youtuber() {
 
             }
         }
-        else if(mainEvt.data.response&&mainEvt.data.response[REQUEST_TYPE]==R_PAGE_LOADED){
-            if (responseType==CONCERT_CREATED) {
+        else if (mainEvt.data.response && mainEvt.data.response[REQUEST_TYPE]==R_PAGE_LOADED) {
+
+            var responseType = mainEvt.data.response[RESPONSE_TYPE];
+
+            if (responseType == CONCERT_CREATED) {
 
             } else if (responseType==CHUTIYA_KATA) {
 
