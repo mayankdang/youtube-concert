@@ -38,6 +38,7 @@ var CHUTIYA_KATA = "chutiyaKata";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 
+var EXTRA_DELAY=300;
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -111,77 +112,88 @@ function youtuber() {
 //        setTimeout( upDowning , MYID*15)
 //    }
 
+    function redirectBasedOnState(vid,ct,of){
+        var url=window.location.href;
+
+        if(
+               youtube_parser(url) != vid
+            || ct != concert_parser(url)
+            || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
+            || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
+        ){
+            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+        }
+    }
+
     kango.addMessageListener("mainToContent", function(mainEvt) {
 
         console.log("Received message from main:" + mainEvt.data);
+        var responseType = mainEvt.data.response[RESPONSE_TYPE];
+        var response=mainEvt.data.response;
+        ownerFlag=response[OWNER_FLAG];
+        var videoId=response[VIDEO_URL];
 
 
-        if (mainEvt.data.response!=null&&mainEvt.data.response[REQUEST_TYPE] == R_VIDEO_UPDATE) {
+        if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE] == R_VIDEO_UPDATE && mainEvt.data.response[OWNER_FLAG]==false) {
             var response=mainEvt.data.response;
             console.log("...............Response from main:" + JSON.stringify(response));
-
-            if (mainEvt.data.response[OWNER_FLAG]==false) {
-                console.log("Bakchodi - Not owner dude!");
+            console.log("Bakchodi - Not owner dude!");
                 // joinee handle this
-                if (
-                       response[CONCERT_TAG]
-                    && response[VIDEO_URL]
-                    && ( youtube_parser(window.location.href)!=response[VIDEO_URL] || concert_parser(window.location.href)!=response[CONCERT_TAG])
-                    ) {
-                    window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+response[VIDEO_URL]+"#"+response[CONCERT_TAG];
+
+            try {
+                redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+            } catch (err) {
+            }
+
+            if (
+                (response[VOFFSET] !== null)
+                && (response[VIDEO_STATE] !== null)
+            ) {
+                if (response[VIDEO_STATE] == 2) {
+                    pauseCurrentVideo();
+
+                    videoSynchronizedFlag = false;
+                    videoState=response[VIDEO_STATE];
+                    console.log("Setting the timeout...");
+                    videoSynchronizedSystemTime = new Date().getTime();
+
+                    var event = getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,response[VIDEO_URL]);
+                    eventQueue.push(event);
+
+                    console.log("Paused the video.");
+                } else if (response[VIDEO_STATE] == 1) {
+
+                    // assume that you shall have to buffer the video before playing.
+                    // goTo = The position where it should have been right now.
+                    goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
+                    console.log("Goto: " + goTo);
+                    seekToCurrentVideo(goTo - preloadDuration);
+                    setVolume(0);
+                    playCurrentVideo();
+
+                    // the setInterval in the outer loop will take the required action.
+                    videoSynchronizedFlag = false;
+                    videoState=response[VIDEO_STATE];
+                    console.log("Setting the timeout...");
+                    videoSynchronizedSystemTime = new Date().getTime();
+
+                    var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState);
+                    eventQueue.push(event);
                 }
-
-                if (
-                       response[VOFFSET]
-                    && response[VIDEO_STATE]
-                    ) {
-
-                    if (response[VIDEO_STATE] == 2) {
-                        pauseCurrentVideo();
-
-                        videoSynchronizedFlag = false;
-                        videoState=response[VIDEO_STATE];
-                        console.log("Setting the timeout...");
-                        videoSynchronizedSystemTime = new Date().getTime();
-
-                        var event = getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,response[VIDEO_URL]);
-                        eventQueue.push(event);
-
-                        console.log("Paused the video.");
-                    } else if (response[VIDEO_STATE] == 1) {
-
-                        // assume that you shall have to buffer the video before playing.
-
-                        // goTo = The position where it should have been right now.
-                        goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
-                        console.log("Goto: " + goTo);
-                        seekToCurrentVideo(goTo - preloadDuration);
-                        setVolume(0);
-                        playCurrentVideo();
-
-                        // the setInterval in the outer loop will take the required action.
-                        videoSynchronizedFlag = false;
-                        videoState=response[VIDEO_STATE];
-                        console.log("Setting the timeout...");
-                        videoSynchronizedSystemTime = new Date().getTime();
-
-                        var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState);
-                        eventQueue.push(event);
-                    }
-                }
-
             }
         }
         else if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE]== R_PAGE_LOADED) {
-
-            var responseType = mainEvt.data.response[RESPONSE_TYPE];
 
             if (responseType == CONCERT_CREATED) {
 
             } else if (responseType==CHUTIYA_KATA) {
 
             } else if (responseType==CONCERT_JOINED) {
+                try{
+                    redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+                }catch (err){
 
+                }
             } else if (responseType==NO_CONCERT) {
 
             } else if (responseType==I_AM_ALREADY_OWNER) {
@@ -395,7 +407,7 @@ setInterval( function() {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
             for (var i=0;i<concertPlayer.buffered.length;i++){
-                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo + 300;
+                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo + EXTRA_DELAY;
                 if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
                     try {
                         seekToCurrentVideo(whereIShouldBeRightNow);
