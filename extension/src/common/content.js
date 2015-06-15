@@ -5,7 +5,7 @@ var videoChecking=false;
 var playTime=new Date().getTime();
 console.log("helloooooooooooooooooooo");
 var link=window.location.href;
-var concertRole= -1 // -1 initially, 1 for owner, 2 for joinee.
+var concertRole= -1; // -1 initially, 1 for owner, 2 for joinee.
 // for sync-ers
 var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
