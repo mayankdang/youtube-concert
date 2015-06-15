@@ -1,6 +1,7 @@
 ﻿var IP = "192.168.0.102";
 var PORT = "8000";
 var websocket;
+var wsConnectionAttempts = 1
 var videoChecking=false;
 
 // response macros
@@ -37,6 +38,17 @@ var SYNC_VIDEO = "syncVideo";
 var sentNetworkDelay=false;
 var delayArray = [];
 
+function generateInteval (k) {
+  var maxInterval = (Math.pow(2, k) - 1) * 1000;
+  
+  if (maxInterval > 30*1000) {
+    maxInterval = 30*1000; // If the generated interval is more than 30 seconds, truncate it down to 30 seconds.
+  }
+  
+  // generate the interval to a random number between 0 and the maxInterval determined from above
+  return Math.random() * maxInterval; 
+}
+
 function doConnect() {
     websocket = new WebSocket( "ws://"+IP+":"+PORT+"/" );
     websocket.onopen = function(evt) { onOpen(evt) };
@@ -44,29 +56,39 @@ function doConnect() {
     websocket.onmessage = function(evt) { onMessage(evt) };
     websocket.onerror = function(evt) { onError(evt) };
 
+
+    function onOpen(evt) {
+        if (kango.storage.getItem(USER_ID)) {
+            wsConnectionAttempts = 1;
+            var userId = kango.storage.getItem(USER_ID);
+            var messageToSend = new Object();
+            messageToSend[USER_ID] = userId;
+            messageToSend[REQUEST_TYPE] = R_USER_ONLINE;
+            doSend(messageToSend);
+            initiateHandshaking();
+        } else {
+            var messageToSend = new Object();
+            messageToSend[REQUEST_TYPE] = R_CREATE_USER;
+            doSend(messageToSend);
+        }
+    }
+
     function onClose(evt) {
-        console.log("Disconnected.\n");
+        var time = generateInterval(wsConnectionAttempts);
+        
+        setTimeout(function () {
+            // We've tried to reconnect so increment the attempts by 1
+            wsConnectionAttempts++;
+            
+            // Connection has closed so try to reconnect every 10 seconds.
+            doConnect(); 
+        }, time);
     }
 
     function onError(evt)
     {
         console.log('Error: ' + evt.data + '\n');
         websocket.close();
-    }
-
-    function onOpen(evt) {
-        if (kango.storage.getItem(USER_ID)) {
-            var userId = kango.storage.getItem(USER_ID);
-            var messageToSend = new Object();
-            messageToSend[USER_ID] = userId;
-            messageToSend[REQUEST_TYPE] = R_USER_ONLINE;
-            initiateHandshaking();
-            doSend(messageToSend);
-        } else {
-            var messageToSend = new Object();
-            messageToSend[REQUEST_TYPE] = R_CREATE_USER;
-            doSend(messageToSend);
-        }
     }
 
     function initiateHandshaking() {
@@ -152,12 +174,11 @@ function doConnect() {
         }
     }
 
-    function doDisconnect() {
-        websocket.close();
-    }
-
 }
-doConnect();
+
+function doDisconnect() {
+    websocket.close();
+}
 
 function doSend(requestMap)
 {
@@ -243,30 +264,30 @@ var concertTag = null;
 var ownerFlag = null;
 
 function handleEvent(event){
-    if (
-    // koi naya url...
-    //        concertYoutubeTab==null||event.url !== currentUrl
-    true
-    )
-        {
-            if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
-                currentUrl = event.url;
-                videoId = youtube_parser(currentUrl);
-                concertTag = concert_parser(currentUrl);
-                ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
-                var messageToSend = new Object();
-                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-                messageToSend[VIDEO_URL] = videoId;
-                messageToSend[CONCERT_TAG] = concertTag;
-                messageToSend[OWNER_FLAG] = ownerFlag;
-                messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
-                doSend(messageToSend);
-                concertYoutubeTab = event.target;
-            }
-            else {
-                    concertYoutubeTab=null;
-                }
-         }
+
+    if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
+        
+        // estabilish websocket connection for the first time
+        if (concertYoutubeTab == null){
+            doConnect();
+        }
+
+        currentUrl = event.url;
+        videoId = youtube_parser(currentUrl);
+        concertTag = concert_parser(currentUrl);
+        ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
+        var messageToSend = new Object();
+        messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+        messageToSend[VIDEO_URL] = videoId;
+        messageToSend[CONCERT_TAG] = concertTag;
+        messageToSend[OWNER_FLAG] = ownerFlag;
+        messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
+        doSend(messageToSend);
+        concertYoutubeTab = event.target;
+    }
+    else {
+            concertYoutubeTab=null;
+        }
 }
 
 kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
@@ -275,6 +296,7 @@ kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(e
 
 kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
-        concertYoutubeTab=null
+        concertYoutubeTab=null;
+        doDisconnect();
     }
 });
