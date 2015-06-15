@@ -58,14 +58,15 @@ function doConnect() {
 
 
     function onOpen(evt) {
+        wsConnectionAttempts = 1;
         if (kango.storage.getItem(USER_ID)) {
-            wsConnectionAttempts = 1;
             var userId = kango.storage.getItem(USER_ID);
+            initiateHandshaking();
+
             var messageToSend = new Object();
             messageToSend[USER_ID] = userId;
             messageToSend[REQUEST_TYPE] = R_USER_ONLINE;
             doSend(messageToSend);
-            initiateHandshaking();
         } else {
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = R_CREATE_USER;
