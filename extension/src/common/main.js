@@ -1,6 +1,7 @@
 ﻿var IP = "192.168.0.102";
 var PORT = "8000";
 var websocket;
+var wsConnectionAttempts = 1
 var videoChecking=false;
 
 // response macros
@@ -37,6 +38,17 @@ var SYNC_VIDEO = "syncVideo";
 var sentNetworkDelay=false;
 var delayArray = [];
 
+function generateInteval (k) {
+  var maxInterval = (Math.pow(2, k) - 1) * 1000;
+  
+  if (maxInterval > 30*1000) {
+    maxInterval = 30*1000; // If the generated interval is more than 30 seconds, truncate it down to 30 seconds.
+  }
+  
+  // generate the interval to a random number between 0 and the maxInterval determined from above
+  return Math.random() * maxInterval; 
+}
+
 function doConnect() {
     websocket = new WebSocket( "ws://"+IP+":"+PORT+"/" );
     websocket.onopen = function(evt) { onOpen(evt) };
@@ -44,18 +56,10 @@ function doConnect() {
     websocket.onmessage = function(evt) { onMessage(evt) };
     websocket.onerror = function(evt) { onError(evt) };
 
-    function onClose(evt) {
-        console.log("Disconnected.\n");
-    }
-
-    function onError(evt)
-    {
-        console.log('Error: ' + evt.data + '\n');
-        websocket.close();
-    }
 
     function onOpen(evt) {
         if (kango.storage.getItem(USER_ID)) {
+            wsConnectionAttempts = 1;
             var userId = kango.storage.getItem(USER_ID);
             var messageToSend = new Object();
             messageToSend[USER_ID] = userId;
@@ -67,6 +71,24 @@ function doConnect() {
             messageToSend[REQUEST_TYPE] = R_CREATE_USER;
             doSend(messageToSend);
         }
+    }
+
+    function onClose(evt) {
+        var time = generateInterval(wsConnectionAttempts);
+        
+        setTimeout(function () {
+            // We've tried to reconnect so increment the attempts by 1
+            wsConnectionAttempts++;
+            
+            // Connection has closed so try to reconnect every 10 seconds.
+            doConnect(); 
+        }, time);
+    }
+
+    function onError(evt)
+    {
+        console.log('Error: ' + evt.data + '\n');
+        websocket.close();
     }
 
     function initiateHandshaking() {
@@ -157,7 +179,6 @@ function doConnect() {
     }
 
 }
-doConnect();
 
 function doSend(requestMap)
 {
@@ -278,3 +299,5 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
         concertYoutubeTab=null
     }
 });
+
+doConnect();
