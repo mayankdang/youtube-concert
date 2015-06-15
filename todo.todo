@@ -1,11 +1,11 @@
  ✔ join concert -> sync @done (15-06-13 06:20)
  ☐ double enter in url to join ->> single
- ☐ I am a user in a group, I cannot change the video
- ☐ retry websocket connection on destroy (loop forever)
- ☐ permissions and url changes - what if I am not the owner replace #gId# by #gId
- ☐ Stop redundant messages when video stops/ends
+ ✔ I am a user in a group, I cannot change the video @done (15-06-15 20:09)
+ ✔ retry websocket connection on destroy (loop forever) @done (15-06-15 20:09)
+ ✔ permissions and url changes - what if I am not the owner replace #gId# by #gId @done (15-06-15 20:09)
+ ✔ Stop redundant messages when video stops/ends @done (15-06-15 20:09)
  ☐ 
- ☐ multiple group support
+ ✔ multiple group support @done (15-06-15 20:10)
  ☐ hosting - ec2
  ☐ code on demand
  ☐ 

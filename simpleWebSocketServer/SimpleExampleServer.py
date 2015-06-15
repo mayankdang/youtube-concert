@@ -60,8 +60,8 @@ class Concert(object):
         self.concertSize = 0  # unused - remove after checking.
         self.videoUrl = videoUrl
         self._updatedVOffsetTime = None
-        self._vOffset = None
-        self._videoState = None
+        self._vOffset = 0
+        self._videoState = 2
         self.createdAt = current_milli_time()
         self.updatedAt = current_milli_time()
 
