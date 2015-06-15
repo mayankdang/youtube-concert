@@ -64,8 +64,8 @@ function doConnect() {
             var messageToSend = new Object();
             messageToSend[USER_ID] = userId;
             messageToSend[REQUEST_TYPE] = R_USER_ONLINE;
-            initiateHandshaking();
             doSend(messageToSend);
+            initiateHandshaking();
         } else {
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = R_CREATE_USER;
@@ -174,10 +174,10 @@ function doConnect() {
         }
     }
 
-    function doDisconnect() {
-        websocket.close();
-    }
+}
 
+function doDisconnect() {
+    websocket.close();
 }
 
 function doSend(requestMap)
@@ -264,30 +264,30 @@ var concertTag = null;
 var ownerFlag = null;
 
 function handleEvent(event){
-    if (
-    // koi naya url...
-    //        concertYoutubeTab==null||event.url !== currentUrl
-    true
-    )
-        {
-            if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
-                currentUrl = event.url;
-                videoId = youtube_parser(currentUrl);
-                concertTag = concert_parser(currentUrl);
-                ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
-                var messageToSend = new Object();
-                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-                messageToSend[VIDEO_URL] = videoId;
-                messageToSend[CONCERT_TAG] = concertTag;
-                messageToSend[OWNER_FLAG] = ownerFlag;
-                messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
-                doSend(messageToSend);
-                concertYoutubeTab = event.target;
-            }
-            else {
-                    concertYoutubeTab=null;
-                }
-         }
+
+    if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
+        
+        // estabilish websocket connection for the first time
+        if (concertYoutubeTab == null){
+            doConnect();
+        }
+
+        currentUrl = event.url;
+        videoId = youtube_parser(currentUrl);
+        concertTag = concert_parser(currentUrl);
+        ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
+        var messageToSend = new Object();
+        messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+        messageToSend[VIDEO_URL] = videoId;
+        messageToSend[CONCERT_TAG] = concertTag;
+        messageToSend[OWNER_FLAG] = ownerFlag;
+        messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
+        doSend(messageToSend);
+        concertYoutubeTab = event.target;
+    }
+    else {
+            concertYoutubeTab=null;
+        }
 }
 
 kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
@@ -296,8 +296,7 @@ kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(e
 
 kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
-        concertYoutubeTab=null
+        concertYoutubeTab=null;
+        doDisconnect();
     }
 });
-
-doConnect();
