@@ -73,7 +73,8 @@ class Concert(object):
             responseMap[USER_ID] = tempUserId
             if tempUserId != self.ownerId:
                 try:
-                    userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
+                    if userIdMainMap[tempUserId].getConcertTag() == self.concertTag:
+                        userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
                 except Exception, e:
                     print "Exception: ", e
 
@@ -101,7 +102,7 @@ class Concert(object):
 class User(object):
     def __init__(self, userId, client):
         self.id = userId
-        self.concertTag = None
+        self._concertTag = None
         self.networkDelay = 15  # default
         self.recentTime = -1
         self.client = client
@@ -110,6 +111,20 @@ class User(object):
 
     def setClient(self, client):
         self.client = client
+
+    def updateConcertTag(self, newConcertTag):
+        try:
+            if self._concertTag is not None \
+                    and self._concertTag != newConcertTag \
+                    and self._concertTag in concertTagHashMap \
+                    and self.id in concertTagHashMap[self._concertTag].users:
+                concertTagHashMap[self._concertTag].users.remove(self.id)
+        except Exception, err:
+            print "Exception in updateConcertTag: ", err
+        self._concertTag = newConcertTag
+
+    def getConcertTag(self):
+        return self._concertTag
 
     def getCurrentTime(self):
         return int(round(time.time() * 1000))
@@ -123,20 +138,21 @@ class User(object):
 
     def createConcert(self, concertTag, videoUrl):
         if concertTag not in concertTagHashMap:
-            print "1. concertTag is None? ", self.concertTag is None
+            print "1. concertTag is None? ", self.getConcertTag() is None
             print "2. concertTagHashMap =", concertTagHashMap
-            print "3. concertTag not in concertTagHashMap", self.concertTag not in concertTagHashMap
+            print "3. concertTag not in concertTagHashMap", self.getConcertTag() not in concertTagHashMap
             newConcert = Concert(self.id, concertTag, videoUrl)
-            self.concertTag = newConcert.concertTag
+            self.updateConcertTag(newConcert.concertTag)
             concertTagHashMap[newConcert.concertTag] = newConcert
             print "4. Latest concertTagHashMap =", concertTagHashMap
             return True
         elif concertTagHashMap[concertTag].ownerId == self.id:
             print "I am owner. I can change the video, bitch."
+            self.updateConcertTag(concertTag)
             concertTagHashMap[concertTag].videoUrl = videoUrl
             return True
         else:
-            print "The concert -", self.concertTag, " is already underway. Please use different concert name "
+            print "The concert -", self.getConcertTag(), " is already underway. Please use different concert name "
         return False
 
 
@@ -183,6 +199,7 @@ class SimpleChat(WebSocket):
                 user = None
                 if userId in userIdMainMap:
                     user = userIdMainMap[userId]
+                    user.setClient(self)
                 else:
                     user = User(userId, self)
                     userIdMainMap[userId] = user
@@ -198,6 +215,7 @@ class SimpleChat(WebSocket):
 
             elif requestType == R_PAGE_LOADED:
                 user = userIdMainMap[userId]
+                user.setClient(self)
 
                 # CREATE CONCERT
                 if ownerFlag:
@@ -215,6 +233,7 @@ class SimpleChat(WebSocket):
                         self.sendingWrapper(responseMap)
                     else:
                         # Either he was successful in creating the group or he was the master himself (cool cool).
+                        user.updateLatestConcertTagEnquired(concertTag)
                         responseMap[RESPONSE_TYPE] = CONCERT_CREATED
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
@@ -229,6 +248,7 @@ class SimpleChat(WebSocket):
                     concertToJoin = concertTagHashMap.get(concertTag)
 
                     if concertToJoin is not None:
+                        user.updateConcertTag(concertTag)
                         if concertToJoin.ownerId == userId:
                             # owner asked to join as non - owner. Owner bakchodi kar raha hai ab!
                             responseMap[USER_ID] = user.id
@@ -243,7 +263,7 @@ class SimpleChat(WebSocket):
                         else:
                             # ideal case - concert join.
                             concertToJoin.users.add(userId)
-                            userIdMainMap[userId].concertTag = concertTag
+                            userIdMainMap[userId].updateConcertTag(concertTag)
 
                             responseMap[USER_ID] = user.id
                             responseMap[CONCERT_TAG] = concertTag
@@ -265,11 +285,13 @@ class SimpleChat(WebSocket):
                         self.sendingWrapper(responseMap)
 
             elif requestType == R_VIDEO_UPDATE:
-                userIdMainMap[userId].setClient(self)
+                user = userIdMainMap[userId]
+                user.setClient(self)
 
                 if ownerFlag:
                     if concertTag in concertTagHashMap and videoUrl is not None:
                         if concertTagHashMap[concertTag].ownerId == userId:
+                            user.updateLatestConcertTagEnquired(concertTag)
                             # BROADCAST
                             print "vOffset:", vOffset
                             print "videoState:", videoState
