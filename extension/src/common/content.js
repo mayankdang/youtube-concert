@@ -14,6 +14,7 @@ var ownerUpdatedTimestamp = -1;
 var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
 var EXTRA_DELAY=246;
+var BUFFER_DELAY=500;
 
 // response macros
 var USER_ID = "userId";
@@ -166,7 +167,7 @@ function youtuber() {
                     // goTo = The position where it should have been right now.
                     goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
                     console.log("Goto: " + goTo);
-                    seekToCurrentVideo(goTo + EXTRA_DELAY - preloadDuration);
+                    seekToCurrentVideo(goTo - preloadDuration + BUFFER_DELAY );
                     setVolume(0);
                     playCurrentVideo();
 
@@ -412,7 +413,7 @@ setInterval( function() {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
             for (var i=0;i<concertPlayer.buffered.length;i++){
-                //var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo + EXTRA_DELAY;
+                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo ;
                 if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
                     try {
                         seekToCurrentVideo(whereIShouldBeRightNow);
