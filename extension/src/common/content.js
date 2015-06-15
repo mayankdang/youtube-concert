@@ -173,9 +173,9 @@ function youtuber() {
         else if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE]== R_PAGE_LOADED) {
 
             if (responseType == CONCERT_CREATED) {
-
+                alert(responseType);
             } else if (responseType==CHUTIYA_KATA) {
-
+                alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
                 try{
                     redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
@@ -183,13 +183,11 @@ function youtuber() {
 
                 }
                 onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
-
             } else if (responseType==NO_CONCERT) {
-
+                alert(responseType);
             } else if (responseType==I_AM_ALREADY_OWNER) {
-
+                alert(responseType);
             }
-            alert(responseType);
         }
     });
 }
