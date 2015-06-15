@@ -287,8 +287,8 @@ function handleEvent(event){
         concertYoutubeTab = event.target;
     }
     else {
-            concertYoutubeTab=null;
-        }
+            //concertYoutubeTab=null;
+    }
 }
 
 kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
