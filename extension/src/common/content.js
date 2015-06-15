@@ -13,7 +13,7 @@ var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
 var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
-var EXTRA_DELAY=0;
+var EXTRA_DELAY=246;
 
 // response macros
 var USER_ID = "userId";
@@ -355,7 +355,6 @@ if (document.location.host=="www.youtube.com") {
 
     var bootingVideoFlag = false;
     setInterval(function() {
-        EXTRA_DELAY=(kango.storage.getItem("EXTRA_DELAY")===null?300:kango.storage.getItem("EXTRA_DELAY"));
         if (ownerFlag) {
             try {
                 var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
@@ -371,6 +370,10 @@ if (document.location.host=="www.youtube.com") {
             getPlayerInfoFromServer();
             bootingVideoFlag = true;
         }
+
+        EXTRA_DELAY=(kango.storage.getItem("EXTRA_DELAY")===null?300:kango.storage.getItem("EXTRA_DELAY"));
+        console.log("EXTRA_DELAY: "+EXTRA_DELAY);
+
     }, 200);
 }
 
@@ -382,6 +385,8 @@ function doSend(message)
     kango.dispatchMessage("contentToMain", message);
 }
 
+var prevLink=window.location.href;
+var concertTag=concert_parser(window.location.href);
 setInterval( function() {
     if (eventQueue.length>0&&kango.storage.getItem(OWNER_FLAG)==false) {
         console.log("...........................SetInterval chutiyaapa..........................."+videoSynchronizedFlag);
@@ -407,7 +412,7 @@ setInterval( function() {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
             for (var i=0;i<concertPlayer.buffered.length;i++){
-                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo + EXTRA_DELAY;
+                //var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo + EXTRA_DELAY;
                 if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
                     try {
                         seekToCurrentVideo(whereIShouldBeRightNow);
@@ -426,5 +431,13 @@ setInterval( function() {
         }
 
         eventQueue=[];
+    }
+    else{
+        if(window.location.href!=prevLink){
+            prevLink=window.location.href;
+            if(youtube_parser(prevLink)!==null&&concert_parser(prevLink)==null){
+                window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
+            }
+        }
     }
 }, 200);
