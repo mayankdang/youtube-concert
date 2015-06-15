@@ -57,8 +57,8 @@ var goTo = null;
 var controlFlag = true;
 var ownerFlag = false;
 
-function getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,videoId){
-    return {vstf:videoSynchronizedFlag,vsst:videoSynchronizedSystemTime,vs:videoState,vid:videoId};
+function getEvent(goto,videoSynchronizedSystemTime,videoState,videoId){
+    return {goto:goto,vsst:videoSynchronizedSystemTime,vs:videoState,vid:videoId};
 }
 
 function youtuber() {
@@ -125,6 +125,22 @@ function youtuber() {
         }
     }
 
+    function onOwnerUpdate(vOffset , ownerDelay , networkDelay,videoState,videoId) {
+        var goto=vOffset +ownerDelay+networkDelay;
+        seekToCurrentVideo(goto- preloadDuration + BUFFER_DELAY );
+        if(videoState==1) {
+            setVolume(0);
+            playCurrentVideo();
+        }else if(videoState==2) {
+            pauseCurrentVideo();
+        }
+
+        var videoSynchronizedSystemTime = new Date().getTime();
+        eventQueue.push(getEvent(goto,videoSynchronizedSystemTime,videoState,videoId));
+        videoSynchronizedFlag = false;
+    }
+
+
     kango.addMessageListener("mainToContent", function(mainEvt) {
 
         console.log("Received message from main:" + mainEvt.data);
@@ -132,6 +148,7 @@ function youtuber() {
         var response=mainEvt.data.response;
         ownerFlag=response[OWNER_FLAG];
         var videoId=response[VIDEO_URL];
+
 
 
         if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE] == R_VIDEO_UPDATE && mainEvt.data.response[OWNER_FLAG]==false) {
@@ -148,38 +165,9 @@ function youtuber() {
             if (
                 (response[VOFFSET] !== null)
                 && (response[VIDEO_STATE] !== null)
+                && (response[VIDEO_URL] !== null)
             ) {
-                if (response[VIDEO_STATE] == 2) {
-                    pauseCurrentVideo();
-
-                    videoSynchronizedFlag = false;
-                    videoState=response[VIDEO_STATE];
-                    console.log("Setting the timeout...");
-                    videoSynchronizedSystemTime = new Date().getTime();
-
-                    var event = getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState,response[VIDEO_URL]);
-                    eventQueue.push(event);
-
-                    console.log("Paused the video.");
-                } else if (response[VIDEO_STATE] == 1) {
-
-                    // assume that you shall have to buffer the video before playing.
-                    // goTo = The position where it should have been right now.
-                    goTo = response[VOFFSET] + response[OWNER_DELAY] + kango.storage.getItem(NETWORK_DELAY);
-                    console.log("Goto: " + goTo);
-                    seekToCurrentVideo(goTo - preloadDuration + BUFFER_DELAY );
-                    setVolume(0);
-                    playCurrentVideo();
-
-                    // the setInterval in the outer loop will take the required action.
-                    videoSynchronizedFlag = false;
-                    videoState=response[VIDEO_STATE];
-                    console.log("Setting the timeout...");
-                    videoSynchronizedSystemTime = new Date().getTime();
-
-                    var event=getEvent(videoSynchronizedFlag,videoSynchronizedSystemTime,videoState);
-                    eventQueue.push(event);
-                }
+                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
             }
         }
         else if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE]== R_PAGE_LOADED) {
@@ -194,6 +182,8 @@ function youtuber() {
                 }catch (err){
 
                 }
+                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
+
             } else if (responseType==NO_CONCERT) {
 
             } else if (responseType==I_AM_ALREADY_OWNER) {
@@ -409,6 +399,7 @@ setInterval( function() {
 
         if(videoState==2){
             pauseCurrentVideo();
+            videoSynchronizedFlag = true;
         }else if (videoSynchronizedFlag === false&&controlFlag===true) {
             console.log("Inside if condition");
             var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
