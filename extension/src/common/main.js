@@ -75,15 +75,15 @@ function doConnect() {
     }
 
     function onClose(evt) {
-        var time = generateInterval(wsConnectionAttempts);
-        
-        setTimeout(function () {
-            // We've tried to reconnect so increment the attempts by 1
-            wsConnectionAttempts++;
-            
-            // Connection has closed so try to reconnect every 10 seconds.
-            doConnect(); 
-        }, time);
+        //var time = generateInterval(wsConnectionAttempts);
+        //
+        //setTimeout(function () {
+        //    // We've tried to reconnect so increment the attempts by 1
+        //    wsConnectionAttempts++;
+        //
+        //    // Connection has closed so try to reconnect every 10 seconds.
+        //    doConnect();
+        //}, time);
     }
 
     function onError(evt)
@@ -257,7 +257,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 //    doSend(optionEvt.data.message);
 //});
 //
-//doConnect();
+doConnect();
 
 var currentUrl=null;
 var videoId = null;
@@ -269,9 +269,6 @@ function handleEvent(event){
     if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
         
         // estabilish websocket connection for the first time
-        if (concertYoutubeTab == null){
-            doConnect();
-        }
 
         currentUrl = event.url;
         videoId = youtube_parser(currentUrl);
@@ -298,6 +295,6 @@ kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(e
 kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
         concertYoutubeTab=null;
-        doDisconnect();
+        //doDisconnect();
     }
 });
