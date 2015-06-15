@@ -23,9 +23,10 @@ VOFFSET = "vOffset"
 VIDEO_STATE = "videoState"
 OWNER_FLAG = "ownerFlag"
 CLIENT_TIMESTAMP = "clientTimeStamp"
+SERVER_TIMESTAMP = "serverTimeStamp"
+CLOCK_DIFF = "clockDiff"
 REQUEST_TYPE = "requestType"
 ACK = "ack"                             # status acknowledgement for request successfully received.
-NETWORK_DELAY = "networkDelay"
 OWNER_DELAY = "ownerDelay"
 CONCERT_CREATED = "concertCreated"
 CONCERT_JOINED = "concertJoined"
@@ -38,7 +39,7 @@ I_AM_ALREADY_OWNER = "iAmAlreadyOwner"
 # Request Types
 R_CREATE_USER = 0
 R_HANDSHAKING = 1
-R_NETWORK_DELAY = 2
+R_CLOCK_DIFF = 2
 R_VIDEO_UPDATE = 3
 R_USER_ONLINE = 4
 R_PAGE_LOADED = 5
@@ -66,9 +67,9 @@ class Concert(object):
         self.updatedAt = current_milli_time()
 
     def concertRelay(self, responseMap):
-        ownerDelay = userIdMainMap[self.ownerId].networkDelay
+        # ownerDelay = userIdMainMap[self.ownerId].networkDelay
         responseMap[OWNER_FLAG] = False
-        responseMap[OWNER_DELAY] = ownerDelay
+        # responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
             responseMap[USER_ID] = tempUserId
             if tempUserId != self.ownerId:
@@ -103,7 +104,7 @@ class User(object):
     def __init__(self, userId, client):
         self.id = userId
         self._concertTag = None
-        self.networkDelay = 15  # default
+        self.clockDiff = 0  # default
         self.recentTime = -1
         self.client = client
         self.createdAt = current_milli_time()
@@ -132,9 +133,9 @@ class User(object):
     def updateRecentTime(self):
         self.recentTime = self.getCurrentTime()
 
-    def setNetworkDelay(self, delay):
-        self.networkDelay = delay
-        print "set network delay as", delay
+    def setClockDiff(self, clockDiff):
+        self.clockDiff = clockDiff
+        print "set Clock Diff as", clockDiff
 
     def createConcert(self, concertTag, videoUrl):
         if concertTag not in concertTagHashMap:
@@ -168,7 +169,7 @@ class SimpleChat(WebSocket):
             CLIENT_TIMESTAMP: None,
             REQUEST_TYPE: None,
             ACK: True,
-            NETWORK_DELAY: None
+            CLOCK_DIFF: None
         }
 
         try:
@@ -182,7 +183,7 @@ class SimpleChat(WebSocket):
             ownerFlag = getH(message, OWNER_FLAG)
             clientTimeStamp = getH(message, CLIENT_TIMESTAMP)
             requestType = getH(message, REQUEST_TYPE)
-            networkDelay = getH(message, NETWORK_DELAY)
+            clockDiff = getH(message, CLOCK_DIFF)
 
             if requestType == R_CREATE_USER:
                 responseMap[USER_ID] = idGenerator(16)
@@ -191,11 +192,12 @@ class SimpleChat(WebSocket):
 
             elif requestType == R_HANDSHAKING:
                 responseMap[CLIENT_TIMESTAMP] = clientTimeStamp
+                responseMap[SERVER_TIMESTAMP] = current_milli_time()
                 responseMap[REQUEST_TYPE] = R_HANDSHAKING
                 print "Sending handshaking to user.."
                 self.sendingWrapper(responseMap)
 
-            elif requestType == R_NETWORK_DELAY:
+            elif requestType == R_CLOCK_DIFF:
                 user = None
                 if userId in userIdMainMap:
                     user = userIdMainMap[userId]
@@ -203,11 +205,11 @@ class SimpleChat(WebSocket):
                 else:
                     user = User(userId, self)
                     userIdMainMap[userId] = user
-                user.networkDelay = networkDelay
-                print "Network delay set as:", networkDelay, "for userId:", userId
+                user.clockDiff = clockDiff
+                print "Clock Difference set as:", clockDiff, "for userId:", userId
                 responseMap[USER_ID] = user.id
-                responseMap[REQUEST_TYPE] = R_NETWORK_DELAY
-                responseMap[NETWORK_DELAY] = networkDelay
+                responseMap[REQUEST_TYPE] = R_CLOCK_DIFF
+                responseMap[CLOCK_DIFF] = clockDiff
                 self.sendingWrapper(responseMap)
 
             elif requestType == R_USER_ONLINE:
@@ -259,7 +261,7 @@ class SimpleChat(WebSocket):
                             responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = I_AM_ALREADY_OWNER
                             responseMap[OWNER_FLAG] = True
-                            responseMap[OWNER_DELAY] = user.networkDelay
+                            # responseMap[OWNER_DELAY] = user.networkDelay
                             self.sendingWrapper(responseMap)
                         else:
                             # ideal case - concert join.
@@ -273,9 +275,9 @@ class SimpleChat(WebSocket):
                             responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = CONCERT_JOINED
                             responseMap[VOFFSET] = concertToJoin.getCurrentPlayTime()
-                            ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
+                            # ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
                             responseMap[OWNER_FLAG] = False
-                            responseMap[OWNER_DELAY] = ownerDelay
+                            # responseMap[OWNER_DELAY] = ownerDelay
                             self.sendingWrapper(responseMap)
                     else:
                         # no concert found.

@@ -12,9 +12,10 @@ var VOFFSET = "vOffset";
 var VIDEO_STATE = "videoState";
 var OWNER_FLAG = "ownerFlag";
 var CLIENT_TIMESTAMP = "clientTimeStamp";
+var SERVER_TIMESTAMP = "serverTimeStamp";
+var CLOCK_DIFF = "clockDiff";
 var REQUEST_TYPE = "requestType";
 var ACK = "ack";
-var NETWORK_DELAY = "networkDelay";
 var OWNER_DELAY = "ownerDelay";
 var CONCERT_CREATED = "concertCreated";
 var CONCERT_JOINED = "concertJoined";
@@ -26,7 +27,7 @@ var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 // Request Types
 var R_CREATE_USER = 0;
 var R_HANDSHAKING = 1;
-var R_NETWORK_DELAY = 2;
+var R_CLOCK_DIFF = 2;
 var R_VIDEO_UPDATE = 3;
 var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
@@ -35,7 +36,7 @@ var R_PAGE_LOADED = 5;
 var PAGE_LOADED = "pageLoaded";
 var SYNC_VIDEO = "syncVideo";
 
-var sentNetworkDelay=false;
+var sentClockDifference = false;
 var delayArray = [];
 
 function generateInteval (k) {
@@ -100,18 +101,18 @@ function doConnect() {
             setTimeout(function() {
                 messageToSend[CLIENT_TIMESTAMP] = new Date().getTime();
                 doSend(messageToSend);
-            }, 200*i);
+            }, 300*i);
         }
     }
 
-    function saveNetworkDelay(delay) {
-        console.log("delay is - " + delay);
-        if (!sentNetworkDelay) {
+    function saveClockDifference(clockDiff) {
+        console.log("clock difference is - " + clockDiff);
+        if (!sentClockDifference) {
             if (delayArray.length>=3) {
-                computeDelayMedianAndSend();
-                sentNetworkDelay = true;
+                computeClockDiffMedianAndSend();
+                sentClockDifference = true;
             } else {
-                delayArray.push(parseInt(delay));
+                delayArray.push(parseInt(clockDiff));
             }
         }
     }
@@ -120,14 +121,13 @@ function doConnect() {
         return a - b;
     }
 
-    function computeDelayMedianAndSend() {
+    function computeClockDiffMedianAndSend() {
         delayArray.sort(sortNumberComparator);
-        // extra division by 2 to divide RoundTripTime RTT and get single way duration.
 
-        var networkDelay = parseInt(delayArray[1]);
+        var clockDiff = parseInt(delayArray[1]);
         var messageToSend = new Object();
-        messageToSend[REQUEST_TYPE] = R_NETWORK_DELAY;
-        messageToSend[NETWORK_DELAY] = networkDelay;
+        messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
+        messageToSend[CLOCK_DIFF] = clockDiff;
         messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
         doSend(messageToSend);
         console.log("delayArray:" + JSON.stringify(delayArray));
@@ -145,9 +145,10 @@ function doConnect() {
         var videoState = response[VIDEO_STATE];
         var ownerFlag = response[OWNER_FLAG];
         var clientTimeStamp = response[CLIENT_TIMESTAMP];
+        var serverTimeStamp = response[SERVER_TIMESTAMP];
+        var clockDiff = response[CLOCK_DIFF];
         var requestType = response[REQUEST_TYPE];
         var ack = response[ACK];
-        var networkDelay = response[NETWORK_DELAY];
         var responseType=response[RESPONSE_TYPE];
 
         if (requestType == R_CREATE_USER) {
@@ -157,13 +158,13 @@ function doConnect() {
 
         if (requestType == R_HANDSHAKING) {
             console.log("Handshaking ki request aayi hai.");
-            var diff = new Date().getTime()-parseInt(clientTimeStamp);
-            saveNetworkDelay(diff);
+            var networkDelay = (new Date().getTime() - parseInt(clientTimeStamp))/2;
+            var serverTimeStampOriginal = serverTimeStamp - networkDelay;
+            saveClockDifference(clientTimeStamp-serverTimeStampOriginal);
         }
 
-        if (requestType == R_NETWORK_DELAY) {
-            console.log("******* Network Delay is: " + networkDelay + " *******");
-            kango.storage.setItem(NETWORK_DELAY, networkDelay);
+        if (requestType == R_CLOCK_DIFF) {
+            console.log("******* Clock Difference is: " + clockDiff + " *******");
         }
 
         if (requestType == R_VIDEO_UPDATE || requestType == R_PAGE_LOADED) {
