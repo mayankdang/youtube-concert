@@ -233,7 +233,8 @@ class SimpleChat(WebSocket):
                         self.sendingWrapper(responseMap)
                     else:
                         # Either he was successful in creating the group or he was the master himself (cool cool).
-                        user.updateLatestConcertTagEnquired(concertTag)
+
+                        user.updateConcertTag(concertTag)
                         responseMap[RESPONSE_TYPE] = CONCERT_CREATED
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
@@ -291,7 +292,7 @@ class SimpleChat(WebSocket):
                 if ownerFlag:
                     if concertTag in concertTagHashMap and videoUrl is not None:
                         if concertTagHashMap[concertTag].ownerId == userId:
-                            user.updateLatestConcertTagEnquired(concertTag)
+                            user.updateConcertTag(concertTag)
                             # BROADCAST
                             print "vOffset:", vOffset
                             print "videoState:", videoState
