@@ -236,6 +236,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         var c2mOwnerFlag = contentEvt.data.of;
         var c2mVOffset = contentEvt.data.o;
         var c2mVideoState = contentEvt.data.vs;
+        var c2mClientTimestamp = contentEvt.data.t;
         if (concertYoutubeTab!==null && c2mAction == SYNC_VIDEO) {
             var messageToSend = new Object();
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
@@ -245,6 +246,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             messageToSend[VOFFSET] = c2mVOffset;
             messageToSend[OWNER_FLAG] = c2mOwnerFlag;
             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+            messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
             doSend(messageToSend);
         }
     } catch (err) {

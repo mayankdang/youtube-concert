@@ -23,6 +23,7 @@ var VIDEO_URL = "videoUrl";
 var VOFFSET = "vOffset";
 var VIDEO_STATE = "videoState";
 var OWNER_FLAG = "ownerFlag";
+var CLIENT_TIMESTAMP = "clientTimeStamp";
 var VIDEO_TIME = "videoTime";
 var CLIENT_TIMESTAMP = "clientTimeStamp";
 var REQUEST_TYPE = "requestType";
@@ -143,52 +144,55 @@ function youtuber() {
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
 
+        // NOW TAKE OUT evt.data.response[CLIENT_TIMESTAMP]
+
         console.log("Received message from main:" + mainEvt.data);
-        var responseType = mainEvt.data.response[RESPONSE_TYPE];
-        var response=mainEvt.data.response;
-        ownerFlag=response[OWNER_FLAG];
-        var videoId=response[VIDEO_URL];
-
-
-
-        if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE] == R_VIDEO_UPDATE && mainEvt.data.response[OWNER_FLAG]==false) {
-            var response=mainEvt.data.response;
-            console.log("...............Response from main:" + JSON.stringify(response));
-            console.log("Bakchodi - Not owner dude!");
-                // joinee handle this
-
-            try {
-                redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
-            } catch (err) {
-            }
-
-            if (
-                (response[VOFFSET] !== null)
-                && (response[VIDEO_STATE] !== null)
-                && (response[VIDEO_URL] !== null)
-            ) {
-                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
-            }
-        }
-        else if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE]== R_PAGE_LOADED) {
-
-            if (responseType == CONCERT_CREATED) {
-                alert(responseType);
-            } else if (responseType==CHUTIYA_KATA) {
-                alert(responseType);
-            } else if (responseType==CONCERT_JOINED) {
-                try{
-                    redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
-                }catch (err){
-
-                }
-                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
-            } else if (responseType==NO_CONCERT) {
-                alert(responseType);
-            } else if (responseType==I_AM_ALREADY_OWNER) {
-                alert(responseType);
-            }
-        }
+        alert(mainEvt.data);
+//        var responseType = mainEvt.data.response[RESPONSE_TYPE];
+//        var response=mainEvt.data.response;
+//        ownerFlag=response[OWNER_FLAG];
+//        var videoId=response[VIDEO_URL];
+//
+//
+//
+//        if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE] == R_VIDEO_UPDATE && mainEvt.data.response[OWNER_FLAG]==false) {
+//            var response=mainEvt.data.response;
+//            console.log("...............Response from main:" + JSON.stringify(response));
+//            console.log("Bakchodi - Not owner dude!");
+//                // joinee handle this
+//
+//            try {
+//                redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+//            } catch (err) {
+//            }
+//
+//            if (
+//                (response[VOFFSET] !== null)
+//                && (response[VIDEO_STATE] !== null)
+//                && (response[VIDEO_URL] !== null)
+//            ) {
+//                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
+//            }
+//        }
+//        else if (mainEvt.data.response!=null && mainEvt.data.response[REQUEST_TYPE]== R_PAGE_LOADED) {
+//
+//            if (responseType == CONCERT_CREATED) {
+//                alert(responseType);
+//            } else if (responseType==CHUTIYA_KATA) {
+//                alert(responseType);
+//            } else if (responseType==CONCERT_JOINED) {
+//                try{
+//                    redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+//                }catch (err){
+//
+//                }
+//                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),response[VIDEO_STATE],response[VIDEO_URL]);
+//            } else if (responseType==NO_CONCERT) {
+//                alert(responseType);
+//            } else if (responseType==I_AM_ALREADY_OWNER) {
+//                alert(responseType);
+//            }
+//        }
     });
 }
 
@@ -332,13 +336,13 @@ if (document.location.host=="www.youtube.com") {
         if (ownerFlag) {
             console.log("Sending updated player info to server...");
             doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
-                vs: (isVideoPaused() ? 2 : 1), of: ownerFlag});
+                vs: (isVideoPaused() ? 2 : 1), of: ownerFlag, t:new Date().getTime()});
         }
     }
 
     function getPlayerInfoFromServer() {
         if (!ownerFlag) {
-            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href), of: !ownerFlag});
+            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href), of: !ownerFlag, t:new Date().getTime()});
         }
     }
 

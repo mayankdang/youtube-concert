@@ -27,7 +27,6 @@ SERVER_TIMESTAMP = "serverTimeStamp"
 CLOCK_DIFF = "clockDiff"
 REQUEST_TYPE = "requestType"
 ACK = "ack"                             # status acknowledgement for request successfully received.
-OWNER_DELAY = "ownerDelay"
 CONCERT_CREATED = "concertCreated"
 CONCERT_JOINED = "concertJoined"
 RESPONSE_TYPE = "responseType"
@@ -60,44 +59,39 @@ class Concert(object):
         self.users = {userId}
         self.concertSize = 0  # unused - remove after checking.
         self.videoUrl = videoUrl
-        self._updatedVOffsetTime = None
+        self._updatedVOffsetTime = current_milli_time()
         self._vOffset = 0
         self._videoState = 2
-        self.createdAt = current_milli_time()
-        self.updatedAt = current_milli_time()
 
     def concertRelay(self, responseMap):
-        # ownerDelay = userIdMainMap[self.ownerId].networkDelay
         responseMap[OWNER_FLAG] = False
-        # responseMap[OWNER_DELAY] = ownerDelay
         for tempUserId in self.users:
             responseMap[USER_ID] = tempUserId
             if tempUserId != self.ownerId:
                 try:
                     if userIdMainMap[tempUserId].getConcertTag() == self.concertTag:
+                        responseMap[CLIENT_TIMESTAMP] = self._updatedVOffsetTime + userIdMainMap[tempUserId].clockDiff
                         userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
                 except Exception, e:
                     print "Exception: ", e
 
-    def getCurrentTime(self):
-        return int(round(time.time() * 1000))
-
-    def getCurrentPlayTime(self):
-        if self._updatedVOffsetTime is not None and self._vOffset is not None:
-            return self._vOffset + self.getCurrentTime() - self._updatedVOffsetTime
-        return 0
-
-    def syncVideoAttributes(self, vOffset, videoState):
+    def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp):
         self._vOffset = vOffset
-        self._updatedVOffsetTime = self.getCurrentTime()
+        self._updatedVOffsetTime = clientTimeStamp - userIdMainMap[self.ownerId].clockDiff
         self._videoState = videoState
         print "VOFFSET set in concert: ",
         print "_vOffset = ", vOffset,
-        print "updatedVOffsetTime = ", self._updatedVOffsetTime,
+        print "_updatedVOffsetTime = ", self._updatedVOffsetTime,
         print "_videoState = ", self._videoState
 
     def getVideoState(self):
         return self._videoState
+
+    def getVideoOffset(self):
+        return self._vOffset
+
+    def getUpdatedVOffsetTime(self):
+        return self._updatedVOffsetTime
 
 
 class User(object):
@@ -105,10 +99,7 @@ class User(object):
         self.id = userId
         self._concertTag = None
         self.clockDiff = 0  # default
-        self.recentTime = -1
         self.client = client
-        self.createdAt = current_milli_time()
-        self.updatedAt = current_milli_time()
 
     def setClient(self, client):
         self.client = client
@@ -129,9 +120,6 @@ class User(object):
 
     def getCurrentTime(self):
         return int(round(time.time() * 1000))
-
-    def updateRecentTime(self):
-        self.recentTime = self.getCurrentTime()
 
     def setClockDiff(self, clockDiff):
         self.clockDiff = clockDiff
@@ -261,7 +249,6 @@ class SimpleChat(WebSocket):
                             responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = I_AM_ALREADY_OWNER
                             responseMap[OWNER_FLAG] = True
-                            # responseMap[OWNER_DELAY] = user.networkDelay
                             self.sendingWrapper(responseMap)
                         else:
                             # ideal case - concert join.
@@ -271,13 +258,12 @@ class SimpleChat(WebSocket):
                             responseMap[USER_ID] = user.id
                             responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_URL] = concertToJoin.videoUrl
-                            responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
                             responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = CONCERT_JOINED
-                            responseMap[VOFFSET] = concertToJoin.getCurrentPlayTime()
-                            # ownerDelay = userIdMainMap[concertToJoin.ownerId].networkDelay
+                            responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
+                            responseMap[VOFFSET] = concertToJoin.getVideoOffset()
+                            responseMap[CLIENT_TIMESTAMP] = concertToJoin.getUpdatedVOffsetTime() + user.clockDiff
                             responseMap[OWNER_FLAG] = False
-                            # responseMap[OWNER_DELAY] = ownerDelay
                             self.sendingWrapper(responseMap)
                     else:
                         # no concert found.
@@ -298,8 +284,8 @@ class SimpleChat(WebSocket):
                             # BROADCAST
                             print "vOffset:", vOffset
                             print "videoState:", videoState
-                            if vOffset is not None and videoState is not None:
-                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState)
+                            if vOffset is not None and videoState is not None and clientTimeStamp is not None:
+                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState, clientTimeStamp)
 
                             responseMap[VOFFSET] = vOffset if vOffset is not None else None
                             responseMap[CONCERT_TAG] = concertTag
