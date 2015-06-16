@@ -126,7 +126,7 @@ function youtuber() {
         }
     }
 
-    function onOwnerUpdate(vOffset , ownerDelay , networkDelay, videoState, videoId, clientTimestamp) {
+    function onOwnerUpdate(vOffset , videoState, videoId, clientTimestamp) {
 
         if (
             (vOffset !== null)
@@ -135,32 +135,30 @@ function youtuber() {
                 && (clientTimestamp !== null)
             ) {
 
-            var interval = clientTimeStamp - (new Date().getTime());
-            
+            var interval = clientTimestamp - (new Date().getTime());
+
+            var WAITING_TIME = 2000;
             var timer = new Tock({
               countdown: true,
-              interval: interval,
+              interval: interval+WAITING_TIME,
               callback: function(){console.log(new Date().getTime())},
               complete: function(){
-                var goto=vOffset;
-                seekToCurrentVideo(goto );
-              
+                  setVolume(100);
+                  seekToCurrentVideo( vOffset + WAITING_TIME + 246 );
+                  console.log("SEEEKING1 :" + clientTimestamp);
+                  console.log("INTERVAL :" + interval);
               }
             });
 
-            timer.start(interval);
+            timer.start(interval+WAITING_TIME);
             
-            seekToCurrentVideo( vOffset -preloadDuration );
+            seekToCurrentVideo( vOffset + WAITING_TIME -preloadDuration );
              if(videoState==1) {
                 setVolume(0);
                 playCurrentVideo();
             }else if(videoState==2) {
                 pauseCurrentVideo();
             }
-
-            // var videoSynchronizedSystemTime = new Date().getTime();
-            // eventQueue.push(getEvent(goto,videoSynchronizedSystemTime,videoState,videoId));
-            // videoSynchronizedFlag = false;
         }
     }
 
@@ -185,8 +183,7 @@ function youtuber() {
                 redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
             } catch (err) {
             }
-            onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),
-                response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
+            onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
 
         }
         else if (response!=null && response[REQUEST_TYPE]== R_PAGE_LOADED) {
@@ -201,8 +198,7 @@ function youtuber() {
                 }catch (err){
 
                 }
-                onOwnerUpdate(response[VOFFSET] , response[OWNER_DELAY] , kango.storage.getItem(NETWORK_DELAY),
-                    response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
+                onOwnerUpdate(response[VOFFSET],response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
 
             } else if (responseType==NO_CONCERT) {
                 alert(responseType);
@@ -351,7 +347,7 @@ if (document.location.host=="www.youtube.com") {
 
     function sendUpdatedPlayerInfoToServer() {
         if (ownerFlag) {
-            console.log("Sending updated player info to server...");
+            console.log("Sending updated player info to server. :"+new Date().getTime());
             doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
                 vs: (isVideoPaused() ? 2 : 1), of: ownerFlag, t:new Date().getTime()});
         }
@@ -381,13 +377,8 @@ if (document.location.host=="www.youtube.com") {
             bootingVideoFlag = true;
         }
 
-        EXTRA_DELAY=(kango.storage.getItem("EXTRA_DELAY")===null?300:kango.storage.getItem("EXTRA_DELAY"));
-        console.log("EXTRA_DELAY: "+EXTRA_DELAY);
-
     }, 200);
 }
-
-//        window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+kango.storage.getItem(VIDEO_URL)+"#"+kango.storage.getItem(CONCERT_TAG);
 
 function doSend(message)
 {
@@ -397,58 +388,12 @@ function doSend(message)
 
 var prevLink=window.location.href;
 var concertTag=concert_parser(window.location.href);
+
 setInterval( function() {
-    if (eventQueue.length>0&&kango.storage.getItem(OWNER_FLAG)==false) {
-        console.log("...........................SetInterval chutiyaapa..........................."+videoSynchronizedFlag);
-        var lastUpdatedTime=eventQueue[0].vstf;
-
-        var index=0;
-        for(var i=0;i<eventQueue.length;i++){
-            var event=eventQueue[i];
-            if(event.vsst>=lastUpdatedTime){
-                index=i;
-            }
-        }
-
-
-        var event=eventQueue[index];
-        var videoSynchronizedFlag=event.vstf;
-        var videoState=event.vs;
-        var videoSynchronizedSystemTime=event.vsst;
-
-        if(videoState==2){
-            pauseCurrentVideo();
-            videoSynchronizedFlag = true;
-        }else if (videoSynchronizedFlag === false&&controlFlag===true) {
-            console.log("Inside if condition");
-            var concertPlayer = document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-            for (var i=0;i<concertPlayer.buffered.length;i++){
-                var whereIShouldBeRightNow = new Date().getTime() - videoSynchronizedSystemTime + goTo ;
-                if (concertPlayer.buffered.start(i) <= whereIShouldBeRightNow && whereIShouldBeRightNow < concertPlayer.buffered.end(i)) {
-                    try {
-                        seekToCurrentVideo(whereIShouldBeRightNow);
-                        playCurrentVideo();
-                        setVolume(100);
-                        console.log("Played the video ~~ finally.");
-                        videoSynchronizedFlag = true;
-//                        videoSynchronizedSystemTime = null;
-//                        goTo = null;
-                        break;
-                    } catch (exception) {
-                        console.log(exception);
-                    }
-                }
-            }
-        }
-
-        eventQueue=[];
-    }
-    else{
-        if(window.location.href!=prevLink){
-            prevLink=window.location.href;
-            if(youtube_parser(prevLink)!==null&&concert_parser(prevLink)==null){
-                window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
-            }
+    if(window.location.href!=prevLink){
+        prevLink=window.location.href;
+        if(youtube_parser(prevLink)!==null&&concert_parser(prevLink)==null){
+            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
         }
     }
 }, 200);
