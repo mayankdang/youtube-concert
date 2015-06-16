@@ -49,7 +49,6 @@ var R_VIDEO_UPDATE = 3;
 var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
 
-var eventQueue=[];
 var videoSynchronizedFlag = true;
 var videoSynchronizedSystemTime = null;
 var videoState=null;
@@ -57,9 +56,10 @@ var videoState=null;
 var goTo = null;
 var controlFlag = true;
 var ownerFlag = false;
+var events= [];
 
-function getEvent(goto,videoSynchronizedSystemTime,videoState,videoId){
-    return {goto:goto,vsst:videoSynchronizedSystemTime,vs:videoState,vid:videoId};
+function getEvent(vOffset, videoState, videoId, clientTimestamp) {
+    return { clientTimestamp:clientTimestamp, vOffset:vOffset, videoState:videoState, videoId:videoId };
 }
 
 function youtuber() {
@@ -126,41 +126,15 @@ function youtuber() {
         }
     }
 
-    function onOwnerUpdate(vOffset , videoState, videoId, clientTimestamp) {
-
+    function onOwnerUpdate(vOffset, videoState, videoId, clientTimestamp) {
         if (
             (vOffset !== null)
                 && (videoState !== null)
                 && (videoId !== null)
                 && (clientTimestamp !== null)
             ) {
-
-            var interval = clientTimestamp - (new Date().getTime());
-
-            var WAITING_TIME = 2000;
-            try{document.getElementsByTagName("video").style.opacity=0.1;}catch (er){}
-            var timer = new Tock({
-              countdown: true,
-              interval: interval+WAITING_TIME,
-              callback: function(){console.log(new Date().getTime())},
-              complete: function(){
-                  try{document.getElementsByTagName("video").style.opacity=1;}catch (er){}
-                  setVolume(100);
-                  seekToCurrentVideo( vOffset + WAITING_TIME + 300 );
-                  console.log("SEEEKING1 :" + clientTimestamp);
-                  console.log("INTERVAL :" + interval);
-              }
-            });
-
-            timer.start(interval+WAITING_TIME);
-            
-            seekToCurrentVideo( vOffset + WAITING_TIME -preloadDuration );
-             if(videoState==1) {
-                setVolume(0);
-                playCurrentVideo();
-            }else if(videoState==2) {
-                pauseCurrentVideo();
-            }
+            var event = getEvent(vOffset , videoState, videoId, clientTimestamp);
+            events.push(event);
         }
     }
 
@@ -185,6 +159,7 @@ function youtuber() {
                 redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
             } catch (err) {
             }
+
             onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
 
         }
@@ -200,7 +175,7 @@ function youtuber() {
                 }catch (err){
 
                 }
-                onOwnerUpdate(response[VOFFSET],response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
+                onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
 
             } else if (responseType==NO_CONCERT) {
                 alert(responseType);
@@ -209,10 +184,6 @@ function youtuber() {
             }
         }
     });
-}
-
-function setEventStatus(status){
-    document.getElementById("masthead-search-term").value=status;
 }
 
 function youtube_parser(url){
@@ -395,7 +366,60 @@ setInterval( function() {
     if(window.location.href!=prevLink){
         prevLink=window.location.href;
         if(youtube_parser(prevLink)!==null&&concert_parser(prevLink)==null){
-            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
+//            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
+        //todo:check this
         }
     }
 }, 200);
+
+var WAITING_TIME = 2000;
+var internalTimer = null;
+var VO = null;
+var VS = null;
+var CT = null;
+var VID = null;
+
+var mainSyncTimer = new Tock( {
+    countdown: true,
+    interval: 500,
+    callback: function() {
+        if (events.length > 0) {
+            var latestEvent = events[events.length-1];
+            VO = latestEvent.vOffset;
+            VS = latestEvent.videoState;
+            CT = latestEvent.clientTimestamp;
+            VID = latestEvent.videoId;
+
+            if (internalTimer !== null) {
+                internalTimer.stop();
+            }
+            try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
+            var interval = CT - new Date().getTime();
+            internalTimer = new Tock({
+                countdown: true,
+                interval: interval + WAITING_TIME,
+                callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
+                complete: function() {
+                    try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
+                    setVolume(100);
+                    seekToCurrentVideo( VO + WAITING_TIME + 300 );
+                    console.log("SEEKING :" + CT);
+                    console.log("INTERVAL :" + interval);
+                }
+            });
+            internalTimer.start(interval+WAITING_TIME);
+            seekToCurrentVideo( VO + WAITING_TIME - preloadDuration );
+            if (VS == 1) {
+                setVolume(0);
+                playCurrentVideo();
+            } else if (VS == 2) {
+                pauseCurrentVideo();
+            }
+            events = []
+        }
+    },
+    complete: function(){
+
+    }
+});
+mainSyncTimer.start(1000000000);
