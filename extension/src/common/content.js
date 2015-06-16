@@ -134,19 +134,33 @@ function youtuber() {
                 && (videoId !== null)
                 && (clientTimestamp !== null)
             ) {
-            var goto=vOffset +ownerDelay+networkDelay;
-            seekToCurrentVideo(goto- preloadDuration + BUFFER_DELAY );
-            if(videoState==1) {
+
+            var interval = clientTimeStamp - (new Date().getTime());
+            
+            var timer = new Tock({
+              countdown: true,
+              interval: interval,
+              callback: function(){console.log(new Date().getTime())},
+              complete: function(){
+                var goto=vOffset;
+                seekToCurrentVideo(goto );
+              
+              }
+            });
+
+            timer.start(interval);
+            
+            seekToCurrentVideo( vOffset -preloadDuration );
+             if(videoState==1) {
                 setVolume(0);
                 playCurrentVideo();
             }else if(videoState==2) {
                 pauseCurrentVideo();
             }
 
-            var videoSynchronizedSystemTime = new Date().getTime();
-            eventQueue.push(getEvent(goto,videoSynchronizedSystemTime,videoState,videoId));
-            videoSynchronizedFlag = false;
-
+            // var videoSynchronizedSystemTime = new Date().getTime();
+            // eventQueue.push(getEvent(goto,videoSynchronizedSystemTime,videoState,videoId));
+            // videoSynchronizedFlag = false;
         }
     }
 
