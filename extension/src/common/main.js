@@ -227,7 +227,7 @@ function youtube_parser(url){
 
 kango.addMessageListener("contentToMain", function(contentEvt) {
 
-    console.log("contentToMain:" + contentEvt.data);
+    console.log("contentToMain:" + JSON.stringify(contentEvt.data));
 
     try {
         var c2mAction = contentEvt.data.a;

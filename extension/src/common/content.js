@@ -1,5 +1,5 @@
 var timeScriptLoaded = new Date().getTime();
-var threshold = 30;
+var threshold = 100;
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
@@ -137,7 +137,6 @@ function youtuber() {
             events.push(event);
         }
     }
-
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
 
@@ -344,7 +343,9 @@ if (document.location.host=="www.youtube.com") {
                 console.log("Exception-" + exception);
             }
         }
-        if (!bootingVideoFlag) {
+
+        if ( !bootingVideoFlag && isVideoPaused() === false && getCurrentVideoOffsetInMillis() > 0 ) {
+            console.log("@@@@@@@ - sendUpdatedPlayerInfoToServer / getPlayerInfoFromServer : " + getCurrentVideoOffsetInMillis());
             sendUpdatedPlayerInfoToServer();
             getPlayerInfoFromServer();
             bootingVideoFlag = true;
@@ -378,56 +379,65 @@ var VO = null;
 var VS = null;
 var CT = null;
 var VID = null;
+var canSync = true;
+var pullTime = null;
 
 var mainSyncTimer = new Tock( {
     countdown: true,
     interval: 500,
     callback: function() {
-        if (events.length > 0) {
-            var latestEvent = events[events.length-1];
-            VO = latestEvent.vOffset;
-            VS = latestEvent.videoState;
-            CT = latestEvent.clientTimestamp;
-            VID = latestEvent.videoId;
-        }
-        var vp = isVideoPaused();
-        if (
-            (VS === 1) && ( vp ||
-                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ) > threshold )
-                )
-            )
-        {
-            if (internalTimer !== null) {
-                internalTimer.stop();
+        if (canSync) {
+            if (events.length > 0) {
+                var latestEvent = events[events.length-1];
+                VO = latestEvent.vOffset;
+                VS = latestEvent.videoState;
+                CT = latestEvent.clientTimestamp;
+                VID = latestEvent.videoId;
+                pullTime = new Date().getTime();
+                events = []
             }
-            try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
-            var interval = CT - new Date().getTime();
-            internalTimer = new Tock({
-                countdown: true,
-                interval: interval + WAITING_TIME,
-                callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
-                complete: function() {
-                    try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
-                    setVolume(100);
-                    seekToCurrentVideo( VO + WAITING_TIME + 300 );
-                    console.log("SEEKING :" + CT);
-                    console.log("INTERVAL :" + interval);
+            var vp = isVideoPaused();
+            console.log(vp);
+            console.log( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ));
+            if (
+                (VS === 1) && ( vp ||
+                    ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ) > threshold )
+                    )
+                )
+            {
+                console.log("Here.");
+                if (internalTimer !== null) {
+                    internalTimer.stop();
                 }
-            });
-            internalTimer.start(interval+WAITING_TIME);
-            seekToCurrentVideo( VO + WAITING_TIME - preloadDuration );
-            if (VS == 1) {
+                try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
+                var interval = CT - new Date().getTime();
+                canSync = false;
+                console.log("Setting canSync = FALSE.. Initiating a timer..");
+                internalTimer = new Tock({
+                    countdown: true,
+                    interval: interval + WAITING_TIME,
+                    callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
+                    complete: function() {
+                        try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
+                        setVolume(100);
+                        seekToCurrentVideo( VO +new Date().getTime()-CT+ 300);
+                        console.log("SEEKING :" + CT);
+                        console.log("INTERVAL :" + interval);
+                        canSync = true;
+                        console.log("Timer completed. Setting canSync = TRUE");
+                    }
+                });
+
+                internalTimer.start(interval+WAITING_TIME);
+                seekToCurrentVideo( VO+ interval + WAITING_TIME - preloadDuration );
                 setVolume(0);
                 playCurrentVideo();
-            } else if (VS == 2) {
+
+            } else if ( (VS === 2) && (!vp) ) {
+                seekToCurrentVideo( VO - preloadDuration );
                 pauseCurrentVideo();
             }
-            events = []
-        } else if ( (VS === 2) && (!vp) ) {
-            seekToCurrentVideo( VO - preloadDuration );
-            pauseCurrentVideo();
         }
-
     },
     complete: function(){
 
