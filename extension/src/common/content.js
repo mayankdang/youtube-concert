@@ -117,11 +117,11 @@ function youtuber() {
         var url=window.location.href;
 
         if(
-               youtube_parser(url) != vid
-            || ct != concert_parser(url)
-            || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
-            || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
-        ){
+            youtube_parser(url) != vid
+                || ct != concert_parser(url)
+                || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
+                || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
+            ){
             window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
         }
     }
@@ -153,7 +153,7 @@ function youtuber() {
         if (response != null && response[REQUEST_TYPE] == R_VIDEO_UPDATE && response[OWNER_FLAG] == false) {
             console.log("...............Response from main:" + JSON.stringify(response));
             console.log("Bakchodi - Not owner dude!");
-                // joinee handle this
+            // joinee handle this
 
             try {
                 redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
@@ -367,7 +367,7 @@ setInterval( function() {
         prevLink=window.location.href;
         if(youtube_parser(prevLink)!==null&&concert_parser(prevLink)==null){
 //            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
-        //todo:check this
+            //todo:check this
         }
     }
 }, 200);
@@ -389,7 +389,14 @@ var mainSyncTimer = new Tock( {
             VS = latestEvent.videoState;
             CT = latestEvent.clientTimestamp;
             VID = latestEvent.videoId;
-
+        }
+        var vp = isVideoPaused();
+        if (
+            (VS === 1) && ( vp ||
+                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ) > threshold )
+                )
+            )
+        {
             if (internalTimer !== null) {
                 internalTimer.stop();
             }
@@ -416,7 +423,11 @@ var mainSyncTimer = new Tock( {
                 pauseCurrentVideo();
             }
             events = []
+        } else if ( (VS === 2) && (!vp) ) {
+            seekToCurrentVideo( VO - preloadDuration );
+            pauseCurrentVideo();
         }
+
     },
     complete: function(){
 
