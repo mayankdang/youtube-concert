@@ -138,13 +138,15 @@ function youtuber() {
             var interval = clientTimestamp - (new Date().getTime());
 
             var WAITING_TIME = 2000;
+            try{document.getElementsByTagName("video").style.opacity=0.1;}catch (er){}
             var timer = new Tock({
               countdown: true,
               interval: interval+WAITING_TIME,
               callback: function(){console.log(new Date().getTime())},
               complete: function(){
+                  try{document.getElementsByTagName("video").style.opacity=1;}catch (er){}
                   setVolume(100);
-                  seekToCurrentVideo( vOffset + WAITING_TIME + 246 );
+                  seekToCurrentVideo( vOffset + WAITING_TIME + 300 );
                   console.log("SEEEKING1 :" + clientTimestamp);
                   console.log("INTERVAL :" + interval);
               }
