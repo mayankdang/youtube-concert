@@ -1,5 +1,5 @@
 var timeScriptLoaded = new Date().getTime();
-var threshold = 100;
+var threshold = 300;
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
@@ -384,7 +384,7 @@ var pullTime = null;
 
 var mainSyncTimer = new Tock( {
     countdown: true,
-    interval: 500,
+    interval: 2500,
     callback: function() {
         if (canSync) {
             if (events.length > 0) {
@@ -420,7 +420,7 @@ var mainSyncTimer = new Tock( {
                     complete: function() {
                         try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
                         setVolume(100);
-                        seekToCurrentVideo( VO +new Date().getTime()-CT+ 300);
+                        seekToCurrentVideo( VO +new Date().getTime()-CT);
                         console.log("SEEKING :" + CT);
                         console.log("INTERVAL :" + interval);
                         canSync = true;
@@ -429,7 +429,7 @@ var mainSyncTimer = new Tock( {
                 });
 
                 internalTimer.start(interval+WAITING_TIME);
-                seekToCurrentVideo( VO+ interval + WAITING_TIME - preloadDuration );
+                seekToCurrentVideo( VO + new Date().getTime()-CT - preloadDuration );
                 setVolume(0);
                 playCurrentVideo();
 
