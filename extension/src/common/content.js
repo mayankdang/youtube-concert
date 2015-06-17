@@ -119,13 +119,15 @@ function youtuber() {
         var url=window.location.href;
 
         if(
-            youtube_parser(url) != vid
+                 youtube_parser(url) != vid
                 || ct != concert_parser(url)
                 || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
                 || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
-            ){
+            )
+        {
             url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
-            kango.dispatchMessage("contentToMain", {a: LOAD_VIDEO, v: vid, c: ct, of: of, u: url})
+            window.location.assign(url);
+            //kango.dispatchMessage("contentToMain", {a: LOAD_VIDEO, v: vid, c: ct, of: of, u: url})
         }
     }
 
@@ -334,7 +336,7 @@ if (document.location.host=="www.youtube.com") {
 
     function getPlayerInfoFromServer() {
         if (!ownerFlag) {
-            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href), of: !ownerFlag, t:new Date().getTime()});
+            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href), of: ownerFlag, t:new Date().getTime()});
         }
     }
 
