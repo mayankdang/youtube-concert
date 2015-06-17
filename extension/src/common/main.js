@@ -250,7 +250,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
             messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
             doSend(messageToSend);
-        }else if{concertYoutubeTab!=null && c2mAction == LOAD_VIDEO}{
+        }else if(concertYoutubeTab!=null && c2mAction == LOAD_VIDEO){
             concertYoutubeTab.navigate(c2mVideoURL);
         }
     } catch (err) {
