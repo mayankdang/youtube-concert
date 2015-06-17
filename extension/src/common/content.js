@@ -71,7 +71,7 @@ function redirectBasedOnState(vid,ct,of){
     {
         if(ct!=null&&vid!=null){
             url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
-            window.location.assign(url);
+            kango.dispatchMessage("contentToMain",{a:LOAD_VIDEO,u:url});
         }
     }
 }
