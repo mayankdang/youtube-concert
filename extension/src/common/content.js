@@ -61,12 +61,12 @@ var events= [];
 
 
 function redirectBasedOnState(vid,ct,of){
-    var url=window.location.href;
+    var url = window.location.href;
     if(
         youtube_parser(url) != vid
         || ct != concert_parser(url)
-        || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
-        || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
+        || ( (of === true) && (url.lastIndexOf("#") != url.length-1) )
+        || ( (of === false) && (url.lastIndexOf("#") == url.length-1) )
     )
     {
         url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
@@ -373,7 +373,7 @@ var concertTag=concert_parser(window.location.href);
 
 setInterval( function() {
     if(ownerFlag)
-     redirectBasedOnState(OWNER_VID, OWNER_CON,true);
+     redirectBasedOnState(OWNER_VID, OWNER_CON, ownerFlag);
 }, 200);
 
 var WAITING_TIME = 2000;
