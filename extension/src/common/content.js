@@ -426,7 +426,7 @@ var mainSyncTimer = new Tock( {
                     complete: function() {
                         try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
                         setVolume(100);
-                        seekToCurrentVideo( VO +new Date().getTime()-CT -190);
+                        seekToCurrentVideo( VO +new Date().getTime()-CT + 190);
                         console.log("SEEKING :" + CT);
                         console.log("INTERVAL :" + interval);
                         canSync = true;
