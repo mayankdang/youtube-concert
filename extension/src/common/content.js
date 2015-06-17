@@ -59,6 +59,22 @@ var controlFlag = true;
 var ownerFlag = false;
 var events= [];
 
+
+function redirectBasedOnState(vid,ct,of){
+    var url=window.location.href;
+    if(
+        youtube_parser(url) != vid
+        || ct != concert_parser(url)
+        || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
+        || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
+    )
+    {
+        url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+        window.location.assign(url);
+        //kango.dispatchMessage("contentToMain", {a: LOAD_VIDEO, v: vid, c: ct, of: of, u: url})
+    }
+}
+
 function getEvent(vOffset, videoState, videoId, clientTimestamp) {
     return { clientTimestamp:clientTimestamp, vOffset:vOffset, videoState:videoState, videoId:videoId };
 }
@@ -113,23 +129,6 @@ function youtuber() {
 //        console.log("Randomize Sound called!");
 //        setTimeout( upDowning , MYID*15)
 //    }
-
-    function redirectBasedOnState(vid,ct,of){
-
-        var url=window.location.href;
-
-        if(
-                 youtube_parser(url) != vid
-                || ct != concert_parser(url)
-                || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
-                || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
-            )
-        {
-            url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
-            window.location.assign(url);
-            //kango.dispatchMessage("contentToMain", {a: LOAD_VIDEO, v: vid, c: ct, of: of, u: url})
-        }
-    }
 
     function onOwnerUpdate(vOffset, videoState, videoId, clientTimestamp) {
         if (
@@ -427,7 +426,7 @@ var mainSyncTimer = new Tock( {
                     complete: function() {
                         try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
                         setVolume(100);
-                        seekToCurrentVideo( VO +new Date().getTime()-CT);
+                        seekToCurrentVideo( VO +new Date().getTime()-CT -190);
                         console.log("SEEKING :" + CT);
                         console.log("INTERVAL :" + interval);
                         canSync = true;
