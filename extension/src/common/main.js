@@ -35,6 +35,7 @@ var R_PAGE_LOADED = 5;
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
 var SYNC_VIDEO = "syncVideo";
+var LOAD_VIDEO = "loadVideo";
 
 var sentClockDifference = false;
 var delayArray = [];
@@ -237,6 +238,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         var c2mVOffset = contentEvt.data.o;
         var c2mVideoState = contentEvt.data.vs;
         var c2mClientTimestamp = contentEvt.data.t;
+        var c2mVideoURL = contentEvt.data.u;
         if (concertYoutubeTab!==null && c2mAction == SYNC_VIDEO) {
             var messageToSend = new Object();
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
@@ -248,6 +250,8 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
             messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
             doSend(messageToSend);
+        }else if{concertYoutubeTab!=null && c2mAction == LOAD_VIDEO}{
+            concertYoutubeTab.navigate(c2mVideoURL);
         }
     } catch (err) {
 

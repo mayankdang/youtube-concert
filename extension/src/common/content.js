@@ -40,6 +40,7 @@ var RESPONSE_TYPE = "responseType";
 var CHUTIYA_KATA = "chutiyaKata";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
+var LOAD_VIDEO = "loadVideo"
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -114,6 +115,7 @@ function youtuber() {
 //    }
 
     function redirectBasedOnState(vid,ct,of){
+
         var url=window.location.href;
 
         if(
@@ -122,7 +124,8 @@ function youtuber() {
                 || ( (of === true) && (url.lastIndexOf("#") == url.length-1) )
                 || ( (of === false) && (url.lastIndexOf("#") != url.length-1) )
             ){
-            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+            url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+            kango.dispatchMessage("contentToMain", {a: LOAD_VIDEO, v: vid, c: ct, of: of, u: url})
         }
     }
 
@@ -320,6 +323,10 @@ if (document.location.host=="www.youtube.com") {
     function sendUpdatedPlayerInfoToServer() {
         if (ownerFlag) {
             console.log("Sending updated player info to server. :"+new Date().getTime());
+
+            OWNER_VID = youtube_parser(window.location.href);
+            OWNER_CON = concert_parser(window.location.href);
+
             doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
                 vs: (isVideoPaused() ? 2 : 1), of: ownerFlag, t:new Date().getTime()});
         }
@@ -364,13 +371,8 @@ var prevLink=window.location.href;
 var concertTag=concert_parser(window.location.href);
 
 setInterval( function() {
-    if(window.location.href!=prevLink){
-        prevLink=window.location.href;
-        if(youtube_parser(prevLink)!==null&&concert_parser(prevLink)==null){
-//            window.location.href=window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser(prevLink)+"#"+concertTag+"#";
-            //todo:check this
-        }
-    }
+    if(ownerFlag)
+     redirectBasedOnState(OWNER_VID, OWNER_CON,true);
 }, 200);
 
 var WAITING_TIME = 2000;
@@ -381,6 +383,9 @@ var CT = null;
 var VID = null;
 var canSync = true;
 var pullTime = null;
+
+var OWNER_VID = youtube_parser(window.location.href);
+var OWNER_CON = concert_parser(window.location.href);
 
 var mainSyncTimer = new Tock( {
     countdown: true,
