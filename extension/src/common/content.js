@@ -65,13 +65,14 @@ function redirectBasedOnState(vid,ct,of){
     if(
         youtube_parser(url) != vid
         || ct != concert_parser(url)
-        || ( (of === true) && (url.lastIndexOf("#") != url.length-1) )
         || ( (of === false) && (url.lastIndexOf("#") == url.length-1) )
-    )
+        || ( (of === true) && (url.lastIndexOf("#") != url.length-1) )
+        )
     {
-        url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
-        window.location.assign(url);
-        //kango.dispatchMessage("contentToMain", {a: LOAD_VIDEO, v: vid, c: ct, of: of, u: url})
+        if(ct!=null&&vid!=null){
+            url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+            window.location.assign(url);
+        }
     }
 }
 
@@ -324,10 +325,6 @@ if (document.location.host=="www.youtube.com") {
     function sendUpdatedPlayerInfoToServer() {
         if (ownerFlag) {
             console.log("Sending updated player info to server. :"+new Date().getTime());
-
-            OWNER_VID = youtube_parser(window.location.href);
-            OWNER_CON = concert_parser(window.location.href);
-
             doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
                 vs: (isVideoPaused() ? 2 : 1), of: ownerFlag, t:new Date().getTime()});
         }
@@ -368,14 +365,7 @@ function doSend(message)
     kango.dispatchMessage("contentToMain", message);
 }
 
-var prevLink=window.location.href;
 var concertTag=concert_parser(window.location.href);
-
-setInterval( function() {
-    if(ownerFlag)
-     redirectBasedOnState(OWNER_VID, OWNER_CON, ownerFlag);
-}, 200);
-
 var WAITING_TIME = 2000;
 var internalTimer = null;
 var VO = null;
@@ -384,9 +374,6 @@ var CT = null;
 var VID = null;
 var canSync = true;
 var pullTime = null;
-
-var OWNER_VID = youtube_parser(window.location.href);
-var OWNER_CON = concert_parser(window.location.href);
 
 var mainSyncTimer = new Tock( {
     countdown: true,
@@ -450,3 +437,14 @@ var mainSyncTimer = new Tock( {
     }
 });
 mainSyncTimer.start(1000000000);
+
+
+setInterval(function(){
+    if(
+        (ownerFlag&&concert_parser(window.location.href)===null)
+        ||(ownerFlag && concert_parser(window.location.href)!==concertTag)
+    )
+    {
+        redirectBasedOnState(youtube_parser(window.location.href),concertTag,true);
+    }
+},200);
