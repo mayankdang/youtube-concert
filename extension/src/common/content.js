@@ -110,6 +110,7 @@ function redirectBasedOnState(vid,ct,of){
         if(ct!=null&&vid!=null){
             url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
             kango.dispatchMessage("contentToMain",{a:LOAD_VIDEO,u:url});
+            window.close();
         }
     }
 }
@@ -191,9 +192,9 @@ function youtuber() {
         ownerFlag = response[OWNER_FLAG];
         var videoId = response[VIDEO_URL];
         var clientTimestamp = response[CLIENT_TIMESTAMP];
+        console.log("...............Response from main:" + JSON.stringify(mainEvt.data));
 
         if (response != null && response[REQUEST_TYPE] == R_VIDEO_UPDATE && response[OWNER_FLAG] == false) {
-            console.log("...............Response from main:" + JSON.stringify(response));
             console.log("Bakchodi - Not owner dude!");
             // joinee handle this
 
@@ -224,7 +225,7 @@ function youtuber() {
             } else if (responseType==I_AM_ALREADY_OWNER) {
                 alert(responseType);
             }
-        }else if(mainEvt.data.action===DIE){
+        }else if(mainEvt.data.action == DIE ){
             window.close();
         }
     });

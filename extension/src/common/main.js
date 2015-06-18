@@ -1,4 +1,4 @@
-var IP = "192.168.0.101";
+var IP = "localhost";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
@@ -265,6 +265,9 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                            {
                             success=false;
                            }
+                            else{
+                               tabs[i].dispatchMessage("mainToContent",{response:null,action:DIE});
+                           }
                            
                         }catch(err){
 
@@ -272,15 +275,8 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                     }
 
                     if(success){
-                        for(var i=0;i<tabs.length;i++)
-                        {
-                            try{
-                                tabs[i].dispatchMessage("mainToContent",{response:null,action:DIE});
-                            }catch(err){}    
-                        }
-                        kango.browser.tabs.create({url:c2mVideoURL});                
+                        kango.browser.tabs.create({url:c2mVideoURL});
                     }
-            
                 });
 
             
