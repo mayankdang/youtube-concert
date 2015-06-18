@@ -50,14 +50,52 @@ var R_VIDEO_UPDATE = 3;
 var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
 
+
+var DIE = "die";
+
 var videoSynchronizedFlag = true;
 var videoSynchronizedSystemTime = null;
 var videoState=null;
 
 var goTo = null;
 var controlFlag = true;
-var ownerFlag = false;
 var events= [];
+
+function concert_parser(url){
+    try {
+        if (url.indexOf("youtube.com")>-1) {
+            if (url.lastIndexOf("#")==url.length-1) {
+                var turl = url.substring(0,url.length-1);
+                var arr = turl.split("#");
+                if (arr.length>=1) {
+                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                }
+            }
+            else if(url.lastIndexOf("#")>-1) {
+                var turl = url.substring(url.lastIndexOf("#")+1,url.length);
+                var arr = turl.split("#");
+                if (arr.length>=1) {
+                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                }
+            }
+        }
+    } catch (err) { }
+    return null;
+}
+
+function youtube_parser(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match&&match[7].length==11){
+        return match[7];
+    }else{
+        return null;
+    }
+}
+
+var tempurl=window.location.href;
+var concertTag=concert_parser(window.location.href);
+var ownerFlag = (youtube_parser(tempurl)!==null&&concert_parser(tempurl)&&tempurl.lastIndexOf("#")==tempurl.length-1);
 
 
 function redirectBasedOnState(vid,ct,of){
@@ -186,40 +224,10 @@ function youtuber() {
             } else if (responseType==I_AM_ALREADY_OWNER) {
                 alert(responseType);
             }
+        }else if(mainEvt.data.action===DIE){
+            window.close();
         }
     });
-}
-
-function youtube_parser(url){
-    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
-    var match = url.match(regExp);
-    if (match&&match[7].length==11){
-        return match[7];
-    }else{
-        return null;
-    }
-}
-
-function concert_parser(url){
-    try {
-        if (url.indexOf("youtube.com")>-1) {
-            if (url.lastIndexOf("#")==url.length-1) {
-                var turl = url.substring(0,url.length-1);
-                var arr = turl.split("#");
-                if (arr.length>=1) {
-                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
-                }
-            }
-            else if(url.lastIndexOf("#")>-1) {
-                var turl = url.substring(url.lastIndexOf("#")+1,url.length);
-                var arr = turl.split("#");
-                if (arr.length>=1) {
-                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
-                }
-            }
-        }
-    } catch (err) { }
-    return null;
 }
 
 function genericFunctionCallOnPlayerStateChange() {
@@ -365,7 +373,6 @@ function doSend(message)
     kango.dispatchMessage("contentToMain", message);
 }
 
-var concertTag=concert_parser(window.location.href);
 var WAITING_TIME = 2000;
 var internalTimer = null;
 var VO = null;

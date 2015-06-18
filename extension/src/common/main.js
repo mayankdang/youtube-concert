@@ -1,4 +1,4 @@
-﻿var IP = "192.168.0.105";
+var IP = "192.168.0.101";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
@@ -23,6 +23,7 @@ var RESPONSE_TYPE = "responseType";
 var CHUTIYA_KATA = "chutiyaKata";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
+var DIE = "die";
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -229,8 +230,8 @@ function youtube_parser(url){
 kango.addMessageListener("contentToMain", function(contentEvt) {
 
     console.log("contentToMain:" + JSON.stringify(contentEvt.data));
-
     try {
+        
         var c2mAction = contentEvt.data.a;
         var c2mVideoId = contentEvt.data.v;
         var c2mConcertTag = contentEvt.data.c;
@@ -250,8 +251,39 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
             messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
             doSend(messageToSend);
-        }else if(concertYoutubeTab!=null && c2mAction == LOAD_VIDEO){
-            concertYoutubeTab.navigate(c2mVideoURL);
+        }else if(concertYoutubeTab!=null && c2mAction == LOAD_VIDEO && youtube_parser(c2mVideoURL) && concert_parser(c2mVideoURL)){
+            
+            var success=true;
+
+                kango.browser.tabs.getAll(function(tabs){
+                
+                    for(var i=0;i<tabs.length;i++)
+                    {
+                        var url =tabs[i].getUrl();
+                        try{
+                           if(youtube_parser(url)== youtube_parser(c2mVideoURL) && concert_parser(url)==concert_parser(c2mVideoURL))
+                           {
+                            success=false;
+                           }
+                           
+                        }catch(err){
+
+                        }
+                    }
+
+                    if(success){
+                        for(var i=0;i<tabs.length;i++)
+                        {
+                            try{
+                                tabs[i].dispatchMessage("mainToContent",{response:null,action:DIE});
+                            }catch(err){}    
+                        }
+                        kango.browser.tabs.create({url:c2mVideoURL});                
+                    }
+            
+                });
+
+            
         }
     } catch (err) {
 
@@ -274,9 +306,7 @@ var ownerFlag = null;
 function handleEvent(event){
 
     if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
-        
         // estabilish websocket connection for the first time
-
         currentUrl = event.url;
         videoId = youtube_parser(currentUrl);
         concertTag = concert_parser(currentUrl);
