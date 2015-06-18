@@ -1,5 +1,5 @@
 var timeScriptLoaded = new Date().getTime();
-var threshold = 300;
+var threshold = 42;
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
@@ -30,6 +30,7 @@ var REQUEST_TYPE = "requestType";
 var ACK = "ack";
 var NETWORK_DELAY = "networkDelay";
 var OWNER_DELAY = "ownerDelay";
+var AWESOME_DELAY = 248;
 
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
@@ -188,6 +189,11 @@ function youtuber() {
 
         console.log("Received message from main:" + mainEvt.data);
         var response = mainEvt.data.response;
+
+        if(response!=null&&response[CLIENT_TIMESTAMP]!=null&&!ownerFlag){
+            response[CLIENT_TIMESTAMP]=response[CLIENT_TIMESTAMP]-AWESOME_DELAY;
+        }
+
         var responseType = response[RESPONSE_TYPE];
         ownerFlag = response[OWNER_FLAG];
         var videoId = response[VIDEO_URL];
@@ -398,11 +404,12 @@ var mainSyncTimer = new Tock( {
                 events = []
             }
             var vp = isVideoPaused();
-            console.log(vp);
+            console.log("DDDDDD : Time Gap "+((new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ));
+
             console.log( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ));
             if (
                 (VS === 1) && ( vp ||
-                    ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ) > threshold )
+                    ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ) > threshold )
                     )
                 )
             {
@@ -420,8 +427,10 @@ var mainSyncTimer = new Tock( {
                     callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
                     complete: function() {
                         try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
+                        //pauseCurrentVideo();
+                        seekToCurrentVideo( VO +new Date().getTime()-CT );
+                        playCurrentVideo();
                         setVolume(100);
-                        seekToCurrentVideo( VO +new Date().getTime()-CT + 190);
                         console.log("SEEKING :" + CT);
                         console.log("INTERVAL :" + interval);
                         canSync = true;
@@ -430,7 +439,7 @@ var mainSyncTimer = new Tock( {
                 });
 
                 internalTimer.start(interval+WAITING_TIME);
-                seekToCurrentVideo( VO + new Date().getTime()-CT - preloadDuration );
+                seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration );
                 setVolume(0);
                 playCurrentVideo();
 
@@ -444,6 +453,7 @@ var mainSyncTimer = new Tock( {
 
     }
 });
+
 mainSyncTimer.start(1000000000);
 
 
