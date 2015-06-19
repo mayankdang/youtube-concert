@@ -1,6 +1,7 @@
 var timer;
 var scriptLoaded=false;
-if(window.location.href=="www.youtube.com"){
+console.log("233333333333333333333333");
+if(window.location.host=="www.youtube.com"){
     timer=setInterval(function(){
         if(!scriptLoaded&&kango.storage.getItem("SCRIPT_LOADED")!==null&&kango.storage.getItem("SCRIPT_LOADED")===true){
             eval(kango.storage.getItem("content.js"));
