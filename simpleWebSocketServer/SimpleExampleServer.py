@@ -30,7 +30,7 @@ ACK = "ack"                             # status acknowledgement for request suc
 CONCERT_CREATED = "concertCreated"
 CONCERT_JOINED = "concertJoined"
 RESPONSE_TYPE = "responseType"
-CHUTIYA_KATA = "chutiyaKata"
+CONCERT_TAKEN = "concertTaken"
 NO_CONCERT = "noConcert"
 I_AM_ALREADY_OWNER = "iAmAlreadyOwner"
 
@@ -213,7 +213,7 @@ class SimpleChat(WebSocket):
                     success = user.createConcert(concertTag, videoUrl)
 
                     if not success:
-                        responseMap[RESPONSE_TYPE] = CHUTIYA_KATA
+                        responseMap[RESPONSE_TYPE] = CONCERT_TAKEN
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
                         responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
@@ -294,7 +294,7 @@ class SimpleChat(WebSocket):
                             responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                             concertTagHashMap[concertTag].concertRelay(responseMap)
                         else:
-                            print "chutiya bana raha hai"
+                            print "Sender is not owner"
 
         except Exception, e:
             print e

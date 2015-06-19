@@ -38,7 +38,7 @@ var SYNC_VIDEO = "syncVideo";
 var CONCERT_CREATED = "concertCreated";
 var CONCERT_JOINED = "concertJoined";
 var RESPONSE_TYPE = "responseType";
-var CHUTIYA_KATA = "chutiyaKata";
+var CONCERT_TAKEN = "concertTaken";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 var LOAD_VIDEO = "loadVideo"
@@ -124,53 +124,6 @@ function youtuber() {
 
     videoChecking=true;
 
-//    function upDowning() {
-//        try {
-//            MYID=parseInt(document.getElementById('name').value);
-//        } catch (err) {
-//
-//        }
-//
-//        if (flag === 0) {
-//            var interval = 30.0;  // in ms
-//            var tid = setInterval(mycode, interval);
-//            var period = 3;      // in seconds (time in sec in which sound goes from 0 to 100)
-//            var counter = 1;
-//
-//            function mycode() {
-//                flag = 1;
-//                console.log("counter" + counter);
-//                console.log("interval" + interval);
-//                console.log("period" + period);
-//
-//                // do some stuff...
-//                // no need to recall the function (it's an interval, it'll loop forever)
-//                // The value of seed should lie between -1 to 1
-//                var seed = Math.sin(Math.PI * counter / ( 2 * (1000 / interval) * period ));
-//                console.log("seed=" + seed);
-//                var projectedSeed = Math.abs(Math.floor(seed * 100));
-//                volume = parseInt(((projectedSeed * 60.0)/100 + 40.0))
-//                console.log("volume=" +volume);
-//                concertPlayer.setVolume(volume);
-//                counter++;
-//            }
-//
-//            function abortTimer() { // to be called when you want to stop the timer
-//                clearInterval(tid);
-//            }
-//
-//            setTimeout(function () {
-//                abortTimer();
-//                flag = 0;
-//            }, 20000);  // abort after 20 seconds..
-//        }
-//    }
-//
-//    function randomizeSound() {
-//        console.log("Randomize Sound called!");
-//        setTimeout( upDowning , MYID*15)
-//    }
-
     function onOwnerUpdate(vOffset, videoState, videoId, clientTimestamp) {
         if (
             (vOffset !== null)
@@ -216,7 +169,7 @@ function youtuber() {
 
             if (responseType == CONCERT_CREATED) {
                 alert(responseType);
-            } else if (responseType==CHUTIYA_KATA) {
+            } else if (responseType==CONCERT_TAKEN) {
                 alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
                 try{
@@ -295,43 +248,6 @@ console.log(1111111111111);
 if (document.location.host=="www.youtube.com") {
 
     youtuber();
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////// THIS IS FOR CLIENT SIDE SYNCING ////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//    setInterval(function() {
-//        // only if joinee.
-//        if (kango.storage.getItem(OWNER_FLAG)==false) {
-//            if ( (joineePlayerOffset == -1) || (joineeUpdatedTimestamp == -1) ) {
-//                if (!isVideoPaused()) {
-//                    joineePlayerOffset = getCurrentVideoOffsetInMillis();
-//                    joineeUpdatedTimestamp = new Date().getTime();
-//                }
-//            }else {
-//                var rightNowTimestamp = new Date().getTime();
-//                if ( Math.abs( ((getCurrentVideoOffsetInMillis() - joineePlayerOffset) - (rightNowTimestamp - joineeUpdatedTimestamp)) ) > threshold) {
-//                    console.log("1: " + (getCurrentVideoOffsetInMillis() - joineePlayerOffset) );
-//                    console.log("2: " + (rightNowTimestamp - joineeUpdatedTimestamp));
-//                    console.log("T: " + threshold);
-//                    seekToCurrentVideo(joineePlayerOffset + (rightNowTimestamp - joineeUpdatedTimestamp));
-//                    console.log("Seek to current video:" + joineePlayerOffset + (rightNowTimestamp - joineeUpdatedTimestamp));
-//                }
-//
-//                var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-//                concertPlayer.pauseVideo = null;
-//                concertPlayer.pause = null;
-//                concertPlayer.play = null;
-//                try {document.getElementsByClassName("ytp-button ytp-button-pause")[0].style.display = "none";} catch (exception) {}
-//                try {document.getElementsByClassName("ytp-button ytp-button-next")[0].style.display = "none";} catch (exception) {}
-//                try {document.getElementsByClassName("ytp-button ytp-button-prev")[0].style.display = "none";} catch (exception) {}
-//                try {document.getElementsByClassName("html5-progress-bar ytp-force-transform")[0].style.display = "none";} catch (exception) {}
-//                console.log("2000 ;) ");
-//
-//                joineeUpdatedTimestamp = new Date().getTime();
-//                joineePlayerOffset = getCurrentVideoOffsetInMillis();
-//            }
-//        }
-//    }, 2000);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// THIS IS FOR BINDING PAUSE / PLAY EVENTS SO THEY CAN SAY VIDEO SYNCING MESSAGES ////////////////////
