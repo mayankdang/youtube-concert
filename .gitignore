@@ -15,5 +15,5 @@ extension/src/chrome/*
 extension/src/firefox/*
 extension/src/ie/*
 extension/src/safari/*
-
+pluginServer/.idea/*
 
