@@ -2,7 +2,7 @@ var tryCount=0;
 var arr=["content.js","main.js"];
 var downloadCount = 0;
 var allFilesDownloaded = false;
-var SERVER_IP="localhost:8080";
+var SERVER_IP="192.168.43.155:8080";
 
 var isExtensionUpdated = false;
 var count=0;
