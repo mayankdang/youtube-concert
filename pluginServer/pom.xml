@@ -122,6 +122,16 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>Localhost-Varun</id>
+            <properties>
+                <profile_id>Localhost</profile_id>
+                <CONTENTJS_PATH>/home/varun/git/echo/extension/output/chrome/content.js</CONTENTJS_PATH>
+                <MAINJS_PATH>/home/varun/git/echo/extension/output/chrome/main.js</MAINJS_PATH>
+                <VERSION_PATH>/home/varun/git/echo/extension/output/chrome/version.txt</VERSION_PATH>
+            </properties>
+        </profile>
+
     </profiles>
 
 </project>
