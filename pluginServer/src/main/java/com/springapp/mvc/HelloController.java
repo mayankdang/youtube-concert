@@ -51,6 +51,8 @@ public class HelloController {
 	@ResponseBody
     public ResponseEntity<String> fetchContentJS(ModelMap model) {
         String json = main(SysProperties.getInstance().getProperty("CONTENTJS_PATH"));
+
+        json.replaceAll("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
         return new ResponseEntity<String>(json, responseHeaders, HttpStatus.OK);
@@ -60,6 +62,7 @@ public class HelloController {
     public ResponseEntity<String> fetchMainJS(ModelMap model) {
 
         String json =main(SysProperties.getInstance().getProperty("MAINJS_PATH"));
+        json.replaceAll("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
@@ -87,13 +90,11 @@ public class HelloController {
 
     @RequestMapping(method = RequestMethod.GET,value = "/access/request")
     public ResponseEntity<String> handleRequest(ModelMap model,@RequestParam(value="action")String action,@RequestParam(value="token")String token) {
-        if(token!=null&&action!=null&&token.equals(SysProperties.SECURITY_TOKEN)){
-
+        if(token!=null&&action!=null&&token.equals(SysProperties.getInstance().getProperty("SECURITY_TOKEN"))){
             if(action.equals("rs")){
             }
             else if(action.equals("rc")){
             }
-
         }
 
         HttpHeaders responseHeaders = new HttpHeaders();

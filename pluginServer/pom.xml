@@ -116,6 +116,7 @@
             <properties>
                 <profile_id>Localhost</profile_id>
                 <MY_LOCAL_PATH>/programmingDrive/personal/chat-python-websocket2</MY_LOCAL_PATH>
+                <SERVER_HOST_DOMAIN></SERVER_HOST_DOMAIN>
             </properties>
         </profile>
 
@@ -124,6 +125,7 @@
             <properties>
                 <profile_id>Localhost</profile_id>
                 <MY_LOCAL_PATH>/home/rishabh/Desktop</MY_LOCAL_PATH>
+                <SERVER_HOST_DOMAIN></SERVER_HOST_DOMAIN>
             </properties>
         </profile>
 
@@ -132,7 +134,18 @@
             <properties>
                 <profile_id>Localhost</profile_id>
                 <MY_LOCAL_PATH>/home/varun/git</MY_LOCAL_PATH>
+                <SERVER_HOST_DOMAIN></SERVER_HOST_DOMAIN>
             </properties>
         </profile>
+
+        <profile>
+            <id>EC2</id>
+            <properties>
+                <profile_id>EC2</profile_id>
+                <MY_LOCAL_PATH>/</MY_LOCAL_PATH>
+                <SERVER_HOST_DOMAIN>/</SERVER_HOST_DOMAIN>
+            </properties>
+        </profile>
+
     </profiles>
 </project>
