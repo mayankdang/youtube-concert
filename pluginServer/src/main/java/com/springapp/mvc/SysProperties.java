@@ -22,6 +22,7 @@ public class SysProperties {
 
             try {
                 prop.load(url.openStream());
+
             } catch (IOException ex) {
             }
         }
@@ -32,4 +33,7 @@ public class SysProperties {
         return getInstance().getProperty(key);
     }
 
+    public static String get_SECURITY_TOKEN(){
+        return  getInstance().getProperty("SECURITY_TOKEN");
+    }
 }

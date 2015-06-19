@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.BufferedReader;
@@ -82,6 +83,22 @@ public class HelloController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
         return new ResponseEntity<String>(json, responseHeaders, HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET,value = "/access/request")
+    public ResponseEntity<String> handleRequest(ModelMap model,@RequestParam(value="action")String action,@RequestParam(value="token")String token) {
+        if(token!=null&&action!=null&&token.equals(SysProperties.SECURITY_TOKEN)){
+
+            if(action.equals("rs")){
+            }
+            else if(action.equals("rc")){
+            }
+
+        }
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type","text/plain");
+        return new ResponseEntity<String>("ok", responseHeaders, HttpStatus.OK);
     }
 
 }

@@ -9,6 +9,10 @@
 
     <properties>
         <spring.version>4.0.0.RELEASE</spring.version>
+        <R_TEMP_DIR_PATH>echo/temp/</R_TEMP_DIR_PATH>
+        <R_CONTENTJS_PATH>echo/extension/output/chrome/content.js</R_CONTENTJS_PATH>
+        <R_MAINJS_PATH>echo/extension/output/chrome/main.js</R_MAINJS_PATH>
+        <R_VERSION_PATH>echo/extension/output/chrome/version.txt</R_VERSION_PATH>
     </properties>
 
     <dependencies>
@@ -111,9 +115,7 @@
             <id>Localhost-Dangy</id>
             <properties>
                 <profile_id>Localhost</profile_id>
-                <CONTENTJS_PATH>/programmingDrive/personal/chat-python-websocket2/echo/extension/output/chrome/content.js</CONTENTJS_PATH>
-                <MAINJS_PATH>/programmingDrive/personal/chat-python-websocket2/echo/extension/output/chrome/main.js</MAINJS_PATH>
-                <VERSION_PATH>/programmingDrive/personal/chat-python-websocket2/echo//extension/output/chrome/version.txt</VERSION_PATH>
+                <MY_LOCAL_PATH>/programmingDrive/personal/chat-python-websocket2</MY_LOCAL_PATH>
             </properties>
         </profile>
 
@@ -121,9 +123,7 @@
             <id>Localhost-Rishabh</id>
             <properties>
                 <profile_id>Localhost</profile_id>
-                <CONTENTJS_PATH>/home/rishabh/Desktop/echo/extension/output/chrome/content.js</CONTENTJS_PATH>
-                <MAINJS_PATH>/home/rishabh/Desktop/echo/extension/output/chrome/main.js</MAINJS_PATH>
-                <VERSION_PATH>/home/rishabh/Desktop/echo/extension/output/chrome/version.txt</VERSION_PATH>
+                <MY_LOCAL_PATH>/home/rishabh/Desktop</MY_LOCAL_PATH>
             </properties>
         </profile>
 
@@ -131,12 +131,8 @@
             <id>Localhost-Varun</id>
             <properties>
                 <profile_id>Localhost</profile_id>
-                <CONTENTJS_PATH>/home/varun/git/echo/extension/output/chrome/content.js</CONTENTJS_PATH>
-                <MAINJS_PATH>/home/varun/git/echo/extension/output/chrome/main.js</MAINJS_PATH>
-                <VERSION_PATH>/home/varun/git/echo/extension/output/chrome/version.txt</VERSION_PATH>
+                <MY_LOCAL_PATH>/home/varun/git</MY_LOCAL_PATH>
             </properties>
         </profile>
-
     </profiles>
-
 </project>
