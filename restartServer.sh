@@ -1,5 +1,6 @@
 #!/bin/bash
-
+git pull
+git checkout origin/Production
 process_pid() {
         echo `ps ax | grep example | grep python | cut -d' ' -f1`
 }
