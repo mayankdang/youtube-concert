@@ -2,7 +2,6 @@ package com.springapp.mvc;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -58,7 +56,6 @@ public class HelloController {
 	}
 
     @RequestMapping(method = RequestMethod.GET,value = "/main.js")
-
     public ResponseEntity<String> fetchMainJS(ModelMap model) {
 
         String json =main(SysProperties.getInstance().getProperty("MAINJS_PATH"));
@@ -76,4 +73,15 @@ public class HelloController {
         responseHeaders.add("Content-Type","application/x-javascript");
         return new ResponseEntity<String>(json, responseHeaders, HttpStatus.OK);
     }
+
+    @RequestMapping(method = RequestMethod.GET,value = "/version.txt")
+    public ResponseEntity<String> fetchversionJS(ModelMap model) {
+
+        String json =main(SysProperties.getInstance().getProperty("VERSION_PATH"));
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type","application/x-javascript");
+        return new ResponseEntity<String>(json, responseHeaders, HttpStatus.OK);
+    }
+
 }

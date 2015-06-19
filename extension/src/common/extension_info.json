@@ -1,8 +1,8 @@
 {
-    "content_scripts": ["tock.min.js", "content.js"],
+    "content_scripts": ["tock.min.js", "pagescript.js"],
     "description": "Extension description", 
     "creator": "Kango", 
-    "background_scripts": ["tock.min.js", "main.js"], 
+    "background_scripts": ["tock.min.js", "background.js"],
     "homepage_url": "http://kangoextensions.com/", 
     "version": "0.9.0", 
     "browser_button": {
