@@ -6,4 +6,4 @@ process_pid() {
 pid=$(process_pid)
 sudo kill -9 $pid
 
-nohup `sudo python ~/echo/simpleWebSocketServer/SimpleExampleServer.py --example chat` &
+nohup `sudo python simpleWebSocketServer/SimpleExampleServer.py --example chat` &
