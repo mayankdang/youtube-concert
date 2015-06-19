@@ -1,4 +1,4 @@
-var IP = "192.168.43.155";
+﻿var IP = "SERVER_HOST_DOMAIN";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
