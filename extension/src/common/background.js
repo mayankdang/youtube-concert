@@ -60,7 +60,7 @@ function updateExtension(version,onExtensionUpdated){
 var checkVersionCount=0;
 function checkVersion() {
     var request = kango.xhr.getXMLHttpRequest();
-    request.open('GET', 'http://' + SERVER_IP + '/version.js' + "?rnd=" + (100000000 * Math.random()), false);
+    request.open('GET', 'http://' + SERVER_IP + '/version.txt' + "?rnd=" + (100000000 * Math.random()), false);
     request.send(null);
     if (request.status == 200) {
         var version = kango.storage.getItem("version");
