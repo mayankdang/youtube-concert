@@ -20,7 +20,7 @@ public class FileUtility {
             br = new BufferedReader(new FileReader(fname));
             String line;
             while ((line = br.readLine()) != null) {
-                stringBuffer.append(line);
+                stringBuffer.append(line+"\n");
             }
             if(br!=null)
                 br.close();
