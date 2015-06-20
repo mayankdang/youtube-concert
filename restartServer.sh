@@ -1,4 +1,5 @@
 #!/bin/bash
+cd $1
 git pull
 git checkout origin/Production
 process_pid() {
