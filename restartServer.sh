@@ -1,12 +1,10 @@
 #!/bin/bash
-cd $1
-echo $1
-git pull
-git checkout origin/Production
+(cd $1; git pull)
+(cd $1; git checkout origin/Production)
 process_pid() {
         echo `ps ax | grep example | grep python | cut -d' ' -f1`
 }
 pid=$(process_pid)
 sudo kill -9 $pid
 echo $pid
-nohup `sudo python simpleWebSocketServer/SimpleExampleServer.py --example chat` &
+(cd $1; nohup `sudo python simpleWebSocketServer/SimpleExampleServer.py --example chat` &)
