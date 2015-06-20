@@ -16,7 +16,7 @@ public class ShellExecutor {
     public static String execute(String tempFileName) throws IOException {
 
             Runtime rt = Runtime.getRuntime();
-            Process proc = rt.exec(new String[]{"sh", tempFileName});
+            Process proc = rt.exec(new String[]{"sh", tempFileName, SysProperties.getInstance().getProperty("MY_LOCAL_PATH") + "/echo"});
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
