@@ -10,49 +10,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 @Controller
 @RequestMapping("/")
 public class HelloController {
 
-    public static String main(String filePath) {
-
-        BufferedReader br = null;
-        StringBuilder stringBuilder = new StringBuilder();
-
-        try {
-
-            String sCurrentLine;
-
-            br = new BufferedReader(new FileReader(filePath));
-
-            while ((sCurrentLine = br.readLine()) != null) {
-                stringBuilder.append(sCurrentLine+"\n");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null)br.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        return stringBuilder.toString();
-
-    }
-
     @RequestMapping(method = RequestMethod.GET,value = "/content.js")
 	@ResponseBody
     public ResponseEntity<String> fetchContentJS(ModelMap model) {
-        String json = main(SysProperties.getInstance().getProperty("CONTENTJS_PATH"));
+        String json = FileUtility.readFile(SysProperties.getInstance().getProperty("CONTENTJS_PATH"));
 
-        json.replaceAll("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
+        json=json.replace("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
         return new ResponseEntity<String>(json, responseHeaders, HttpStatus.OK);
@@ -61,8 +30,8 @@ public class HelloController {
     @RequestMapping(method = RequestMethod.GET,value = "/main.js")
     public ResponseEntity<String> fetchMainJS(ModelMap model) {
 
-        String json =main(SysProperties.getInstance().getProperty("MAINJS_PATH"));
-        json.replaceAll("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
+        String json = FileUtility.readFile(SysProperties.getInstance().getProperty("MAINJS_PATH"));
+        json=json.replaceAll("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
@@ -81,7 +50,7 @@ public class HelloController {
     @RequestMapping(method = RequestMethod.GET,value = "/version.txt")
     public ResponseEntity<String> fetchversionJS(ModelMap model) {
 
-        String json =main(SysProperties.getInstance().getProperty("VERSION_PATH"));
+        String json =FileUtility.readFile(SysProperties.getInstance().getProperty("VERSION_PATH"));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");

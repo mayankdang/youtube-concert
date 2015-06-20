@@ -1,4 +1,4 @@
-﻿var IP = "SERVER_HOST_DOMAIN";
+var IP = "SERVER_HOST_DOMAIN";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
@@ -43,13 +43,13 @@ var delayArray = [];
 
 function generateInteval (k) {
   var maxInterval = (Math.pow(2, k) - 1) * 1000;
-  
+
   if (maxInterval > 30*1000) {
     maxInterval = 30*1000; // If the generated interval is more than 30 seconds, truncate it down to 30 seconds.
   }
-  
+
   // generate the interval to a random number between 0 and the maxInterval determined from above
-  return Math.random() * maxInterval; 
+  return Math.random() * maxInterval;
 }
 
 function doConnect() {
@@ -231,7 +231,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 
     console.log("contentToMain:" + JSON.stringify(contentEvt.data));
     try {
-        
+
         var c2mAction = contentEvt.data.a;
         var c2mVideoId = contentEvt.data.v;
         var c2mConcertTag = contentEvt.data.c;
@@ -252,11 +252,11 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
             doSend(messageToSend);
         }else if(concertYoutubeTab!=null && c2mAction == LOAD_VIDEO && youtube_parser(c2mVideoURL) && concert_parser(c2mVideoURL)){
-            
+
             var success=true;
 
                 kango.browser.tabs.getAll(function(tabs){
-                
+
                     for(var i=0;i<tabs.length;i++)
                     {
                         var url =tabs[i].getUrl();
@@ -268,7 +268,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                             else{
                                tabs[i].dispatchMessage("mainToContent",{response:null,action:DIE});
                            }
-                           
+
                         }catch(err){
 
                         }
@@ -279,7 +279,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                     }
                 });
 
-            
+
         }
     } catch (err) {
 
