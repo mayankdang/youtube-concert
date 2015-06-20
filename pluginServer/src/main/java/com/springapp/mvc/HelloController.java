@@ -31,7 +31,7 @@ public class HelloController {
     public ResponseEntity<String> fetchMainJS(ModelMap model) {
 
         String json = FileUtility.readFile(SysProperties.getInstance().getProperty("MAINJS_PATH"));
-        json=json.replaceAll("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
+        json=json.replace("SERVER_HOST_DOMAIN",SysProperties.getInstance().getProperty("SERVER_HOST_DOMAIN"));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
