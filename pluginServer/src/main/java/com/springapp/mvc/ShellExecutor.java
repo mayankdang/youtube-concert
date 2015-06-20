@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
  */
 public class ShellExecutor {
 
-    public static String execute(String tempFileName) throws IOException {
+    public static String execute (String tempFileName) throws IOException {
 
             Runtime rt = Runtime.getRuntime();
             Process proc = rt.exec(new String[]{"sh", tempFileName, SysProperties.getInstance().getProperty("MY_LOCAL_PATH")});
