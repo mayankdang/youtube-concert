@@ -62,14 +62,14 @@ public class HelloController {
         if(token!=null&&action!=null&&token.equals(SysProperties.getInstance().getProperty("SECURITY_TOKEN"))){
             if(action.equals("rs")){
                 try {
-                    ShellExecutor.execute(SysProperties.getInstance().getProperty("RESTART_SERVER_SCRIPT"));
+                    System.out.println(ShellExecutor.execute(SysProperties.getInstance().getProperty("RESTART_SERVER_SCRIPT")));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
             else if(action.equals("rc")) {
                 try {
-                    ShellExecutor.execute(SysProperties.getInstance().getProperty("RESTART_CLIENT_SCRIPT"));
+                    System.out.println(ShellExecutor.execute(SysProperties.getInstance().getProperty("RESTART_CLIENT_SCRIPT")));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

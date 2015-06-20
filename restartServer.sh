@@ -1,5 +1,6 @@
 #!/bin/bash
 cd $1
+echo $1
 git pull
 git checkout origin/Production
 process_pid() {
@@ -7,5 +8,5 @@ process_pid() {
 }
 pid=$(process_pid)
 sudo kill -9 $pid
-
+echo $pid
 nohup `sudo python simpleWebSocketServer/SimpleExampleServer.py --example chat` &

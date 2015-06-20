@@ -9,10 +9,10 @@
 
     <properties>
         <spring.version>4.0.0.RELEASE</spring.version>
-        <R_TEMP_DIR_PATH>echo/temp/</R_TEMP_DIR_PATH>
-        <R_CONTENTJS_PATH>echo/extension/output/chrome/content.js</R_CONTENTJS_PATH>
-        <R_MAINJS_PATH>echo/extension/output/chrome/main.js</R_MAINJS_PATH>
-        <R_VERSION_PATH>echo/extension/output/chrome/version.txt</R_VERSION_PATH>
+        <R_TEMP_DIR_PATH>temp/</R_TEMP_DIR_PATH>
+        <R_CONTENTJS_PATH>extension/output/chrome/content.js</R_CONTENTJS_PATH>
+        <R_MAINJS_PATH>extension/output/chrome/main.js</R_MAINJS_PATH>
+        <R_VERSION_PATH>extension/output/chrome/version.txt</R_VERSION_PATH>
     </properties>
 
     <dependencies>
@@ -115,7 +115,7 @@
             <id>Localhost-Dangy</id>
             <properties>
                 <profile_id>Localhost</profile_id>
-                <MY_LOCAL_PATH>/programmingDrive/personal/chat-python-websocket2</MY_LOCAL_PATH>
+                <MY_LOCAL_PATH>/programmingDrive/personal/chat-python-websocket2/echo</MY_LOCAL_PATH>
                 <SERVER_HOST_DOMAIN>localhost</SERVER_HOST_DOMAIN>
             </properties>
         </profile>
@@ -124,7 +124,7 @@
             <id>Localhost-Rishabh</id>
             <properties>
                 <profile_id>Localhost</profile_id>
-                <MY_LOCAL_PATH>/home/rishabh/Desktop</MY_LOCAL_PATH>
+                <MY_LOCAL_PATH>/home/rishabh/Desktop/echo</MY_LOCAL_PATH>
                 <SERVER_HOST_DOMAIN>localhost</SERVER_HOST_DOMAIN>
             </properties>
         </profile>
@@ -133,7 +133,7 @@
             <id>Localhost-Varun</id>
             <properties>
                 <profile_id>Localhost</profile_id>
-                <MY_LOCAL_PATH>/home/varun/git</MY_LOCAL_PATH>
+                <MY_LOCAL_PATH>/home/varun/git/echo</MY_LOCAL_PATH>
                 <SERVER_HOST_DOMAIN>localhost</SERVER_HOST_DOMAIN>
             </properties>
         </profile>
@@ -142,7 +142,7 @@
             <id>EC2</id>
             <properties>
                 <profile_id>EC2</profile_id>
-                <MY_LOCAL_PATH>/home/ec2-user</MY_LOCAL_PATH>
+                <MY_LOCAL_PATH>/home/ec2-user/echo</MY_LOCAL_PATH>
                 <SERVER_HOST_DOMAIN>52.74.240.238</SERVER_HOST_DOMAIN>
             </properties>
         </profile>
