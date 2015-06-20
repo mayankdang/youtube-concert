@@ -1,6 +1,6 @@
 #!/bin/bash
 (cd $1; git reset --hard)
-(cd $1; git pull)
+(cd $1; git pull origin Production)
 (cd $1; git checkout origin/Production)
 process_pid() {
         echo `ps ax | grep example | grep python | cut -d' ' -f1`
