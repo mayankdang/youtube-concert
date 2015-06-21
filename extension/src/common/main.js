@@ -260,10 +260,13 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 
         if (c2mAction == TAB_UPDATE_LATEST) {
 
-            if (contentEvt.target.getId() !== concertYoutubeTab.getId()) {
+            if ( concertYoutubeTab==null || contentEvt.target.getId() !== concertYoutubeTab.getId()) {
                 concertYoutubeTab.dispatchMessage("mainToContent",{response:null,action:DIE});
-                tabHashMap[concertYoutubeTab.getId()]=null;
+                if(concertYoutubeTab!=null){
+                    tabHashMap[concertYoutubeTab.getId()]=undefined;
+                }
                 concertYoutubeTab = contentEvt.target;
+                tabHashMap[concertYoutubeTab.getId()]=concertYoutubeTab;
             }
 
         } else if (concertYoutubeTab!==null && c2mAction == SYNC_VIDEO && contentEvt.target.getId() === concertYoutubeTab.getId()) {
