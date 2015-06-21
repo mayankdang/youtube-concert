@@ -35,6 +35,7 @@ var AWESOME_DELAY = 248;
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
 var SYNC_VIDEO = "syncVideo";
+var TAB_UPDATE_LATEST = "tabUpdateLatest";
 var CONCERT_CREATED = "concertCreated";
 var CONCERT_JOINED = "concertJoined";
 var RESPONSE_TYPE = "responseType";
@@ -84,7 +85,7 @@ function concert_parser(url){
     return null;
 }
 
-function youtube_parser(url){
+function youtube_parser(url)  {
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
     var match = url.match(regExp);
     if (match&&match[7].length==11){
@@ -104,30 +105,30 @@ var TAB_YOUTUBE_JOINEE = 2;
 var TAB_ELSE = -1;
 
 function getUrlType(url){
-        var urlType = TAB_ELSE;
-        if(
-            youtube_parser(url) !=  null
+    var urlType = TAB_ELSE;
+    if(
+        youtube_parser(url) !=  null
             && concert_parser(url) != null
             && url.lastIndexOf("#") == url.length-1
         )
-        {
-            urlType=TAB_YOUTUBE_OWNER;
-        }
-        else if(
-            (
-                concert_parser(url) != null
+    {
+        urlType=TAB_YOUTUBE_OWNER;
+    }
+    else if(
+        (
+            concert_parser(url) != null
                 && url.lastIndexOf("#") != url.length-1
             )
         )
-        {
-            urlType=TAB_YOUTUBE_JOINEE;
-        }
-        else if(
-            window.location.host.indexOf(".youtube.com")>-1
+    {
+        urlType=TAB_YOUTUBE_JOINEE;
+    }
+    else if(
+        window.location.host.indexOf(".youtube.com")>-1
         )
-        {
-            urlType=TAB_YOUTUBE;
-        }
+    {
+        urlType=TAB_YOUTUBE;
+    }
     return urlType;
 }
 
@@ -136,80 +137,79 @@ function getTransitionType(vid,ct,of){
         return -1;
     }
 
-    var url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+    var url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
     return getUrlType(url);
 }
 
-function loadUrl(vid,ct,of){
-    if(vid!==null&&ct!==null&&youtube_parser(window.location.href)!==vid&&ct!==concert_parser(window.location.href))
+var globalVideoId = youtube_parser(window.location.href);
+var globalConcertTag = concert_parser(window.location.href);
+var globalOwnerFlag = ((globalVideoId!==null&&globalConcertTag!==null)?(window.location.href.lastIndexOf("#")===window.location.href.length-1):null);
+
+function loadUrl(vid,ct,of) {
+    if(vid!==null&&ct!==null&&of!==null&& (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag))
     {
-        var u=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
+        var u = window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
+        globalVideoId=vid;
+        globalConcertTag=ct;
+        globalOwnerFlag=of;
+
         //todo: best way to redirect or reload this url;
-        window.location.href=u;
+//        window.location.href = u;
+        var metaTag = document.createElement("meta");
+        metaTag.setAttribute("http-equiv","refresh");
+        metaTag.setAttribute("content","1; watch?v="+vid+"#"+ct+(of===true?"#":""));
+        document.head.appendChild(metaTag);
     }
 }
 
 function redirectBasedOnState(vid,ct,of){
 
-    var url = window.location.href;
-    {
-        if(getUrlType(url)===TAB_YOUTUBE){
-            if(of){                                               //1
-                if(vid!==null&&vid==youtube_parser(url)){
-                    //cool
-                }
-                else if(vid!==null&&vid!==youtube_parser(url)){
+    var toGo = getTransitionType(vid, ct, of);
+    var currentTabState = getTransitionType(globalVideoId, globalConcertTag, globalOwnerFlag);
 
-                }
-            }
-            else if(!of){                                         //2
-                if(vid!==null&&vid==youtube_parser(url)){
-                    //cool
-                }
-                else if(vid!==null&&vid!==youtube_parser(url)){
-                    loadUrl(vid,ct,of);
-                }
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE){
+    if(currentTabState === TAB_ELSE) {
+        if (toGo !== TAB_ELSE) {
+            // nothing.
+        }
+    } else if(currentTabState === TAB_YOUTUBE){
+
+        if (of===null) {
+            if(toGo===TAB_YOUTUBE){
                 //check
             }
-            else if(getTransitionType(vid,ct,of)===TAB_ELSE){
+            else if(toGo===TAB_ELSE){
 
             }
+        } else {
+            loadUrl(vid, ct, of);
         }
-        else if(getUrlType(url)===TAB_YOUTUBE_OWNER){
-            if(getTransitionType(vid,ct,of)===TAB_YOUTUBE){
-                if(vid!=null)
-                    loadUrl(vid,ct,of);
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_OWNER){
-                if(vid!==null&&vid==youtube_parser(url)){
-                    //cool
-                }
-                else if(vid!==null&&vid!==youtube_parser(url)){
-                    // todo: broadcast new video loaded
-                }
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_JOINEE){
-                loadUrl(vid,ct,of);
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_ELSE){
-
-            }
+    }
+    else if (currentTabState === TAB_YOUTUBE_OWNER) {
+        if (toGo === TAB_YOUTUBE){
+            loadUrl (vid, globalConcertTag, globalOwnerFlag);
+        } else if (toGo === TAB_YOUTUBE_OWNER){
+            // todo: broadcast new video loaded
+            loadUrl(vid, ct, of);
         }
-        else if(getUrlType(url)===TAB_YOUTUBE_JOINEE){
-            if(getTransitionType(vid,ct,of)===TAB_YOUTUBE){
-                //
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_OWNER){
-                loadUrl(vid,ct,of);
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_JOINEE){
-                loadUrl(vid,ct,of);
-            }
-            else if(getTransitionType(vid,ct,of)===TAB_ELSE){
+        else if(toGo ===TAB_YOUTUBE_JOINEE){
+            loadUrl(vid,ct,of);
+        }
+        else if(toGo===TAB_ELSE){
 
-            }
+        }
+    }
+    else if(currentTabState===TAB_YOUTUBE_JOINEE){
+        if(toGo === TAB_YOUTUBE){
+            //
+        }
+        else if(toGo === TAB_YOUTUBE_OWNER){
+            loadUrl(vid,ct,of);
+        }
+        else if(toGo === TAB_YOUTUBE_JOINEE){
+            loadUrl(vid,ct,of);
+        }
+        else if(toGo === TAB_ELSE){
+
         }
     }
 }
@@ -232,6 +232,10 @@ function youtuber() {
             var event = getEvent(vOffset , videoState, videoId, clientTimestamp);
             events.push(event);
         }
+    }
+
+    function updateTabInfoToMain() {
+        doSend({a: TAB_UPDATE_LATEST});
     }
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
@@ -267,10 +271,12 @@ function youtuber() {
 
             if (responseType == CONCERT_CREATED) {
                 alert(responseType);
+                updateTabInfoToMain();
             } else if (responseType==CONCERT_TAKEN) {
                 alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
-                try{
+                updateTabInfoToMain();
+                try {
                     redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
                 }catch (err){
 
@@ -282,7 +288,7 @@ function youtuber() {
             } else if (responseType==I_AM_ALREADY_OWNER) {
                 alert(responseType);
             }
-        }else if(mainEvt.data.action == DIE ){
+        } else if(mainEvt.data.action == DIE ) {
             window.close();
         }
     });
@@ -474,7 +480,7 @@ var prevLink = null;
 setInterval(function(){
     if( prevLink!==window.location.href || prevLink==null)
     {
-        prevLink = window.location.href;
         redirectBasedOnState(youtube_parser(window.location.href),concert_parser(window.location.href),ownerFlag);
+        prevLink = window.location.href;
     }
 },200);
