@@ -98,20 +98,118 @@ var tempurl=window.location.href;
 var concertTag=concert_parser(window.location.href);
 var ownerFlag = (youtube_parser(tempurl)!==null&&concert_parser(tempurl)&&tempurl.lastIndexOf("#")==tempurl.length-1);
 
+var TAB_YOUTUBE = 0;
+var TAB_YOUTUBE_OWNER = 1;
+var TAB_YOUTUBE_JOINEE = 2;
+var TAB_ELSE = -1;
+
+function getUrlType(url){
+        var urlType = TAB_ELSE;
+        if(
+            youtube_parser(url) !=  null
+            && concert_parser(url) != null
+            && url.lastIndexOf("#") == url.length-1
+        )
+        {
+            urlType=TAB_YOUTUBE_OWNER;
+        }
+        else if(
+            (
+                concert_parser(url) != null
+                && url.lastIndexOf("#") != url.length-1
+            )
+        )
+        {
+            urlType=TAB_YOUTUBE_JOINEE;
+        }
+        else if(
+            window.location.host.indexOf(".youtube.com")>-1
+        )
+        {
+            urlType=TAB_YOUTUBE;
+        }
+    return urlType;
+}
+
+function getTransitionType(vid,ct,of){
+    if(vid===null||of===null){
+        return -1;
+    }
+
+    var url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
+    return getUrlType(url);
+}
+
+function loadUrl(vid,ct,of){
+    if(vid!==null&&ct!==null&&youtube_parser(window.location.href)!==vid&&ct!==concert_parser(window.location.href))
+    {
+        var u=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
+        //todo: best way to redirect or reload this url;
+        window.location.href=u;
+    }
+}
 
 function redirectBasedOnState(vid,ct,of){
+
     var url = window.location.href;
-    if(
-        youtube_parser(url) != vid
-        || ct != concert_parser(url)
-        || ( (of === false) && (url.lastIndexOf("#") == url.length-1) )
-        || ( (of === true) && (url.lastIndexOf("#") != url.length-1) )
-        )
     {
-        if(ct!=null&&vid!=null){
-            url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of==true?"#":"");
-            kango.dispatchMessage("contentToMain",{a:LOAD_VIDEO,u:url});
-            window.close();
+        if(getUrlType(url)===TAB_YOUTUBE){
+            if(of){                                               //1
+                if(vid!==null&&vid==youtube_parser(url)){
+                    //cool
+                }
+                else if(vid!==null&&vid!==youtube_parser(url)){
+
+                }
+            }
+            else if(!of){                                         //2
+                if(vid!==null&&vid==youtube_parser(url)){
+                    //cool
+                }
+                else if(vid!==null&&vid!==youtube_parser(url)){
+                    loadUrl(vid,ct,of);
+                }
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE){
+                //check
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_ELSE){
+
+            }
+        }
+        else if(getUrlType(url)===TAB_YOUTUBE_OWNER){
+            if(getTransitionType(vid,ct,of)===TAB_YOUTUBE){
+                if(vid!=null)
+                    loadUrl(vid,ct,of);
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_OWNER){
+                if(vid!==null&&vid==youtube_parser(url)){
+                    //cool
+                }
+                else if(vid!==null&&vid!==youtube_parser(url)){
+                    // todo: broadcast new video loaded
+                }
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_JOINEE){
+                loadUrl(vid,ct,of);
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_ELSE){
+
+            }
+        }
+        else if(getUrlType(url)===TAB_YOUTUBE_JOINEE){
+            if(getTransitionType(vid,ct,of)===TAB_YOUTUBE){
+                //
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_OWNER){
+                loadUrl(vid,ct,of);
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_YOUTUBE_JOINEE){
+                loadUrl(vid,ct,of);
+            }
+            else if(getTransitionType(vid,ct,of)===TAB_ELSE){
+
+            }
         }
     }
 }
@@ -371,14 +469,12 @@ var mainSyncTimer = new Tock( {
 });
 
 mainSyncTimer.start(1000000000);
-
+var prevLink = null;
 
 setInterval(function(){
-    if(
-        (ownerFlag&&concert_parser(window.location.href)===null)
-        ||(ownerFlag && concert_parser(window.location.href)!==concertTag)
-    )
+    if( prevLink!==window.location.href || prevLink==null)
     {
-        redirectBasedOnState(youtube_parser(window.location.href),concertTag,true);
+        prevLink = window.location.href;
+        redirectBasedOnState(youtube_parser(window.location.href),concert_parser(window.location.href),ownerFlag);
     }
 },200);
