@@ -269,7 +269,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 tabHashMap[concertYoutubeTab.getId()]=concertYoutubeTab;
             }
 
-        } else if (concertYoutubeTab!==null && c2mAction == SYNC_VIDEO && contentEvt.target.getId() === concertYoutubeTab.getId()) {
+        } else if (c2mAction == SYNC_VIDEO && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
 
             var messageToSend = new Object();
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
@@ -280,7 +280,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             messageToSend[OWNER_FLAG] = c2mOwnerFlag;
             messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
             messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
-            messageToSend[TAB_ID] = concertYoutubeTab.getId();
+            messageToSend[TAB_ID] = contentEvt.target.getId();
             doSend(messageToSend);
 
         }
