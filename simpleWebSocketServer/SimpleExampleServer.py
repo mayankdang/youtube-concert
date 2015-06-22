@@ -313,7 +313,22 @@ class SimpleChat(WebSocket):
                             concertTagHashMap[concertTag].concertRelay(responseMap)
                         else:
                             print "Sender is not owner"
+                else:
+                    # Joinee asks for explicit syncing (video info update)
+                    if concertTag in concertTagHashMap and videoUrl is not None:
 
+                        concertToJoin = concertTagHashMap.get(concertTag)
+
+                        responseMap[USER_ID] = user.id
+                        responseMap[CONCERT_TAG] = concertTag
+                        responseMap[VIDEO_URL] = concertToJoin.videoUrl
+                        responseMap[TAB_ID] = tabId
+                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
+                        responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
+                        responseMap[VOFFSET] = concertToJoin.getVideoOffset()
+                        responseMap[CLIENT_TIMESTAMP] = concertToJoin.getUpdatedVOffsetTime() + user.clockDiff
+                        responseMap[OWNER_FLAG] = False
+                        self.sendingWrapper(responseMap)
         except Exception, e:
             print e
 

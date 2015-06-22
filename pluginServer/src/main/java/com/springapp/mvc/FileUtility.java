@@ -17,7 +17,9 @@ public class FileUtility {
         StringBuffer stringBuffer=new StringBuffer();
         BufferedReader br = null;
         try{
-            br = new BufferedReader(new FileReader(fname));
+            br = new BufferedReader(
+                    new InputStreamReader(
+                            new FileInputStream(fname), "UTF8"));
             String line;
             while ((line = br.readLine()) != null) {
                 stringBuffer.append(line+"\n");
