@@ -372,6 +372,7 @@ if (document.location.host=="www.youtube.com") {
     }
 
     var bootingVideoFlag = false;
+    var bootingVideoFlagTime=new Date().getTime();
     setInterval(function() {
         if (ownerFlag) {
             try {
@@ -384,7 +385,7 @@ if (document.location.host=="www.youtube.com") {
             }
         }
 
-        if ( !bootingVideoFlag && isVideoPaused() === false && getCurrentVideoOffsetInMillis() > 0 ) {
+        if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
             console.log("@@@@@@@ - sendUpdatedPlayerInfoToServer / getPlayerInfoFromServer : " + getCurrentVideoOffsetInMillis());
             sendUpdatedPlayerInfoToServer();
             getPlayerInfoFromServer();
