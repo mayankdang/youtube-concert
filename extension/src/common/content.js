@@ -282,7 +282,7 @@ function youtuber() {
 
                 }
                 onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
-
+                setOnEndInterrupt();
             } else if (responseType==NO_CONCERT) {
                 alert(responseType);
             } else if (responseType==I_AM_ALREADY_OWNER) {
@@ -292,6 +292,19 @@ function youtuber() {
             window.close();
         }
     });
+}
+
+function setOnEndInterrupt() {
+    try {
+        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        concertPlayer.onended = function() {
+            pauseCurrentVideo();
+            VO = getCurrentVideoOffsetInMillis() - 50;
+            VS = 2;
+        }
+        genericFunctionCallOnPlayerStateChange();
+    } catch (exception) {}
+    pauseCurrentVideo();
 }
 
 function genericFunctionCallOnPlayerStateChange() {
@@ -425,6 +438,17 @@ var mainSyncTimer = new Tock( {
         if (canSync) {
             if (events.length > 0) {
                 var latestEvent = events[events.length-1];
+
+                for (var i=0;i<events.length;i++) {
+                    if (   events[i].videoId != null
+                        && youtube_parser(window.location.href) != null
+                        && events[i].videoId != youtube_parser(window.location.href)
+                        )
+                    {
+                        latestEvent = events[i];
+                    }
+                }
+
                 VO = latestEvent.vOffset;
                 VS = latestEvent.videoState;
                 CT = latestEvent.clientTimestamp;
@@ -462,8 +486,8 @@ var mainSyncTimer = new Tock( {
                         setVolume(100);
                         console.log("SEEKING :" + CT);
                         console.log("INTERVAL :" + interval);
-                        canSync = true;
                         console.log("Timer completed. Setting canSync = TRUE");
+                        canSync = true;
                     }
                 });
 

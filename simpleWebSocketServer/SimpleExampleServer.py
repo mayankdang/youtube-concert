@@ -238,14 +238,16 @@ class SimpleChat(WebSocket):
 
                         user.updateConcertTag(concertTag)
                         user.updateTabId(tabId)
-                        responseMap[RESPONSE_TYPE] = CONCERT_CREATED
-                        responseMap[USER_ID] = user.id
+
+                        responseMap[USER_ID] = userId
                         responseMap[CONCERT_TAG] = concertTag
-                        responseMap[VIDEO_URL] = videoUrl
-                        responseMap[VIDEO_STATE] = videoState
                         responseMap[TAB_ID] = user.getTabId()
-                        responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                         responseMap[OWNER_FLAG] = True
+                        responseMap[VIDEO_STATE] = concertTagHashMap[concertTag].getVideoState()
+                        responseMap[VOFFSET] = concertTagHashMap[concertTag].getVideoOffset()
+                        responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
+                        responseMap[RESPONSE_TYPE] = CONCERT_CREATED
+                        responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                         self.sendingWrapper(responseMap)
 
                 # JOIN CONCERT
