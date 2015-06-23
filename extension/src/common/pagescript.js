@@ -8,5 +8,5 @@ if(window.location.host=="www.youtube.com"){
             scriptLoaded=true;
             clearInterval(timer);
         }
-    },5000);
+    },200);
 }
