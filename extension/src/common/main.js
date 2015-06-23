@@ -43,7 +43,7 @@ var sentClockDifference = false;
 var delayArray = [];
 var tabHashMap = new Object();
 
-function generateInteval (k) {
+function generateInterval (k) {
   var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
   if (maxInterval > 30*1000) {
@@ -80,15 +80,15 @@ function doConnect() {
     }
 
     function onClose(evt) {
-        //var time = generateInterval(wsConnectionAttempts);
-        //
-        //setTimeout(function () {
-        //    // We've tried to reconnect so increment the attempts by 1
-        //    wsConnectionAttempts++;
-        //
-        //    // Connection has closed so try to reconnect every 10 seconds.
-        //    doConnect();
-        //}, time);
+        var time = generateInterval(wsConnectionAttempts);
+
+        setTimeout(function () {
+            // We've tried to reconnect so increment the attempts by 1
+            wsConnectionAttempts++;
+
+            // Connection has closed so try to reconnect every 10 seconds.
+            doConnect();
+        }, time);
     }
 
     function onError(evt)
