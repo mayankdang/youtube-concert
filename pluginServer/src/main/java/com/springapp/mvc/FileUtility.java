@@ -13,24 +13,31 @@ import java.util.List;
  */
 public class FileUtility {
 
-    public static String readFile(String fname){
-        StringBuffer stringBuffer=new StringBuffer();
-        BufferedReader br = null;
-        try{
-            br = new BufferedReader(
+    public static String readFile (String filePath) {
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(
                     new InputStreamReader(
-                            new FileInputStream(fname), "UTF8"));
+                            new FileInputStream(filePath),
+                            "UTF-8"));
+            // Checking if the first character is UTF-8 optional anchor.
+            in.mark(1);
+            if (in.read() != 0xFEFF)
+                in.reset();
+
             String line;
-            while ((line = br.readLine()) != null) {
-                stringBuffer.append(line+"\n");
+            while ((line = in.readLine()) != null) {
+                stringBuilder.append(line+"\n");
             }
-            if(br!=null)
-                br.close();
-        }
-        catch (Exception e){
+
+            if(in!=null)
+                in.close();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
     public static List<String> readListFromFile(String fname){
