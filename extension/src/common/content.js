@@ -350,7 +350,6 @@ function setVolume(volume) {
 console.log(1111111111111);
 
 if (document.location.host=="www.youtube.com") {
-
     youtuber();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,26 +372,35 @@ if (document.location.host=="www.youtube.com") {
 
     var bootingVideoFlag = false;
     var bootingVideoFlagTime=new Date().getTime();
-    setInterval(function() {
-        if (ownerFlag) {
-            try {
-                var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
-                concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
-                concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
-                concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
-            } catch (exception) {
-                console.log("Exception-" + exception);
+
+    var checkingTimer = new Tock( {
+        countdown: true,
+        interval: 200,
+        callback: function() {
+            if (ownerFlag) {
+                try {
+                    var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+                    concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
+                    concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
+                    concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
+                } catch (exception) {
+                    console.log("Exception-" + exception);
+                }
             }
-        }
 
-        if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
-            console.log("@@@@@@@ - sendUpdatedPlayerInfoToServer / getPlayerInfoFromServer : " + getCurrentVideoOffsetInMillis());
-            sendUpdatedPlayerInfoToServer();
-            getPlayerInfoFromServer();
-            bootingVideoFlag = true;
+            if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
+                console.log("@@@@@@@ - sendUpdatedPlayerInfoToServer / getPlayerInfoFromServer : " + getCurrentVideoOffsetInMillis());
+                sendUpdatedPlayerInfoToServer();
+                getPlayerInfoFromServer();
+                bootingVideoFlag = true;
+            }
+        },
+        complete: function(){
         }
+    });
+    checkingTimer.start(1000000000);
 
-    }, 200);
+
 }
 
 function doSend(message)
