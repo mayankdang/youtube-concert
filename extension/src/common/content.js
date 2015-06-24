@@ -134,7 +134,7 @@ function getUrlType(url){
 }
 
 function getTransitionType(vid,ct,of){
-    if(vid===null||of===null){
+    if(vid===null) {
         return -1;
     }
 
