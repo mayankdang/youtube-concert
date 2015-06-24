@@ -513,7 +513,10 @@ var prevLink = null;
 setInterval(function(){
     if( prevLink!==window.location.href || prevLink==null)
     {
-        redirectBasedOnState(youtube_parser(window.location.href),concert_parser(window.location.href),ownerFlag);
+        var tempYt = youtube_parser(window.location.href);
+        var tempCt = concert_parser(window.location.href);
+        var tempOf = (tempCt==null ? null : (window.location.href.lastIndexOf("#")===window.location.href.length-1));
+        redirectBasedOnState(tempYt, tempCt, tempOf);
         prevLink = window.location.href;
     }
 },200);
