@@ -104,6 +104,7 @@ var TAB_YOUTUBE_OWNER = 1;
 var TAB_YOUTUBE_JOINEE = 2;
 var TAB_ELSE = -1;
 
+//todo- merge getUrlType and getTransitionType
 function getUrlType(url){
     var urlType = TAB_ELSE;
     if(
@@ -137,6 +138,10 @@ function getTransitionType(vid,ct,of){
         return -1;
     }
 
+    // This is for when the url is a generic youtube url.
+    if(vid!=null && ct==null)
+        return TAB_YOUTUBE;
+
     var url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
     return getUrlType(url);
 }
@@ -153,16 +158,14 @@ function loadUrl(vid,ct,of) {
         globalConcertTag=ct;
         globalOwnerFlag=of;
 
-        //todo: best way to redirect or reload this url;
-//        window.location.href = u;
         var metaTag = document.createElement("meta");
         metaTag.setAttribute("http-equiv","refresh");
-        metaTag.setAttribute("content","1; watch?v="+vid+"#"+ct+(of===true?"#":""));
+        metaTag.setAttribute("content","0; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
     }
 }
 
-function redirectBasedOnState(vid,ct,of){
+function redirectBasedOnState(vid,ct,of) {
 
     var toGo = getTransitionType(vid, ct, of);
     var currentTabState = getTransitionType(globalVideoId, globalConcertTag, globalOwnerFlag);
@@ -515,7 +518,7 @@ setInterval(function(){
     {
         var tempYt = youtube_parser(window.location.href);
         var tempCt = concert_parser(window.location.href);
-        var tempOf = (tempCt==null ? null : (window.location.href.lastIndexOf("#")===window.location.href.length-1));
+        var tempOf = (tempCt==null ? null : (window.location.href.lastIndexOf("#") === window.location.href.length-1));
         redirectBasedOnState(tempYt, tempCt, tempOf);
         prevLink = window.location.href;
     }
