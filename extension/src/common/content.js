@@ -365,7 +365,7 @@ function setVolume(volume) {
 
 console.log(1111111111111);
 
-if (document.location.host=="www.youtube.com") {
+if (document.location.host.indexOf(".youtube.com")>-1) {
     youtuber();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -417,6 +417,7 @@ if (document.location.host=="www.youtube.com") {
     checkingTimer.start(1000000000);
 
 
+    doSend({a: R_PAGE_LOADED, url:window.location.href});
 }
 
 function doSend(message)

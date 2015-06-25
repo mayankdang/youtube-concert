@@ -268,6 +268,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         var c2mVOffset = contentEvt.data.o;
         var c2mVideoState = contentEvt.data.vs;
         var c2mClientTimestamp = contentEvt.data.t;
+        var c2mUrl = contentEvt.data.url;
 
         if (c2mAction == TAB_UPDATE_LATEST) {
 
@@ -295,6 +296,25 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             doSend(messageToSend);
 
         }
+        else if(c2mAction == R_PAGE_LOADED){
+            var url=contentEvt.data.url;
+            if ( url !=null && youtube_parser(contentEvt.data.url)!==null && concert_parser(contentEvt.data.url)!==null ) {
+                // estabilish websocket connection for the first time
+                var currentUrl = url;
+                var videoId = youtube_parser(currentUrl);
+                var concertTag = concert_parser(currentUrl);
+                var ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
+                var messageToSend = new Object();
+                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+                messageToSend[VIDEO_URL] = videoId;
+                messageToSend[CONCERT_TAG] = concertTag;
+                messageToSend[OWNER_FLAG] = ownerFlag;
+                messageToSend[TAB_ID] = event.target.getId();
+                messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
+                doSend(messageToSend);
+            }
+
+        }
     } catch (err) {
 
     }
@@ -312,28 +332,6 @@ var currentUrl=null;
 var videoId = null;
 var concertTag = null;
 var ownerFlag = null;
-
-function handleEvent(event){
-
-    if ( youtube_parser(event.url)!==null && concert_parser(event.url)!==null ) {
-        // estabilish websocket connection for the first time
-        currentUrl = event.url;
-        videoId = youtube_parser(currentUrl);
-        concertTag = concert_parser(currentUrl);
-        ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
-        var messageToSend = new Object();
-        messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-        messageToSend[VIDEO_URL] = videoId;
-        messageToSend[CONCERT_TAG] = concertTag;
-        messageToSend[OWNER_FLAG] = ownerFlag;
-        messageToSend[TAB_ID] = event.target.getId();
-        messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
-        doSend(messageToSend);
-    }
-    else {
-            //concertYoutubeTab=null;
-    }
-}
 
 kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
     handleEvent(event);
