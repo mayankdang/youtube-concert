@@ -307,7 +307,6 @@ function setOnEndInterrupt() {
     try {
         var concertPlayer=document.getElementsByTagName("video")[0];
         concertPlayer.onended = function() {
-            document.getElementById("autoplay-checkbox").checked=false;
             pauseCurrentVideo();
             VO = getCurrentVideoOffsetInMillis();
             VS = 2;
@@ -418,6 +417,14 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                 } catch (exception) {
                     console.log("Exception-" + exception);
                 }
+            }
+            else{
+                try{
+                    document.getElementById("autoplay-checkbox").checked=false;
+                }catch (err){}
+                try{
+                    document.getElementsByClassName("ytp-endscreen-upnext-cancel-button")[0].click();
+                }catch (err){}
             }
 
             if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
