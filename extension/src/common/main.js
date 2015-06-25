@@ -309,7 +309,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[VIDEO_URL] = videoId;
                 messageToSend[CONCERT_TAG] = concertTag;
                 messageToSend[OWNER_FLAG] = ownerFlag;
-                messageToSend[TAB_ID] = event.target.getId();
+                messageToSend[TAB_ID] = contentEvt.target.getId();
                 messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
                 doSend(messageToSend);
             }
