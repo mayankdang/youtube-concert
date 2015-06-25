@@ -25,6 +25,7 @@ var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 var DIE = "die";
 var TAB_ID = "tab_id";
+var CLIENT_VERSION = "clientVersion";
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -42,6 +43,7 @@ var TAB_UPDATE_LATEST = "tabUpdateLatest";
 var sentClockDifference = false;
 var delayArray = [];
 var tabHashMap = new Object();
+
 
 function generateInterval (k) {
   var maxInterval = (Math.pow(2, k) - 1) * 1000;
@@ -195,6 +197,15 @@ function doConnect() {
                 } catch (exception) {
 
                 }
+            }
+
+
+            if(response[CLIENT_VERSION]!=null&&response[CLIENT_VERSION]!=kango.storage.getItem("version"))
+            {
+                var metaTag = document.createElement("meta");
+                metaTag.setAttribute("http-equiv","refresh");
+                metaTag.setAttribute("content","0; ");
+                document.head.appendChild(metaTag);
             }
         }
     }
