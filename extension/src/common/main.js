@@ -312,9 +312,13 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         if (c2mAction == TAB_UPDATE_LATEST) {
 
             if ( concertYoutubeTab==null || contentEvt.target.getId() !== concertYoutubeTab.getId()) {
-                concertYoutubeTab.dispatchMessage("mainToContent",{response:null,action:DIE});
                 if(concertYoutubeTab!=null){
+                 try{
+                    concertYoutubeTab.dispatchMessage("mainToContent",{response:null,action:DIE});
                     tabHashMap[concertYoutubeTab.getId()]=undefined;
+                 }catch (err){
+
+                 }
                 }
                 concertYoutubeTab = contentEvt.target;
                 tabHashMap[concertYoutubeTab.getId()]=concertYoutubeTab;

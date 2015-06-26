@@ -291,6 +291,13 @@ function youtuber() {
             if (responseType == CONCERT_CREATED) {
                 alert(responseType);
                 updateTabInfoToMain();
+
+                //try{
+                //    var div=document.createElement("div");
+                //    div.innerHTML="<div style='color: #ffffff;font-weight:bolder;max-width: 100px;white-space:nowrap;overflow:hidden'>#poopy</div>";
+                //    document.getElementsByClassName("html5-video-player")[0].appendChild(div.childNodes[0]);
+                //}catch (er){}
+
             } else if (responseType==CONCERT_TAKEN) {
                 alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
