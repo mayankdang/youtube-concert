@@ -308,6 +308,7 @@ function youtuber() {
 
                 }
                 onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
+                joineeStateHandler();
                 setOnEndInterrupt();
             } else if (responseType==NO_CONCERT) {
                 alert(responseType);
@@ -320,12 +321,17 @@ function youtuber() {
     });
 }
 
+function joineeStateHandler() {
+    setOnEndInterrupt();
+    document.getElementById("autoplay-checkbox").checked=false;
+}
+
 function setOnEndInterrupt() {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         concertPlayer.onended = function() {
             pauseCurrentVideo();
-            VO = getCurrentVideoOffsetInMillis() - 50;
+            VO = getCurrentVideoOffsetInMillis();
             VS = 2;
         }
         genericFunctionCallOnPlayerStateChange();
@@ -340,7 +346,7 @@ function genericFunctionCallOnPlayerStateChange() {
 
 function pauseCurrentVideo() {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         concertPlayer.pause();
         genericFunctionCallOnPlayerStateChange();
     } catch (exception) {}
@@ -348,7 +354,7 @@ function pauseCurrentVideo() {
 
 function playCurrentVideo() {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         concertPlayer.play();
         genericFunctionCallOnPlayerStateChange();
     } catch (exception) {}
@@ -356,7 +362,7 @@ function playCurrentVideo() {
 
 function seekToCurrentVideo(timeInMillis) {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         concertPlayer.currentTime=timeInMillis/1000;
         genericFunctionCallOnPlayerStateChange();
     } catch (exception) {}
@@ -364,8 +370,17 @@ function seekToCurrentVideo(timeInMillis) {
 
 function getCurrentVideoOffsetInMillis() {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         return concertPlayer.currentTime * 1000;
+    } catch (exception) {
+        return 0;
+    }
+}
+
+function getVideoLengthInMillis() {
+    try {
+        var concertPlayer=document.getElementsByTagName("video")[0];
+        return (parseInt(concertPlayer.duration*1000));
     } catch (exception) {
         return 0;
     }
@@ -373,7 +388,7 @@ function getCurrentVideoOffsetInMillis() {
 
 function isVideoPaused() {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         return concertPlayer.paused;
     } catch (exception) {}
     return true;
@@ -381,7 +396,7 @@ function isVideoPaused() {
 
 function setVolume(volume) {
     try {
-        var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+        var concertPlayer=document.getElementsByTagName("video")[0];
         concertPlayer.setVolume(parseInt(volume));
     } catch (exception) {}
 }
@@ -418,13 +433,21 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
         callback: function() {
             if (ownerFlag) {
                 try {
-                    var concertPlayer=document.getElementsByClassName("html5-video-container")[0].getElementsByTagName("video")[0];
+                    var concertPlayer=document.getElementsByTagName("video")[0];
                     concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
                     concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
                     concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
                 } catch (exception) {
                     console.log("Exception-" + exception);
                 }
+            }
+            else{
+                try{
+                    document.getElementById("autoplay-checkbox").checked=false;
+                }catch (err){}
+                try{
+                    document.getElementsByClassName("ytp-endscreen-upnext-cancel-button")[0].click();
+                }catch (err){}
             }
 
             if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
@@ -488,41 +511,47 @@ var mainSyncTimer = new Tock( {
 
             console.log( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ));
             if (
-                (VS === 1) && ( vp ||
+                (VS === 1)
+                    && (
+                    vp ||
                     ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ) > threshold )
                     )
                 )
             {
                 console.log("Here.");
-                if (internalTimer !== null) {
-                    internalTimer.stop();
-                }
-                try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
-                var interval = CT - new Date().getTime();
-                canSync = false;
-                console.log("Setting canSync = FALSE.. Initiating a timer..");
-                internalTimer = new Tock({
-                    countdown: true,
-                    interval: interval + WAITING_TIME,
-                    callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
-                    complete: function() {
-                        try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
-                        //pauseCurrentVideo();
-                        seekToCurrentVideo( VO +new Date().getTime()-CT );
-                        playCurrentVideo();
-                        setVolume(100);
-                        console.log("SEEKING :" + CT);
-                        console.log("INTERVAL :" + interval);
-                        console.log("Timer completed. Setting canSync = TRUE");
-                        canSync = true;
+                if (VO +new Date().getTime()-CT < 0 || VO + new Date().getTime()-CT > getVideoLengthInMillis()) {
+                    pauseCurrentVideo();
+                    seekToCurrentVideo(getVideoLengthInMillis());
+                } else {
+                    if (internalTimer !== null) {
+                        internalTimer.stop();
                     }
-                });
+                    try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
+                    var interval = CT - new Date().getTime();
+                    canSync = false;
+                    console.log("Setting canSync = FALSE.. Initiating a timer..");
+                    internalTimer = new Tock({
+                        countdown: true,
+                        interval: interval + WAITING_TIME,
+                        callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
+                        complete: function() {
+                            try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
+                            //pauseCurrentVideo();
+                            seekToCurrentVideo( VO +new Date().getTime()-CT );
+                            playCurrentVideo();
+                            setVolume(100);
+                            console.log("SEEKING :" + CT);
+                            console.log("INTERVAL :" + interval);
+                            console.log("Timer completed. Setting canSync = TRUE");
+                            canSync = true;
+                        }
+                    });
 
-                internalTimer.start(interval+WAITING_TIME);
-                seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration );
-                setVolume(0);
-                playCurrentVideo();
-
+                    internalTimer.start(interval+WAITING_TIME);
+                    seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration );
+                    setVolume(0);
+                    playCurrentVideo();
+                }
             } else if ( (VS === 2) && (!vp) ) {
                 seekToCurrentVideo( VO - preloadDuration );
                 pauseCurrentVideo();

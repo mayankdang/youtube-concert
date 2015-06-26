@@ -371,14 +371,9 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 //
 doConnect();
 
-var currentUrl=null;
 var videoId = null;
 var concertTag = null;
 var ownerFlag = null;
-
-kango.browser.addEventListener(kango.browser.event.DOCUMENT_COMPLETE, function(event){
-    handleEvent(event);
-});
 
 kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
