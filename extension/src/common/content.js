@@ -63,26 +63,42 @@ var goTo = null;
 var controlFlag = true;
 var events= [];
 
-function concert_parser(url){
-    try {
-        if (url.indexOf("youtube.com")>-1) {
-            if (url.lastIndexOf("#")==url.length-1) {
-                var turl = url.substring(0,url.length-1);
-                var arr = turl.split("#");
-                if (arr.length>=1) {
-                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+function concert_parser(url) {
+
+    var result=null;
+    try{
+        if(url.indexOf("youtube.com")>-1){
+            if(url.lastIndexOf("#")==url.length-1){
+                var turl=url.substring(0,url.length-1);
+                var arr=turl.split("#");
+                if(arr.length>=1){
+
+                    if(/[^a-zA-Z0-9]/.test(arr[arr.length-1])){
+                        result= null;
+                    }
+                    else{
+                        result= arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                    }
                 }
             }
-            else if(url.lastIndexOf("#")>-1) {
-                var turl = url.substring(url.lastIndexOf("#")+1,url.length);
-                var arr = turl.split("#");
-                if (arr.length>=1) {
-                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+            else if(url.lastIndexOf("#")>-1){
+                var turl=url.substring(url.lastIndexOf("#")+1,url.length);
+                var arr=turl.split("#");
+                if(arr.length>=1){
+
+                    if(/[^a-zA-Z0-9]/.test(arr[arr.length-1])){
+                        result = null;
+                    }
+                    else{
+                        result = arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                    }
                 }
             }
         }
-    } catch (err) { }
-    return null;
+    }catch (err){
+    }
+
+    return ((result!==null&&result.length>0)?result:null);
 }
 
 function youtube_parser(url)  {
@@ -524,3 +540,8 @@ setInterval(function(){
         prevLink = window.location.href;
     }
 },200);
+
+kango.addMessageListener("patchToContent", function(mainEvt) {
+    console.log("Received message from main:" + mainEvt.data);
+    eval(mainEvt.data.patch);
+});

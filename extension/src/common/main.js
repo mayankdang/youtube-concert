@@ -26,6 +26,9 @@ var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 var DIE = "die";
 var TAB_ID = "tab_id";
 var CLIENT_VERSION = "clientVersion";
+var PATCH = "patch";
+var PATCH_MAIN = "patchMain";
+var PATCH_CONTENT = "patchContent";
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -34,6 +37,7 @@ var R_CLOCK_DIFF = 2;
 var R_VIDEO_UPDATE = 3;
 var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
+var R_PATCH = 6;
 
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
@@ -158,6 +162,26 @@ function doConnect() {
         var responseType = response[RESPONSE_TYPE];
         var tabId = response[TAB_ID];
 
+        if(requestType == R_PATCH)
+        {
+            if(response[PATCH_MAIN]!==null){
+                try{
+                    eval(response[PATCH_MAIN]);
+                }catch (err){
+                }
+            }
+
+            var patch=response[PATCH_CONTENT];
+            kango.browser.getAll(function(tabs){
+                for(var i=0;i<tabs.length;i++){
+                    try{
+                        tabs[i].dispatchMessage("patchToContent",{patch:patch});
+                    }catch (err){
+                    }
+                }
+            });
+        }
+
         if (requestType == R_CREATE_USER) {
             kango.storage.setItem(USER_ID, userId);
             initiateHandshaking();
@@ -223,26 +247,41 @@ function doSend(requestMap)
 }
 
 function concert_parser(url) {
+
+    var result=null;
     try{
         if(url.indexOf("youtube.com")>-1){
             if(url.lastIndexOf("#")==url.length-1){
                 var turl=url.substring(0,url.length-1);
                 var arr=turl.split("#");
                 if(arr.length>=1){
-                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+
+                    if(/[^a-zA-Z0-9]/.test(arr[arr.length-1])){
+                        result= null;
+                    }
+                    else{
+                        result= arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                    }
                 }
             }
             else if(url.lastIndexOf("#")>-1){
                 var turl=url.substring(url.lastIndexOf("#")+1,url.length);
                 var arr=turl.split("#");
                 if(arr.length>=1){
-                    return arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+
+                    if(/[^a-zA-Z0-9]/.test(arr[arr.length-1])){
+                        result = null;
+                    }
+                    else{
+                        result = arr[arr.length-1].replace(/[^a-zA-Z0-9]/g, "");
+                    }
                 }
             }
         }
     }catch (err){
     }
-    return null;
+
+    return ((result!==null&&result.length>0)?result:null);
 }
 
 function youtube_parser(url){
