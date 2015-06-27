@@ -117,7 +117,7 @@ function doConnect() {
     function saveClockDifference(clockDiff) {
         console.log("clock difference is - " + clockDiff);
         if (!sentClockDifference) {
-            if (delayArray.length>=15) {
+            if (delayArray.length>=20) {
                 computeClockDiffMedianAndSend();
                 sentClockDifference = true;
             } else {
@@ -148,7 +148,7 @@ function doConnect() {
 
     function computeClockDiffMedianAndSend() {
 
-        var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(0,5)),
+        var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(15,20)),
             returnMedian(delayArray.slice(5,10)), returnMedian(delayArray.slice(10,15))]) );
         if (clockDiff === null) {
             console.log("Chutiya kat gaya baby! Clock diff compute mein null aa gaya..");
@@ -311,7 +311,7 @@ function youtube_parser(url){
     var match = url.match(regExp);
     if (match&&match[7].length==11){
         return match[7];
-    }else{
+    } else {
         return null;
     }
 }
