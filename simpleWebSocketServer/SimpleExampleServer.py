@@ -377,7 +377,7 @@ class SimpleChat(WebSocket):
                             print "Sender is not owner"
                 else:
                     # Joinee asks for explicit syncing (video info update)
-                    if concertTag in concertTagHashMap and videoUrl is not None:
+                    if concertTag in concertTagHashMap:
 
                         concertToJoin = concertTagHashMap.get(concertTag)
 
