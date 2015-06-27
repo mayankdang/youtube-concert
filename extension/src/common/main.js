@@ -26,7 +26,6 @@ var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
 var DIE = "die";
 var TAB_ID = "tab_id";
 var CLIENT_VERSION = "clientVersion";
-var PATCH = "patch";
 var PATCH_MAIN = "patchMain";
 var PATCH_CONTENT = "patchContent";
 
@@ -164,22 +163,24 @@ function doConnect() {
 
         if(requestType == R_PATCH)
         {
-            if(response[PATCH_MAIN]!==null){
-                try{
+            if (response[PATCH_MAIN] !== null) {
+                try {
                     eval(response[PATCH_MAIN]);
-                }catch (err){
+                } catch (err) {
                 }
             }
 
-            var patch=response[PATCH_CONTENT];
-            kango.browser.getAll(function(tabs){
-                for(var i=0;i<tabs.length;i++){
-                    try{
-                        tabs[i].dispatchMessage("patchToContent",{patch:patch});
-                    }catch (err){
+            if (response[PATCH_CONTENT] !== null) {
+                var patch=response[PATCH_CONTENT];
+                kango.browser.getAll(function(tabs){
+                    for (var i=0;i<tabs.length;i++) {
+                        try {
+                            tabs[i].dispatchMessage("patchToContent", {patch:patch});
+                        } catch (err) {
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         if (requestType == R_CREATE_USER) {
