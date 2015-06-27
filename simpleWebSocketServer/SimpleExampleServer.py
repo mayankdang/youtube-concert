@@ -55,7 +55,7 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 userIdMainMap = {}
 concertTagHashMap = {}
 
-versionFilePath = "../extension/src/common/version.txt"
+versionFilePath = "extension/src/common/version.txt"
 
 # Patches, saved.
 globalMainPatchScript = None
