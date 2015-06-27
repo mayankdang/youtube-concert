@@ -106,18 +106,18 @@ function doConnect() {
         delayArray = [];
         var messageToSend = new Object();
         messageToSend[REQUEST_TYPE] = R_HANDSHAKING;
-        for (var i=0;i<5;i++) {
+        for (var i=0;i<30;i++) {
             setTimeout(function() {
                 messageToSend[CLIENT_TIMESTAMP] = new Date().getTime();
                 doSend(messageToSend);
-            }, 300*i);
+            }, 400*i+(Math.random()*400));
         }
     }
 
     function saveClockDifference(clockDiff) {
         console.log("clock difference is - " + clockDiff);
         if (!sentClockDifference) {
-            if (delayArray.length>=3) {
+            if (delayArray.length>=15) {
                 computeClockDiffMedianAndSend();
                 sentClockDifference = true;
             } else {
@@ -130,16 +130,37 @@ function doConnect() {
         return a - b;
     }
 
-    function computeClockDiffMedianAndSend() {
-        delayArray.sort(sortNumberComparator);
+    function returnMedian(arr) {
+        if (arr === null || arr.length < 1) {
+            return null;
+        } else {
+            arr.sort(sortNumberComparator);
+            // even
+            if (arr.length % 2 === 0) {
+                return (arr[arr.length/2] + arr[arr.length/2-1] )/2;
+            }
+            // odd
+            else {
+                return arr[(arr.length-1)/2];
+            }
+        }
+    }
 
-        var clockDiff = parseInt(delayArray[1]);
-        var messageToSend = new Object();
-        messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
-        messageToSend[CLOCK_DIFF] = clockDiff;
-        messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-        doSend(messageToSend);
-        console.log("delayArray:" + JSON.stringify(delayArray));
+    function computeClockDiffMedianAndSend() {
+
+        var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(0,5)),
+            returnMedian(delayArray.slice(5,10)), returnMedian(delayArray.slice(10,15))]) );
+        if (clockDiff === null) {
+            console.log("Chutiya kat gaya baby! Clock diff compute mein null aa gaya..");
+        } else {
+            console.log("ClockDiff is:" + clockDiff);
+            var messageToSend = new Object();
+            messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
+            messageToSend[CLOCK_DIFF] = clockDiff;
+            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+            doSend(messageToSend);
+            console.log("delayArray:" + JSON.stringify(delayArray));
+        }
     }
 
     function onMessage(evt) {
