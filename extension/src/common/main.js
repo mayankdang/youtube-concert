@@ -348,7 +348,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
 
         } else if (c2mAction == SYNC_VIDEO && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
             
-            if(c2mConcertTag!==null){
+            if(!!c2mConcertTag){
                 var messageToSend = new Object();
                 messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
                 messageToSend[VIDEO_URL] = c2mVideoId;
