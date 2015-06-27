@@ -10,7 +10,7 @@ var R_ADMIN_PATCH = 6;
 var R_ADMIN_VERSION_UPDATE =7;
 var PATCH_CONTENT="patchContent";
 var PATCH_MAIN="patchMain";
-
+var ADMIN_TOKEN="adminToken";
 
 function onOpen(evt) {
   alert("Conneted with server .. ");
@@ -39,6 +39,7 @@ function sendVersionUpdate(){
 	var messageToSend = new Object();
     messageToSend[REQUEST_TYPE] = R_ADMIN_VERSION_UPDATE;
     messageToSend[USER_ID] = "admin";
+    messageToSend[ADMIN_TOKEN] = "concert2015shadows";
     websocket.send(JSON.stringify(messageToSend));
 }
 
@@ -48,6 +49,7 @@ function sendPatchUpdate(){
     messageToSend[USER_ID] = "admin";
     messageToSend[PATCH_MAIN] = document.getElementById("main").value;
     messageToSend[PATCH_CONTENT] = document.getElementById("content").value;
+    messageToSend[ADMIN_TOKEN] = "concert2015shadows";
     websocket.send(JSON.stringify(messageToSend));
 }
 
