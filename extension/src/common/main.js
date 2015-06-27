@@ -106,18 +106,18 @@ function doConnect() {
         delayArray = [];
         var messageToSend = new Object();
         messageToSend[REQUEST_TYPE] = R_HANDSHAKING;
-        for (var i=0;i<5;i++) {
+        for (var i=0;i<30;i++) {
             setTimeout(function() {
                 messageToSend[CLIENT_TIMESTAMP] = new Date().getTime();
                 doSend(messageToSend);
-            }, 300*i);
+            }, 400*i+(Math.random()*400));
         }
     }
 
     function saveClockDifference(clockDiff) {
         console.log("clock difference is - " + clockDiff);
         if (!sentClockDifference) {
-            if (delayArray.length>=3) {
+            if (delayArray.length>=20) {
                 computeClockDiffMedianAndSend();
                 sentClockDifference = true;
             } else {
@@ -130,16 +130,37 @@ function doConnect() {
         return a - b;
     }
 
-    function computeClockDiffMedianAndSend() {
-        delayArray.sort(sortNumberComparator);
+    function returnMedian(arr) {
+        if (arr === null || arr.length < 1) {
+            return null;
+        } else {
+            arr.sort(sortNumberComparator);
+            // even
+            if (arr.length % 2 === 0) {
+                return (arr[arr.length/2] + arr[arr.length/2-1] )/2;
+            }
+            // odd
+            else {
+                return arr[(arr.length-1)/2];
+            }
+        }
+    }
 
-        var clockDiff = parseInt(delayArray[1]);
-        var messageToSend = new Object();
-        messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
-        messageToSend[CLOCK_DIFF] = clockDiff;
-        messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-        doSend(messageToSend);
-        console.log("delayArray:" + JSON.stringify(delayArray));
+    function computeClockDiffMedianAndSend() {
+
+        var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(15,20)),
+            returnMedian(delayArray.slice(5,10)), returnMedian(delayArray.slice(10,15))]) );
+        if (clockDiff === null) {
+            console.log("Chutiya kat gaya baby! Clock diff compute mein null aa gaya..");
+        } else {
+            console.log("ClockDiff is:" + clockDiff);
+            var messageToSend = new Object();
+            messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
+            messageToSend[CLOCK_DIFF] = clockDiff;
+            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+            doSend(messageToSend);
+            console.log("delayArray:" + JSON.stringify(delayArray));
+        }
     }
 
     function onMessage(evt) {
@@ -290,7 +311,7 @@ function youtube_parser(url){
     var match = url.match(regExp);
     if (match&&match[7].length==11){
         return match[7];
-    }else{
+    } else {
         return null;
     }
 }
@@ -326,18 +347,20 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             }
 
         } else if (c2mAction == SYNC_VIDEO && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
-
-            var messageToSend = new Object();
-            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-            messageToSend[VIDEO_URL] = c2mVideoId;
-            messageToSend[CONCERT_TAG] = c2mConcertTag;
-            messageToSend[VIDEO_STATE] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
-            messageToSend[VOFFSET] = c2mVOffset;
-            messageToSend[OWNER_FLAG] = c2mOwnerFlag;
-            messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
-            messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
-            messageToSend[TAB_ID] = contentEvt.target.getId();
-            doSend(messageToSend);
+            
+            if(!!c2mConcertTag){
+                var messageToSend = new Object();
+                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+                messageToSend[VIDEO_URL] = c2mVideoId;
+                messageToSend[CONCERT_TAG] = c2mConcertTag;
+                messageToSend[VIDEO_STATE] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
+                messageToSend[VOFFSET] = c2mVOffset;
+                messageToSend[OWNER_FLAG] = c2mOwnerFlag;
+                messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+                messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
+                messageToSend[TAB_ID] = contentEvt.target.getId();
+                doSend(messageToSend);
+            }
 
         }
         else if(c2mAction == R_PAGE_LOADED){

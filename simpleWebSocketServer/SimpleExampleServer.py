@@ -55,14 +55,14 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 userIdMainMap = {}
 concertTagHashMap = {}
 
-versionFilePath = "../extension/src/common/version.txt"
+versionFilePath = "extension/src/common/version.txt"
 
 # Patches, saved.
 globalMainPatchScript = None
 globalContentPatchScript = None
 globalCurrentClientVersion = None
 try:
-    globalCurrentClientVersion = open(versionFilePath).read()
+    globalCurrentClientVersion = open(versionFilePath).read().strip()
 except Exception, e:
     print "Exception:", e
 
@@ -91,14 +91,16 @@ class Concert(object):
                 except Exception, e:
                     print "Exception: ", e
 
-    def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp):
+    def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp, videoUrl):
         self._vOffset = vOffset
         self._updatedVOffsetTime = clientTimeStamp - userIdMainMap[self.ownerId].clockDiff
         self._videoState = videoState
+        self.videoUrl = videoUrl
         print "VOFFSET set in concert: ",
         print "_vOffset = ", vOffset,
         print "_updatedVOffsetTime = ", self._updatedVOffsetTime,
         print "_videoState = ", self._videoState
+        print "videoUrl = ", self.videoUrl
 
     def getVideoState(self):
         return self._videoState
@@ -237,7 +239,7 @@ class SimpleChat(WebSocket):
                     print "Salt verified."
                     global globalCurrentClientVersion
                     try:
-                        globalCurrentClientVersion = open(versionFilePath).read()
+                        globalCurrentClientVersion = open(versionFilePath).read().strip()
                         print "New Version: ", globalCurrentClientVersion
                     except Exception, err:
                         print "Exception:", err
@@ -365,7 +367,7 @@ class SimpleChat(WebSocket):
                             print "vOffset:", vOffset
                             print "videoState:", videoState
                             if vOffset is not None and videoState is not None and clientTimeStamp is not None:
-                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState, clientTimeStamp)
+                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState, clientTimeStamp, videoUrl)
 
                             responseMap[VOFFSET] = vOffset if vOffset is not None else None
                             responseMap[CONCERT_TAG] = concertTag
@@ -377,7 +379,7 @@ class SimpleChat(WebSocket):
                             print "Sender is not owner"
                 else:
                     # Joinee asks for explicit syncing (video info update)
-                    if concertTag in concertTagHashMap and videoUrl is not None:
+                    if concertTag in concertTagHashMap:
 
                         concertToJoin = concertTagHashMap.get(concertTag)
 
