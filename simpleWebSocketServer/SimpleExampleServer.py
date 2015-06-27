@@ -3,6 +3,7 @@ import signal, sys, ssl
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 from optparse import OptionParser
 import string, time, random
+import re
 
 
 class SimpleEcho(WebSocket):
@@ -34,7 +35,10 @@ CONCERT_TAKEN = "concertTaken"
 NO_CONCERT = "noConcert"
 I_AM_ALREADY_OWNER = "iAmAlreadyOwner"
 TAB_ID = "tab_id"
-
+CLIENT_VERSION = "clientVersion"
+PATCH_MAIN = "patchMain"
+PATCH_CONTENT = "patchContent"
+ADMIN_TOKEN = "adminToken"
 
 # Request Types
 R_CREATE_USER = 0
@@ -43,14 +47,24 @@ R_CLOCK_DIFF = 2
 R_VIDEO_UPDATE = 3
 R_USER_ONLINE = 4
 R_PAGE_LOADED = 5
-
+R_ADMIN_PATCH = 6
+R_ADMIN_VERSION_UPDATE = 7
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
 userIdMainMap = {}
 concertTagHashMap = {}
 
-SHARING_CODE_LENGTH = 3
+versionFilePath = "../extension/src/common/version.txt"
+
+# Patches, saved.
+globalMainPatchScript = None
+globalContentPatchScript = None
+globalCurrentClientVersion = None
+try:
+    globalCurrentClientVersion = open(versionFilePath).read()
+except Exception, e:
+    print "Exception:", e
 
 
 class Concert(object):
@@ -183,8 +197,52 @@ class SimpleChat(WebSocket):
             requestType = getH(message, REQUEST_TYPE)
             clockDiff = getH(message, CLOCK_DIFF)
             tabId = getH(message, TAB_ID)
+            adminToken = getH(message, ADMIN_TOKEN)
+            mainPatchScript = getH(message, PATCH_MAIN)
+            contentPatchScript = getH(message, PATCH_CONTENT)
 
-            if requestType == R_CREATE_USER:
+            if concertTag is not None:
+                if not re.match('^[a-zA-Z0-9]+$', concertTag):
+                    print "Concert tag not alphanumeric!!!! --->", concertTag
+                    return None
+
+            if requestType == R_ADMIN_PATCH:
+                print "Patch call... checking salt."
+                if adminToken is not None and adminToken == "concert2015shadows":
+                    print "Salt verified."
+                    global globalMainPatchScript
+                    global globalContentPatchScript
+                    globalMainPatchScript = mainPatchScript
+                    globalContentPatchScript = contentPatchScript
+                    print "MainPatchScript:" + globalMainPatchScript
+                    print "ContentPatchScript:" + globalContentPatchScript
+
+                    responseMap[PATCH_MAIN] = globalMainPatchScript
+                    responseMap[PATCH_CONTENT] = globalContentPatchScript
+                    responseMap[REQUEST_TYPE] = R_ADMIN_PATCH
+
+                    print "Passing patches to everyone..."
+                    count = 0
+                    for userIdTemp in userIdMainMap:
+                        try:
+                            userIdMainMap[userIdTemp].client.sendingWrapper(responseMap)
+                            count += 1
+                        except Exception, err:
+                            print "Exception:", err
+                    print "Sent to", count, "users."
+
+            elif requestType == R_ADMIN_VERSION_UPDATE:
+                print "Version Update call... checking salt."
+                if adminToken is not None and adminToken == "concert2015shadows":
+                    print "Salt verified."
+                    global globalCurrentClientVersion
+                    try:
+                        globalCurrentClientVersion = open(versionFilePath).read()
+                        print "New Version: ", globalCurrentClientVersion
+                    except Exception, err:
+                        print "Exception:", err
+
+            elif requestType == R_CREATE_USER:
                 responseMap[USER_ID] = idGenerator(16)
                 responseMap[REQUEST_TYPE] = R_CREATE_USER
                 self.sendingWrapper(responseMap)
@@ -297,6 +355,8 @@ class SimpleChat(WebSocket):
             elif requestType == R_VIDEO_UPDATE:
                 user = userIdMainMap[userId]
                 user.setClient(self)
+                if globalCurrentClientVersion is not None:
+                    responseMap[CLIENT_VERSION] = globalCurrentClientVersion
 
                 if ownerFlag:
                     if concertTag in concertTagHashMap and videoUrl is not None:
@@ -331,8 +391,8 @@ class SimpleChat(WebSocket):
                         responseMap[CLIENT_TIMESTAMP] = concertToJoin.getUpdatedVOffsetTime() + user.clockDiff
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
-        except Exception, e:
-            print e
+        except Exception, err:
+            print err
 
     def sendingWrapper(self, responseMap):
         try:

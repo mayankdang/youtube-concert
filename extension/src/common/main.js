@@ -36,7 +36,7 @@ var R_CLOCK_DIFF = 2;
 var R_VIDEO_UPDATE = 3;
 var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
-var R_PATCH = 6;
+var R_ADMIN_PATCH = 6;
 
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
@@ -161,7 +161,7 @@ function doConnect() {
         var responseType = response[RESPONSE_TYPE];
         var tabId = response[TAB_ID];
 
-        if(requestType == R_PATCH)
+        if(requestType == R_ADMIN_PATCH)
         {
             if (response[PATCH_MAIN] !== null) {
                 try {

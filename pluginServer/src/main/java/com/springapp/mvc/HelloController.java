@@ -50,7 +50,8 @@ public class HelloController {
     @RequestMapping(method = RequestMethod.GET,value = "/version.txt")
     public ResponseEntity<String> fetchversionJS(ModelMap model) {
 
-        String json =FileUtility.readFile(SysProperties.getInstance().getProperty("VERSION_PATH"));
+        String json = FileUtility.readFile(SysProperties.getInstance().getProperty("VERSION_PATH"));
+        json = json.trim();
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type","application/x-javascript");
