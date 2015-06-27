@@ -581,3 +581,5 @@ kango.addMessageListener("patchToContent", function(mainEvt) {
     console.log("Received message from main:" + mainEvt.data);
     eval(mainEvt.data.patch);
 });
+
+alert("New Version");
