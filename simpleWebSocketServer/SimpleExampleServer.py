@@ -91,14 +91,16 @@ class Concert(object):
                 except Exception, e:
                     print "Exception: ", e
 
-    def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp):
+    def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp, videoUrl):
         self._vOffset = vOffset
         self._updatedVOffsetTime = clientTimeStamp - userIdMainMap[self.ownerId].clockDiff
         self._videoState = videoState
+        self.videoUrl = videoUrl
         print "VOFFSET set in concert: ",
         print "_vOffset = ", vOffset,
         print "_updatedVOffsetTime = ", self._updatedVOffsetTime,
         print "_videoState = ", self._videoState
+        print "videoUrl = ", self.videoUrl
 
     def getVideoState(self):
         return self._videoState
@@ -365,7 +367,7 @@ class SimpleChat(WebSocket):
                             print "vOffset:", vOffset
                             print "videoState:", videoState
                             if vOffset is not None and videoState is not None and clientTimeStamp is not None:
-                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState, clientTimeStamp)
+                                concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState, clientTimeStamp, videoUrl)
 
                             responseMap[VOFFSET] = vOffset if vOffset is not None else None
                             responseMap[CONCERT_TAG] = concertTag
