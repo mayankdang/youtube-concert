@@ -347,18 +347,20 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             }
 
         } else if (c2mAction == SYNC_VIDEO && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
-
-            var messageToSend = new Object();
-            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-            messageToSend[VIDEO_URL] = c2mVideoId;
-            messageToSend[CONCERT_TAG] = c2mConcertTag;
-            messageToSend[VIDEO_STATE] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
-            messageToSend[VOFFSET] = c2mVOffset;
-            messageToSend[OWNER_FLAG] = c2mOwnerFlag;
-            messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
-            messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
-            messageToSend[TAB_ID] = contentEvt.target.getId();
-            doSend(messageToSend);
+            
+            if(c2mConcertTag!==null){
+                var messageToSend = new Object();
+                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+                messageToSend[VIDEO_URL] = c2mVideoId;
+                messageToSend[CONCERT_TAG] = c2mConcertTag;
+                messageToSend[VIDEO_STATE] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
+                messageToSend[VOFFSET] = c2mVOffset;
+                messageToSend[OWNER_FLAG] = c2mOwnerFlag;
+                messageToSend[REQUEST_TYPE] = R_VIDEO_UPDATE;
+                messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
+                messageToSend[TAB_ID] = contentEvt.target.getId();
+                doSend(messageToSend);
+            }
 
         }
         else if(c2mAction == R_PAGE_LOADED){
