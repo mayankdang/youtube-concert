@@ -62,7 +62,7 @@ globalMainPatchScript = None
 globalContentPatchScript = None
 globalCurrentClientVersion = None
 try:
-    globalCurrentClientVersion = open(versionFilePath).read()
+    globalCurrentClientVersion = open(versionFilePath).read().strip()
 except Exception, e:
     print "Exception:", e
 
@@ -237,7 +237,7 @@ class SimpleChat(WebSocket):
                     print "Salt verified."
                     global globalCurrentClientVersion
                     try:
-                        globalCurrentClientVersion = open(versionFilePath).read()
+                        globalCurrentClientVersion = open(versionFilePath).read().strip()
                         print "New Version: ", globalCurrentClientVersion
                     except Exception, err:
                         print "Exception:", err
