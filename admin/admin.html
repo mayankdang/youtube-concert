@@ -1,0 +1,76 @@
+<html>
+<head>
+<script type="text/javascript">
+
+var IP = "52.74.240.238";
+var PORT = "8000";
+var REQUEST_TYPE = "requestType";
+var USER_ID = "userId";
+var R_ADMIN_PATCH = 6;
+var R_ADMIN_VERSION_UPDATE =7;
+var PATCH_CONTENT="patchContent";
+var PATCH_MAIN="patchMain";
+
+
+function onOpen(evt) {
+  alert("Conneted with server .. ");
+}
+
+function onMessage(evt) {
+
+}
+
+function onClose(evt) {
+}
+
+function onError(evt)
+{
+    console.log('Error: ' + evt.data + '\n');
+    websocket.close();
+}
+
+var websocket = new WebSocket( "ws://"+IP+":"+PORT+"/" );
+websocket.onopen = function(evt) { onOpen(evt) };
+websocket.onclose = function(evt) { onClose(evt) };
+websocket.onmessage = function(evt) { onMessage(evt) };
+websocket.onerror = function(evt) { onError(evt) };
+
+function sendVersionUpdate(){
+	var messageToSend = new Object();
+    messageToSend[REQUEST_TYPE] = R_ADMIN_VERSION_UPDATE;
+    messageToSend[USER_ID] = "admin";
+    websocket.send(JSON.stringify(messageToSend));
+}
+
+function sendPatchUpdate(){
+	var messageToSend = new Object();
+    messageToSend[REQUEST_TYPE] = R_ADMIN_PATCH;
+    messageToSend[USER_ID] = "admin";
+    messageToSend[PATCH_MAIN] = document.getElementById("main").value;
+    messageToSend[PATCH_CONTENT] = document.getElementById("content").value;
+    websocket.send(JSON.stringify(messageToSend));
+}
+
+</script>
+</head>
+<body>
+
+<input type="button"  onclick="sendVersionUpdate()" value="Send Client Update"/>
+</br>
+</br>
+<hr>
+
+Content
+</br><textarea rows="7" cols="50" id="content">
+
+</textarea>
+</br>
+Main
+</br><textarea rows="7" cols="50" id="main"/>
+</textarea>
+
+<input type="button"  onclick="sendPatchUpdate()" value="Send Patch Update">
+<hr>
+
+</body>
+</html>
