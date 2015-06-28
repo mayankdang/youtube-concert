@@ -153,7 +153,10 @@ function getTransitionType(vid,ct,of){
 
 var globalVideoId = youtube_parser(window.location.href);
 var globalConcertTag = concert_parser(window.location.href);
-var globalOwnerFlag = ((globalVideoId!==null&&globalConcertTag!==null)?(window.location.href.lastIndexOf("#")===window.location.href.length-1):null);
+var globalOwnerFlag = (globalConcertTag === null ? null : (window.location.href.lastIndexOf("#") === window.location.href.length-1) && (
+    (window.location.href.indexOf("youtube.com")>-1)
+    ));
+
 
 function loadUrl(vid,ct,of) {
     if(vid!==null&&ct!==null&&of!==null&& (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag))
@@ -321,6 +324,7 @@ function youtuber() {
                 setOnEndInterrupt();
             } else if (responseType==NO_CONCERT) {
                 alert(responseType);
+
             } else if (responseType==I_AM_ALREADY_OWNER) {
                 alert(responseType);
             }
