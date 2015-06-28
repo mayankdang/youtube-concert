@@ -121,46 +121,34 @@ var TAB_YOUTUBE_OWNER = 1;
 var TAB_YOUTUBE_JOINEE = 2;
 var TAB_ELSE = -1;
 
-//todo- merge getUrlType and getTransitionType
-function getUrlType(url){
+function getTransitionType(vid,ct,of){
+
     var urlType = TAB_ELSE;
     if(
-        youtube_parser(url) !=  null
-            && concert_parser(url) != null
-            && url.lastIndexOf("#") == url.length-1
+        vid !==  null
+            && ct !== null
+            && of === true
+            && window.location.host.indexOf(".youtube.com")>-1
         )
     {
         urlType=TAB_YOUTUBE_OWNER;
     }
     else if(
         (
-            concert_parser(url) != null
-                && url.lastIndexOf("#") != url.length-1
+            ct !== null
+                && of === false
+                && window.location.host.indexOf(".youtube.com")>-1
             )
         )
     {
         urlType=TAB_YOUTUBE_JOINEE;
     }
-    else if(
-        window.location.host.indexOf(".youtube.com")>-1
-        )
+    else if (window.location.host.indexOf(".youtube.com")>-1)
     {
         urlType=TAB_YOUTUBE;
     }
+
     return urlType;
-}
-
-function getTransitionType(vid,ct,of){
-    if(vid===null) {
-        return -1;
-    }
-
-    // This is for when the url is a generic youtube url.
-    if(vid!=null && ct==null)
-        return TAB_YOUTUBE;
-
-    var url=window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
-    return getUrlType(url);
 }
 
 var globalVideoId = youtube_parser(window.location.href);
