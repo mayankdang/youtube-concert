@@ -37,11 +37,14 @@ var R_VIDEO_UPDATE = 3;
 var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
 var R_ADMIN_PATCH = 6;
+var R_ADMIN_VERSION_UPDATE = 7;
+var R_LEAVE_CONCERT = 8;
 
 // contentToMainActions
 var PAGE_LOADED = "pageLoaded";
 var SYNC_VIDEO = "syncVideo";
 var TAB_UPDATE_LATEST = "tabUpdateLatest";
+var LEAVE_CONCERT = "leaveConcert";
 
 var sentClockDifference = false;
 var delayArray = [];
@@ -331,6 +334,13 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         var c2mClientTimestamp = contentEvt.data.t;
         var c2mUrl = contentEvt.data.url;
 
+        if (c2mAction == LEAVE_CONCERT) {
+            var messageToSend = new Object();
+            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+            messageToSend[REQUEST_TYPE] = R_LEAVE_CONCERT;
+            doSend(messageToSend);
+        }
+
         if (c2mAction == TAB_UPDATE_LATEST) {
 
             if ( concertYoutubeTab==null || contentEvt.target.getId() !== concertYoutubeTab.getId()) {
@@ -362,8 +372,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 doSend(messageToSend);
             }
 
-        }
-        else if(c2mAction == R_PAGE_LOADED){
+        } else if(c2mAction == R_PAGE_LOADED){
             var url=contentEvt.data.url;
             if ( url !=null && youtube_parser(contentEvt.data.url)!==null && concert_parser(contentEvt.data.url)!==null ) {
                 // estabilish websocket connection for the first time
@@ -403,5 +412,6 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
         tabHashMap[concertYoutubeTab.getId()]=undefined;
         concertYoutubeTab = null;
+        concertLeaver();
     }
 });

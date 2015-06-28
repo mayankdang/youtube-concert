@@ -42,7 +42,8 @@ var RESPONSE_TYPE = "responseType";
 var CONCERT_TAKEN = "concertTaken";
 var NO_CONCERT = "noConcert";
 var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
-var LOAD_VIDEO = "loadVideo"
+var LOAD_VIDEO = "loadVideo";
+var LEAVE_CONCERT = "leaveConcert";
 
 // Request Types
 var R_CREATE_USER = 0;
@@ -181,6 +182,15 @@ function loadUrl(vid,ct,of) {
     }
 }
 
+function concertLeaver() {
+    VO = null;
+    VS = null;
+    CT = null;
+    VID = null;
+    canSync = false;
+    doSend({a: LEAVE_CONCERT});
+}
+
 function redirectBasedOnState(vid,ct,of) {
 
     var toGo = getTransitionType(vid, ct, of);
@@ -214,12 +224,12 @@ function redirectBasedOnState(vid,ct,of) {
             loadUrl(vid,ct,of);
         }
         else if(toGo===TAB_ELSE){
-
+            concertLeaver();
         }
     }
     else if(currentTabState===TAB_YOUTUBE_JOINEE){
         if(toGo === TAB_YOUTUBE){
-            //
+            concertLeaver();
         }
         else if(toGo === TAB_YOUTUBE_OWNER){
             loadUrl(vid,ct,of);
@@ -228,7 +238,7 @@ function redirectBasedOnState(vid,ct,of) {
             loadUrl(vid,ct,of);
         }
         else if(toGo === TAB_ELSE){
-
+            concertLeaver();
         }
     }
 }
