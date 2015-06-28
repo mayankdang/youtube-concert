@@ -49,6 +49,7 @@ R_USER_ONLINE = 4
 R_PAGE_LOADED = 5
 R_ADMIN_PATCH = 6
 R_ADMIN_VERSION_UPDATE = 7
+R_LEAVE_CONCERT = 8
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -88,8 +89,8 @@ class Concert(object):
                         responseMap[CLIENT_TIMESTAMP] = self._updatedVOffsetTime + userIdMainMap[tempUserId].clockDiff
                         responseMap[TAB_ID] = userIdMainMap[tempUserId].getTabId()
                         userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
-                except Exception, e:
-                    print "Exception: ", e
+                except Exception, err:
+                    print "Exception: ", err
 
     def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp, videoUrl):
         self._vOffset = vOffset
@@ -243,6 +244,15 @@ class SimpleChat(WebSocket):
                         print "New Version: ", globalCurrentClientVersion
                     except Exception, err:
                         print "Exception:", err
+
+            elif requestType == R_LEAVE_CONCERT:
+                if userId is not None:
+                    if userId in userIdMainMap:
+                        user = userIdMainMap[userId]
+                        user.setClient(self)
+                        print "User:", userId, "wants to leave the concert. TO EACH HIS OWN, I say! :/"
+                        # Setting user concertTag as None
+                        user.updateConcertTag(None)
 
             elif requestType == R_CREATE_USER:
                 responseMap[USER_ID] = idGenerator(16)
