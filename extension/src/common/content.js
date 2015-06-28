@@ -164,7 +164,7 @@ function loadUrl(vid,ct,of) {
 
         var metaTag = document.createElement("meta");
         metaTag.setAttribute("http-equiv","refresh");
-        metaTag.setAttribute("content","1; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":""));
+        metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
     }
     // this is for youtube.com#abcd
@@ -175,7 +175,7 @@ function loadUrl(vid,ct,of) {
 
         var metaTag = document.createElement("meta");
         metaTag.setAttribute("http-equiv","refresh");
-        metaTag.setAttribute("content","1; " + window.location.protocol+"//"+window.location.host+"#"+ct+(of===true?"#":""));
+        metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
     }
 }
