@@ -299,21 +299,15 @@ function youtuber() {
         else if (response!=null && response[REQUEST_TYPE]== R_PAGE_LOADED) {
 
             if (responseType == CONCERT_CREATED) {
+                displayConcertName(response[CONCERT_TAG]);
                 kango.storage.setItem("LATEST_OWNER_CONCERT",response[CONCERT_TAG]);
 
                 alert(responseType);
                 updateTabInfoToMain();
-
-
-                //try{
-                //    var div=document.createElement("div");
-                //    div.innerHTML="<div style='color: #ffffff;font-weight:bolder;max-width: 100px;white-space:nowrap;overflow:hidden'>#poopy</div>";
-                //    document.getElementsByClassName("html5-video-player")[0].appendChild(div.childNodes[0]);
-                //}catch (er){}
-
             } else if (responseType==CONCERT_TAKEN) {
                 alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
+                displayConcertName(response[CONCERT_TAG]);
                 kango.storage.setItem("LATEST_JOINEE_CONCERT",response[CONCERT_TAG]);
 
                 updateTabInfoToMain();
@@ -334,6 +328,24 @@ function youtuber() {
             window.close();
         }
     });
+}
+
+function displayConcertName(concertTag){
+    if(!!document.getElementById("concertName") && (!!concertTag)){
+        try{
+            p = document.getElementById("concertTag"); //gets the p tag of the div.innerHTML in the else condition below
+            p.innerHTML = '#'+concertTag;
+        }catch(er){}
+    }else{
+        try{
+            ytpPlayer = document.getElementsByClassName("ytp-player-content ytp-iv-player-content")[0];
+            var div = document.createElement("div");
+            div.id = "concertName"
+            div.style.cssText = 'direction:ltr; position:absolute; top:0; right:0; float:left; height:62px; width:100;';
+            div.innerHTML ='<div class="annotation annotation-type-custom iv-branding"><p id="concertTag" class="branding-img iv-click-target iv-view-target" width="54" height="20" style="color:white; left: 0px; top: 0px;">#'+concertTag+'</p></div>';
+            ytpPlayer.insertBefore(div, ytpPlayer.childNodes[0]);
+        }catch(er){}
+    }
 }
 
 function joineeStateHandler() {

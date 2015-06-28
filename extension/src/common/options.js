@@ -49,12 +49,8 @@ function doSend(message) {
     console.log("Sent to main:" + message);
 }
 
-document.getElementById("changeId").onclick = changeVideoId;
-document.getElementById("broadcast").onclick = resetVideo;
-document.getElementById("createConcert").onclick = createConcert;
-document.getElementById("joinConcert").onclick = joinConcert;
-
-
-if(kango.storage.getItem("LATEST_OWNER_CONCERT")!=null){
-    document.getElementById("concert_name").textContent="#"+kango.storage.getItem("LATEST_OWNER_CONCERT");
-}
+KangoAPI.onReady(function() {
+    if(kango.storage.getItem("LATEST_OWNER_CONCERT")!=null){
+        document.getElementById("play_concert").innerHTML="Play Concert #"+kango.storage.getItem("LATEST_OWNER_CONCERT")+" ";
+    }
+});
