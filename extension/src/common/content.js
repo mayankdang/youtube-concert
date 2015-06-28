@@ -254,8 +254,7 @@ function displayConcertName(concertTag){
         if(!!document.getElementById("concertName") && (!!concertTag)){
             try{
                 var p = document.getElementById("concertTag"); //gets the p tag of the div.innerHTML in the else condition below
-                p.style.cssText = 'direction: ltr; position: absolute; top: 0px; right: 0px; float: left; height: 62px;';
-                p.innerHTML = '<div style="background: #000000; z-index: 922;bottom: 20px; right: 20px;position:absolute;opacity: 0.5; -webkit-border-radius: 20px;"><p id="concertTag" width="54" height="20" style="font-family: Verdana, Geneva, sans-serif; font-size: 19px; color:white; left: 0px; top: 0px;padding: 0px;margin: 6px;"><b>#<i>'+concertTag+'</i></b></p></div>';
+                p.innerHTML = '#' + concertTag;
             }catch(er){}
         }else{
             try{
