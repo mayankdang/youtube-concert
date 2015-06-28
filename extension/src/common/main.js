@@ -357,7 +357,6 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
             }
 
         } else if (c2mAction == SYNC_VIDEO && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
-            
             if(!!c2mConcertTag){
                 var messageToSend = new Object();
                 messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
@@ -371,11 +370,9 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[TAB_ID] = contentEvt.target.getId();
                 doSend(messageToSend);
             }
-
-        } else if(c2mAction == R_PAGE_LOADED){
+        } else if(c2mAction == R_PAGE_LOADED && contentEvt.data.url !== null && contentEvt.data.url.indexOf(".youtube.com")>-1){
             var url=contentEvt.data.url;
-            if ( url !=null && youtube_parser(contentEvt.data.url)!==null && concert_parser(contentEvt.data.url)!==null ) {
-                // estabilish websocket connection for the first time
+            if ( url !=null && youtube_parser(contentEvt.data.url) !==null && concert_parser(contentEvt.data.url)!==null ) {
                 var currentUrl = url;
                 var videoId = youtube_parser(currentUrl);
                 var concertTag = concert_parser(currentUrl);
@@ -385,6 +382,18 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[VIDEO_URL] = videoId;
                 messageToSend[CONCERT_TAG] = concertTag;
                 messageToSend[OWNER_FLAG] = ownerFlag;
+                messageToSend[TAB_ID] = contentEvt.target.getId();
+                messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
+                doSend(messageToSend);
+            }
+            else if ( url !=null && youtube_parser(contentEvt.data.url) === null && concert_parser(contentEvt.data.url)!==null ) {
+                var currentUrl = url;
+                var concertTag = concert_parser(currentUrl);
+                var messageToSend = new Object();
+                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+                messageToSend[VIDEO_URL] = "shfdkjhkjh";
+                messageToSend[CONCERT_TAG] = concertTag;
+                messageToSend[OWNER_FLAG] = false;
                 messageToSend[TAB_ID] = contentEvt.target.getId();
                 messageToSend[REQUEST_TYPE] = R_PAGE_LOADED;
                 doSend(messageToSend);

@@ -68,7 +68,7 @@ function concert_parser(url) {
 
     var result=null;
     try{
-        if(url.indexOf("youtube.com")>-1){
+        if(url.indexOf(".youtube.com")>-1){
             if(url.lastIndexOf("#")==url.length-1){
                 var turl=url.substring(0,url.length-1);
                 var arr=turl.split("#");
@@ -158,7 +158,6 @@ var globalOwnerFlag = ((globalVideoId!==null&&globalConcertTag!==null)?(window.l
 function loadUrl(vid,ct,of) {
     if(vid!==null&&ct!==null&&of!==null&& (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag))
     {
-        var u = window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":"");
         globalVideoId=vid;
         globalConcertTag=ct;
         globalOwnerFlag=of;
@@ -166,6 +165,17 @@ function loadUrl(vid,ct,of) {
         var metaTag = document.createElement("meta");
         metaTag.setAttribute("http-equiv","refresh");
         metaTag.setAttribute("content","1; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":""));
+        document.head.appendChild(metaTag);
+    }
+    // this is for youtube.com#abcd
+    else if (vid === null && ct !== null && of === false && (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag)) {
+        globalVideoId=vid;
+        globalConcertTag=ct;
+        globalOwnerFlag=of;
+
+        var metaTag = document.createElement("meta");
+        metaTag.setAttribute("http-equiv","refresh");
+        metaTag.setAttribute("content","1; " + window.location.protocol+"//"+window.location.host+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
     }
 }
@@ -277,7 +287,8 @@ function youtuber() {
             // joinee handle this
 
             try {
-                redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+                if (videoId !== null)
+                    redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
             } catch (err) {
             }
 
@@ -300,7 +311,8 @@ function youtuber() {
 
                 updateTabInfoToMain();
                 try {
-                    redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+                    if (videoId !== null)
+                        redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
                 }catch (err){
                 }
 
@@ -586,7 +598,9 @@ setInterval(function(){
     {
         var tempYt = youtube_parser(window.location.href);
         var tempCt = concert_parser(window.location.href);
-        var tempOf = (tempCt==null ? null : (window.location.href.lastIndexOf("#") === window.location.href.length-1));
+        var tempOf = (tempCt===null ? null : (window.location.href.lastIndexOf("#") === window.location.href.length-1) && (
+            (window.location.href.indexOf("youtube.com")>-1)
+            ));
         redirectBasedOnState(tempYt, tempCt, tempOf);
         prevLink = window.location.href;
     }
