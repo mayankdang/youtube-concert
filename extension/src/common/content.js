@@ -289,8 +289,11 @@ function youtuber() {
         else if (response!=null && response[REQUEST_TYPE]== R_PAGE_LOADED) {
 
             if (responseType == CONCERT_CREATED) {
+                kango.storage.setItem("LATEST_OWNER_CONCERT",response[CONCERT_TAG]);
+
                 alert(responseType);
                 updateTabInfoToMain();
+
 
                 //try{
                 //    var div=document.createElement("div");
@@ -301,12 +304,14 @@ function youtuber() {
             } else if (responseType==CONCERT_TAKEN) {
                 alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
+                kango.storage.setItem("LATEST_JOINEE_CONCERT",response[CONCERT_TAG]);
+
                 updateTabInfoToMain();
                 try {
                     redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
                 }catch (err){
-
                 }
+
                 onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
                 joineeStateHandler();
                 setOnEndInterrupt();

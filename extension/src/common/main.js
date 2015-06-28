@@ -401,7 +401,7 @@ var ownerFlag = null;
 
 kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
-        tabHashMap[concertYoutubeTab.getId()]=null;
+        tabHashMap[concertYoutubeTab.getId()]=undefined;
         concertYoutubeTab = null;
     }
 });
