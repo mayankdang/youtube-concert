@@ -2,16 +2,35 @@
 <html>
 <head>
     <script src="../kango-ui/kango_api.js" type="text/javascript"></script>
+    <style type="text/css">
+        .myButton {
+            background-color:#44c767;
+            -moz-border-radius:28px;
+            -webkit-border-radius:28px;
+            border-radius:28px;
+            border:1px solid #18ab29;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:17px;
+            padding:15px 31px;
+            text-decoration:none;
+            text-shadow:0px 1px 0px #2f6627;
+        }
+        .myButton:hover {
+            background-color:#5cbf2a;
+        }
+        .myButton:active {
+            position:relative;
+            top:1px;
+        }
+
+</style>
 </head>
 <body style="height: 100px;width: 200px">
-<input type="text"  id="videoId"/>
-<button id="changeId">Change Id</button>
-<button id="broadcast">Broadcast</button>
-<button id="createConcert">Create-Concert</button>
-<br>
-<input type="text"  id="groupId"/>
-<button id="joinConcert">Join Concert</button>
-
-<script type="text/javascript" src="options.js"></script>
+<button class="myButton" id="broadcast">Play My Concert !</button>
+<p style="color :#000000;font-family: CoconLight;font-size:34px;" id="concert_name"></p>
+    <script type="text/javascript" src="options.js"></script>
 </body>
 </html>

@@ -53,3 +53,8 @@ document.getElementById("changeId").onclick = changeVideoId;
 document.getElementById("broadcast").onclick = resetVideo;
 document.getElementById("createConcert").onclick = createConcert;
 document.getElementById("joinConcert").onclick = joinConcert;
+
+
+if(kango.storage.getItem("LATEST_OWNER_CONCERT")!=null){
+    document.getElementById("concert_name").textContent="#"+kango.storage.getItem("LATEST_OWNER_CONCERT");
+}
