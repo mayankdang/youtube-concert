@@ -393,6 +393,10 @@ class SimpleChat(WebSocket):
 
                         concertToJoin = concertTagHashMap.get(concertTag)
 
+                        concertToJoin.users.add(userId)
+                        user.updateConcertTag(concertTag)
+                        user.updateTabId(tabId)
+
                         responseMap[USER_ID] = user.id
                         responseMap[CONCERT_TAG] = concertTag
                         responseMap[VIDEO_URL] = concertToJoin.videoUrl
