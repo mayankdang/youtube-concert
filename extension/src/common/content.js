@@ -328,12 +328,12 @@ function displayConcertName(concertTag){
         }catch(er){}
     }else{
         try{
-            ytpPlayer = document.getElementsByClassName("ytp-player-content ytp-iv-player-content")[0];
+            videoContent = document.getElementsByClassName("html5-video-content")[0];
             var div = document.createElement("div");
             div.id = "concertName"
-            div.style.cssText = 'direction:ltr; position:absolute; top:0; right:0; float:left; height:62px; width:100;';
-            div.innerHTML ='<div class="annotation annotation-type-custom iv-branding"><p id="concertTag" class="branding-img iv-click-target iv-view-target" width="54" height="20" style="color:white; left: 0px; top: 0px;">#'+concertTag+'</p></div>';
-            ytpPlayer.insertBefore(div, ytpPlayer.childNodes[0]);
+            div.style.cssText = 'direction: ltr; position: absolute; top: 0px; right: 0px; float: left; height: 62px;';
+            div.innerHTML = '<div style="z-index: 922;bottom: 20px; right: 20px;position:absolute" class=""><p id="concertTag" width="54" height="20" style="color:white; left: 0px; top: 0px;">#'+concertTag+'</p></div>';
+            videoContent.insertBefore(div, videoContent.childNodes[0]);
         }catch(er){}
     }
 }
