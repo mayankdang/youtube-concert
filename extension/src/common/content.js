@@ -342,7 +342,7 @@ function displayConcertName(concertTag){
             var div = document.createElement("div");
             div.id = "concertName"
             div.style.cssText = 'direction: ltr; position: absolute; top: 0px; right: 0px; float: left; height: 62px;';
-            div.innerHTML = '<div style="z-index: 922;bottom: 20px; right: 20px;position:absolute" class=""><p id="concertTag" width="54" height="20" style="color:white; left: 0px; top: 0px;">#'+concertTag+'</p></div>';
+            div.innerHTML = '<div style="background: #000000; z-index: 922;bottom: 20px; right: 20px;position:absolute;opacity: 0.5; -webkit-border-radius: 20px;"><p id="concertTag" width="54" height="20" style="font-family: Verdana, Geneva, sans-serif; font-size: 19px; color:white; left: 0px; top: 0px;padding: 0px;margin: 6px;"><b>#<i>'+concertTag+'</i></b></p></div>';
             videoContent.insertBefore(div, videoContent.childNodes[0]);
         }catch(er){}
     }
