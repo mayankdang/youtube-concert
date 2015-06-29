@@ -261,6 +261,7 @@ function concertLeaver() {
     CT = null;
     VID = null;
     canSync = false;
+    ownerFlag = null;
     doSend({a: LEAVE_CONCERT});
 }
 
