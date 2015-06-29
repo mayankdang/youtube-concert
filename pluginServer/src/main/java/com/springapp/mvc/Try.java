@@ -1,6 +1,6 @@
 package com.springapp.mvc;
 
-import org.apache.commons.io.IOUtils;
+//import org.apache.commons.io.IOUtils;
 
 import java.io.FileInputStream;
 
@@ -27,7 +27,7 @@ public class Try {
         String everything = null;
         try {
             inputStream = new FileInputStream(filePath);
-            everything = IOUtils.toString(inputStream);
+//            everything = IOUtils.toString(inputStream);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
