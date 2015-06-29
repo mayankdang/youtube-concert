@@ -9,7 +9,7 @@ import java.util.Map;
  * Date: 29/6/15
  * Time: 11:31 PM
  */
-public class JsMacroConverter {
+public class FilesMacroConverter {
 
     static HashMap<String,String> macros=new HashMap<String, String>();
 
@@ -49,7 +49,7 @@ public class JsMacroConverter {
     }
 
     public static void main(String[] args) {
-        String files[]={SysProperties.getInstance().getProperty("CONTENTJS_PATH"),SysProperties.getInstance().getProperty("MAINJS_PATH")};
+        String files[]={SysProperties.getInstance().getProperty("CONTENTJS_PATH"),SysProperties.getInstance().getProperty("MAINJS_PATH"),SysProperties.getInstance().getProperty("SERVER_PYTHON_PATH")};
 
         for(String name : files){
 
