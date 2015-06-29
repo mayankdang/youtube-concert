@@ -16,45 +16,49 @@ var preloadDuration = 50;
 var EXTRA_DELAY=246;
 var BUFFER_DELAY=500;
 
-// response macros
-var USER_ID = "userId";
-var CONCERT_TAG = "concertTag";
-var VIDEO_URL = "videoUrl";
-var VOFFSET = "vOffset";
-var VIDEO_STATE = "videoState";
-var OWNER_FLAG = "ownerFlag";
-var CLIENT_TIMESTAMP = "clientTimeStamp";
-var VIDEO_TIME = "videoTime";
-var CLIENT_TIMESTAMP = "clientTimeStamp";
-var REQUEST_TYPE = "requestType";
-var ACK = "ack";
-var NETWORK_DELAY = "networkDelay";
-var OWNER_DELAY = "ownerDelay";
+var ACK = "ACK";
 var AWESOME_DELAY = 248;
-
-// contentToMainActions
-var PAGE_LOADED = "pageLoaded";
-var SYNC_VIDEO = "syncVideo";
-var TAB_UPDATE_LATEST = "tabUpdateLatest";
-var CONCERT_CREATED = "concertCreated";
-var CONCERT_JOINED = "concertJoined";
-var RESPONSE_TYPE = "responseType";
-var CONCERT_TAKEN = "concertTaken";
-var NO_CONCERT = "noConcert";
-var I_AM_ALREADY_OWNER = "iAmAlreadyOwner";
-var LOAD_VIDEO = "loadVideo";
-var LEAVE_CONCERT = "leaveConcert";
-
-// Request Types
+var CLIENT_TIMESTAMP = "CLIENT_TIMESTAMP";
+var CLIENT_VERSION = "CLIENT_VERSION";
+var CLOCK_DIFF = "CLOCK_DIFF";
+var CONCERT_CREATED = "CONCERT_CREATED";
+var CONCERT_JOINED = "CONCERT_JOINED";
+var CONCERT_TAG = "CONCERT_TAG";
+var CONCERT_TAKEN = "CONCERT_TAKEN";
+var DIE = "DIE";
+var I_AM_ALREADY_OWNER = "I_AM_ALREADY_OWNER";
+var LATEST_JOINEE_CONCERT="LATEST_JOINEE_CONCERT";
+var LATEST_OWNER_CONCERT="LATEST_OWNER_CONCERT";
+var LEAVE_CONCERT = "LEAVE_CONCERT";
+var LOAD_VIDEO = "LOAD_VIDEO";
+var NETWORK_DELAY = "NETWORK_DELAY";
+var NO_CONCERT = "NO_CONCERT";
+var OWNER_DELAY = "OWNER_DELAY";
+var OWNER_FLAG = "OWNER_FLAG";
+var PAGE_LOADED = "PAGE_LOADED";
+var PATCH_CONTENT = "PATCH_CONTENT";
+var PATCH_MAIN = "PATCH_MAIN";
+var R_ADMIN_PATCH = 6;
+var R_ADMIN_VERSION_UPDATE = 7;
+var R_CLOCK_DIFF = 2;
 var R_CREATE_USER = 0;
 var R_HANDSHAKING = 1;
+var R_LEAVE_CONCERT = 8;
 var R_NETWORK_DELAY = 2;
-var R_VIDEO_UPDATE = 3;
-var R_USER_ONLINE = 4;
 var R_PAGE_LOADED = 5;
-
-
-var DIE = "die";
+var R_USER_ONLINE = 4;
+var R_VIDEO_UPDATE = 3;
+var REQUEST_TYPE = "REQUEST_TYPE";
+var RESPONSE_TYPE = "RESPONSE_TYPE";
+var SERVER_TIMESTAMP = "SERVER_TIMESTAMP";
+var SYNC_VIDEO = "SYNC_VIDEO";
+var TAB_ID = "TAB_ID";
+var TAB_UPDATE_LATEST = "TAB_UPDATE_LATEST";
+var USER_ID = "USER_ID";
+var VIDEO_STATE = "VIDEO_STATE";
+var VIDEO_TIME = "VIDEO_TIME";
+var VIDEO_URL = "VIDEO_URL";
+var VOFFSET = "VOFFSET";
 
 var videoSynchronizedFlag = true;
 var videoSynchronizedSystemTime = null;
@@ -391,7 +395,7 @@ function youtuber() {
 
             if (responseType == CONCERT_CREATED) {
                 displayConcertName(response[CONCERT_TAG]);
-                kango.storage.setItem("LATEST_OWNER_CONCERT",response[CONCERT_TAG]);
+                kango.storage.setItem(LATEST_OWNER_CONCERT,response[CONCERT_TAG]);
 
                 alert(responseType);
                 updateTabInfoToMain();
@@ -399,7 +403,7 @@ function youtuber() {
                 alert(responseType);
             } else if (responseType==CONCERT_JOINED) {
                 displayConcertName(response[CONCERT_TAG]);
-                kango.storage.setItem("LATEST_JOINEE_CONCERT",response[CONCERT_TAG]);
+                kango.storage.setItem(LATEST_JOINEE_CONCERT,response[CONCERT_TAG]);
 
                 updateTabInfoToMain();
                 try {
