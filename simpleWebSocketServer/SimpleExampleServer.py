@@ -64,7 +64,6 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 userIdMainMap = {}
 concertTagHashMap = {}
 try:
-    concertTagHashMap = json.load
     with open(jsonDumpFile) as data_file:
         concertTagHashMap = json.load(data_file)
 except Exception, err:
