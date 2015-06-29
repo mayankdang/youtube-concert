@@ -13,6 +13,7 @@
         <R_CONTENTJS_PATH>extension/src/common/content.js</R_CONTENTJS_PATH>
         <R_MAINJS_PATH>extension/src/common/main.js</R_MAINJS_PATH>
         <R_VERSION_PATH>extension/src/common/version.txt</R_VERSION_PATH>
+        <R_SERVER_PYTHON_PATH>simpleWebSocketServer/SimpleExampleServer.py</R_SERVER_PYTHON_PATH>
     </properties>
 
     <dependencies>
