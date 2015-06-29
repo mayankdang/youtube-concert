@@ -1,9 +1,14 @@
 import json
-import signal, sys, ssl
+import signal
+import sys
+import ssl
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 from optparse import OptionParser
-import string, time, random
+import string
+import time
+import random
 import re
+from threading import *
 
 
 class SimpleEcho(WebSocket):
@@ -51,12 +56,19 @@ R_ADMIN_PATCH = 6
 R_ADMIN_VERSION_UPDATE = 7
 R_LEAVE_CONCERT = 8
 
+versionFilePath = "extension/src/common/version.txt"
+jsonDumpFile = "userJsonDump.dat"
+
 current_milli_time = lambda: int(round(time.time() * 1000))
 
 userIdMainMap = {}
 concertTagHashMap = {}
-
-versionFilePath = "extension/src/common/version.txt"
+try:
+    concertTagHashMap = json.load
+    with open(jsonDumpFile) as data_file:
+        concertTagHashMap = json.load(data_file)
+except Exception, err:
+    pass
 
 # Patches, saved.
 globalMainPatchScript = None
@@ -66,6 +78,19 @@ try:
     globalCurrentClientVersion = open(versionFilePath).read().strip()
 except Exception, e:
     print "Exception:", e
+
+
+def dataStructuresDumper():
+    while True:
+        time.sleep(3600)
+        # Main dumper code..
+        print "Taking Data Structure dumps..."
+        with open(jsonDumpFile, 'w') as outfile:
+            json.dump(concertTagHashMap, outfile)
+
+t = Thread(target=dataStructuresDumper, args=())
+t.daemon = True
+t.start()
 
 
 class Concert(object):
