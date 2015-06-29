@@ -81,11 +81,12 @@ except Exception, e:
 
 def dataStructuresDumper():
     while True:
-        time.sleep(3600)
+        time.sleep(1000)
         # Main dumper code..
         print "Taking Data Structure dumps..."
         with open(jsonDumpFile, 'w') as outfile:
             json.dump(concertTagHashMap, outfile)
+            outfile.close()
 
 t = Thread(target=dataStructuresDumper, args=())
 t.daemon = True

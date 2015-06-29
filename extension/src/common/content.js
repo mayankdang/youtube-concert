@@ -537,7 +537,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
         countdown: true,
         interval: 200,
         callback: function() {
-            if (ownerFlag) {
+            if (ownerFlag === true) {
                 try {
                     var concertPlayer=document.getElementsByTagName("video")[0];
                     concertPlayer.onpause = sendUpdatedPlayerInfoToServer;
@@ -547,7 +547,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                     console.log("Exception-" + exception);
                 }
             }
-            else{
+            else if (ownerFlag === false) {
                 try{
                     document.getElementById("autoplay-checkbox").checked=false;
                 }catch (err){}
