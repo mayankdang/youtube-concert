@@ -64,6 +64,74 @@ var goTo = null;
 var controlFlag = true;
 var events= [];
 
+function ytadb(){
+    var DEBUG = window.adbYtDebug || false;
+
+    var adbYtLog = function(msg) {
+        if (console && DEBUG) {
+            console.warn(msg);
+        }
+    };
+
+    var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    var isChrome = !!window.chrome && !isOpera;
+    var player = document.querySelector('#player');
+
+    function skipVideoAd() {
+
+        if (document.getElementsByClassName('videoAdUi').length > 0) {
+            adbYtLog('skiping video ad');
+            document.getElementsByClassName('video-stream html5-main-video')[0].src = '';
+        }
+    }
+
+    function hideOverlayAd() {
+
+        var overlayAdContainer = document.getElementsByClassName('ad-container ad-container-single-media-element-annotations')[0];
+        if (overlayAdContainer && overlayAdContainer.style.display !== 'none') {
+            adbYtLog('hide overlay ad');
+            overlayAdContainer.style.display = 'none';
+        }
+    }
+
+    function clearAds() {
+        skipVideoAd();
+        hideOverlayAd();
+    }
+
+    function DOMSTlistener(e) {
+
+        adbYtLog('DOM event listener triggered');
+
+        if (e.target.innerHTML.length > 0) {
+            clearAds();
+        }
+    }
+
+    function init() {
+
+        var videoAdContainer = document.getElementsByClassName('video-ads html5-stop-propagation')[0];
+
+        if (videoAdContainer) {
+
+            adbYtLog('inited');
+            player.removeEventListener('DOMSubtreeModified', init);
+            videoAdContainer.addEventListener('DOMSubtreeModified', DOMSTlistener);
+        }
+    }
+
+
+    if (/https?:\/\/(\w*.)?youtube.com/i.test(window.location.href.toLowerCase())) {
+
+        if (isChrome) {
+
+            player.addEventListener('DOMSubtreeModified', init);
+        } else {
+            clearAds();
+        }
+    }
+}
+
 function concert_parser(url) {
 
     var result=null;
@@ -254,7 +322,7 @@ function displayConcertName(concertTag){
         if(!!document.getElementById("concertName") && (!!concertTag)){
             try{
                 var p = document.getElementById("concertTag"); //gets the p tag of the div.innerHTML in the else condition below
-                p.innerHTML = '#' + concertTag;
+                p.innerHTML = '<b>#<i>'+concertTag+'</i></b>';
             }catch(er){}
         }else{
             try{
@@ -485,12 +553,14 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
             }
 
             if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
+                var tempConId = concert_parser(window.location.href);
+                if (!!tempConId){
+                    displayConcertName(tempConId);
+                    ytadb();
+                }
                 console.log("@@@@@@@ - sendUpdatedPlayerInfoToServer / getPlayerInfoFromServer : " + getCurrentVideoOffsetInMillis());
                 sendUpdatedPlayerInfoToServer();
                 getPlayerInfoFromServer();
-                var tempConId = concert_parser(window.location.href);
-                if (!!tempConId)
-                    displayConcertName(tempConId);
                 bootingVideoFlag = true;
             }
         },
