@@ -557,7 +557,12 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                 }catch (err){}
             }
 
-            if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
+            if (
+                (ownerFlag === true || ownerFlag === false)
+                    && !bootingVideoFlag
+                    && isVideoPaused() === false
+                    && (new Date().getTime()-bootingVideoFlagTime) > 500
+                ) {
                 var tempConId = concert_parser(window.location.href);
                 if (!!tempConId){
                     displayConcertName(tempConId);
