@@ -428,10 +428,10 @@ function youtuber() {
             if (responseType == CONCERT_CREATED) {
                 displayConcertName(response[CONCERT_TAG]);
                 kango.storage.setItem(LATEST_OWNER_CONCERT,response[CONCERT_TAG]);
-                showNotification("#"+response[CONCERT_TAG]+" concert is live.")
+                showNotification("#"+response[CONCERT_TAG]+" concert is live.");
                 updateTabInfoToMain();
             } else if (responseType==CONCERT_TAKEN) {
-                showNotification("#"+response[CONCERT_TAG]+" is already taken by another user.")
+                showNotification("#"+response[CONCERT_TAG]+" is already taken by another user.");
             } else if (responseType==CONCERT_JOINED) {
                 displayConcertName(response[CONCERT_TAG]);
                 kango.storage.setItem(LATEST_JOINEE_CONCERT,response[CONCERT_TAG]);
@@ -447,7 +447,7 @@ function youtuber() {
                 joineeStateHandler();
                 setOnEndInterrupt();
             } else if (responseType==NO_CONCERT) {
-                showNotification("#"+response[CONCERT_TAG]+" is not live!")
+                showNotification("#"+response[CONCERT_TAG]+" is not live!");
             } else if (responseType==I_AM_ALREADY_OWNER) {
                 showNotification("#"+response[CONCERT_TAG]+" You are DJ of this concert!")
             }
