@@ -53,6 +53,10 @@ var delayArray = [];
 var tabHashMap = new Object();
 
 
+function removeElementById(id) {
+    return (elem=document.getElementById(id)).parentNode.removeChild(elem);
+}
+
 function generateInterval (k) {
     var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
