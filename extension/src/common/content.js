@@ -72,14 +72,14 @@ var events= [];
 function fade(element) {
     var op = 1;  // initial opacity
     var timer = setInterval(function () {
-        if (op <= 0.1){
+        if (op <= 0.7){
             clearInterval(timer);
             element.style.display = 'none';
         }
         element.style.opacity = op;
         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-        op -= op * 0.1;
-    }, 50);
+        op -= op * 0.0034;
+    }, 30);
 }
 
 function removeElementById(id) {
@@ -94,7 +94,7 @@ function showNotification(msg){
     var div=document.createElement("div");
     div.id="prettify-notification";
     div.textContent=msg;
-    div.style.cssText="width:200px;margin-top:100px;height:auto;position:absolute;left:50%;margin-left:-100px;right:80px;top:80px;background-color: #383838;color: #F0F0F0;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;-webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);-moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);";
+    div.style.cssText="width:200px;margin-top:100px;height:auto;position:absolute;right:28px;bottom:10px;background-color: #383838;color: #F0F0F0;font-family: Calibri;font-size: 20px;padding:10px;text-align:center;border-radius: 2px;-webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);-moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);";
     document.body.appendChild(div);
 
     fade(document.getElementById("prettify-notification"));
