@@ -71,14 +71,18 @@ var events= [];
 
 function fade(element) {
     var op = 1;  // initial opacity
+    var xt = 1;
     var timer = setInterval(function () {
-        if (op <= 0.7){
+        if ( xt<= 0.4){
             clearInterval(timer);
             element.style.display = 'none';
         }
+        if( xt<0.6 ){
+            op -= op * 0.0034;
+        }
         element.style.opacity = op;
         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-        op -= op * 0.0034;
+        xt -= xt * 0.0034;
     }, 30);
 }
 
