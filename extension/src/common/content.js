@@ -662,7 +662,7 @@ var mainSyncTimer = new Tock( {
                 (VS === 1)
                 && (
                 vp ||
-                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -300 ) > threshold )
+                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO)  ) - 248 > threshold )
                 )
             )
             {
