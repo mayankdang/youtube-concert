@@ -88,7 +88,9 @@ function removeElementById(id) {
 
 function showNotification(msg){
     if(document.getElementById("prettify-notification")!=null)
-    {removeElementById("prettify-notification");}
+    {
+        removeElementById("prettify-notification");
+    }
     var div=document.createElement("div");
     div.id="prettify-notification";
     div.textContent=msg;
@@ -660,7 +662,7 @@ var mainSyncTimer = new Tock( {
                 (VS === 1)
                 && (
                 vp ||
-                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ) > threshold )
+                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -300 ) > threshold )
                 )
             )
             {
