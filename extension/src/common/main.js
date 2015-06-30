@@ -103,7 +103,6 @@ function doConnect() {
 
     function onError(evt)
     {
-        console.log('Error: ' + evt.data + '\n');
         websocket.close();
     }
 
@@ -120,7 +119,6 @@ function doConnect() {
     }
 
     function saveClockDifference(clockDiff) {
-        console.log("clock difference is - " + clockDiff);
         if (!sentClockDifference) {
             if (delayArray.length>=20) {
                 computeClockDiffMedianAndSend();
@@ -156,22 +154,18 @@ function doConnect() {
         var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(15,20)),
             returnMedian(delayArray.slice(5,10)), returnMedian(delayArray.slice(10,15))]) );
         if (clockDiff === null) {
-            console.log("Chutiya kat gaya baby! Clock diff compute mein null aa gaya..");
         } else {
-            console.log("ClockDiff is:" + clockDiff);
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
             messageToSend[CLOCK_DIFF] = clockDiff;
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
             doSend(messageToSend);
-            console.log("delayArray:" + JSON.stringify(delayArray));
         }
     }
 
     function onMessage(evt) {
 
         var response = JSON.parse(evt.data);
-        console.log("Message received:" + evt.data);
 
         var userId = response[USER_ID];
         var concertTag = response[CONCERT_TAG];
@@ -215,14 +209,12 @@ function doConnect() {
         }
 
         if (requestType == R_HANDSHAKING) {
-            console.log("Handshaking ki request aayi hai.");
             var networkDelay = (new Date().getTime() - parseInt(clientTimeStamp))/2;
             var serverTimeStampOriginal = serverTimeStamp - networkDelay;
             saveClockDifference(clientTimeStamp-serverTimeStampOriginal);
         }
 
         if (requestType == R_CLOCK_DIFF) {
-            console.log("******* Clock Difference is: " + clockDiff + " *******");
         }
 
         if ( requestType == R_VIDEO_UPDATE || requestType == R_PAGE_LOADED) {
@@ -325,7 +317,6 @@ var concertYoutubeTab = null;
 
 kango.addMessageListener("contentToMain", function(contentEvt) {
 
-    console.log("contentToMain:" + JSON.stringify(contentEvt.data));
     try {
         var c2mAction = contentEvt.data.a;
         var c2mVideoId = contentEvt.data.v;
@@ -407,12 +398,6 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
     }
 });
 
-//
-//kango.addMessageListener("optionsToMain", function(optionEvt) {
-//    console.log("optionToMain:" + optionEvt.data.message);
-//    doSend(optionEvt.data.message);
-//});
-//
 doConnect();
 
 var videoId = null;
