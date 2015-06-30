@@ -73,12 +73,12 @@ function fade(element) {
     var op = 1;  // initial opacity
     var xt = 1;
     var timer = setInterval(function () {
-        if ( xt<= 0.4){
+        if ( xt<= 0.6){
             clearInterval(timer);
             element.style.display = 'none';
         }
-        if( xt<0.6 ){
-            op -= op * 0.0034;
+        if( xt<0.8 ){
+            op -= op * 0.01;
         }
         element.style.opacity = op;
         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
