@@ -3,15 +3,14 @@ var threshold = 42;
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
-console.log("helloooooooooooooooooooo");
+
 var link=window.location.href;
-var concertRole= -1; // -1 initially, 1 for owner, 2 for joinee.
-// for sync-ers
+var concertRole= -1;
 var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
 var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
-var bufferDelay = 800;      // can be something more than 500.
+var bufferDelay = 800;
 var preloadDuration = 50;
 var EXTRA_DELAY=246;
 var BUFFER_DELAY=500;

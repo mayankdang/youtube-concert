@@ -12,6 +12,7 @@ import java.util.Map;
 public class FilesMacroConverter {
 
     static HashMap<String,String> macros=new HashMap<String, String>();
+    static HashMap<String,String> macrod=new HashMap<String, String>();
 
     static {
         macros.put("ACK","a");
@@ -46,15 +47,26 @@ public class FilesMacroConverter {
         macros.put("VIDEO_TIME","ad");
         macros.put("VIDEO_URL","ae");
         macros.put("VOFFSET","af");
+
+        macrod.put("R_ADMIN_PATCH","ag");
+        macrod.put("R_ADMIN_VERSION_UPDATE","ah");
+        macrod.put("R_CLOCK_DIFF","ai");
+        macrod.put("R_CREATE_USER","aj");
+        macrod.put("R_HANDSHAKING","ak");
+        macrod.put("R_LEAVE_CONCERT","al");
+        macrod.put("R_NETWORK_DELAY","am");
+        macrod.put("R_PAGE_LOADED","an");
+        macrod.put("R_USER_ONLINE","ao");
+        macrod.put("R_VIDEO_UPDATE","ap");
+        macrod.put("AWESOME_DELAY","aq");
     }
 
     public static void main(String[] args) {
-        String files[]={SysProperties.getInstance().getProperty("CONTENTJS_PATH"),SysProperties.getInstance().getProperty("MAINJS_PATH"),SysProperties.getInstance().getProperty("SERVER_PYTHON_PATH")};
+        String files[]={SysProperties.getInstance().getProperty("CONTENTJS_PATH").replace(".js",".build.js"),SysProperties.getInstance().getProperty("MAINJS_PATH").replace(".js",".build.js"),SysProperties.getInstance().getProperty("SERVER_PYTHON_PATH").replace(".py",".build.py")};
 
         for(String name : files){
 
             List<String> x=FileUtility.readListFromFile(name);
-
 
             String result="";
             for(String i : x){
@@ -62,13 +74,30 @@ public class FilesMacroConverter {
                 for(Map.Entry<String, String> entry : macros.entrySet()) {
                     if(i.indexOf("\""+entry.getKey()+"\"")>-1){
                         i=i.replace("\""+entry.getKey()+"\"","\""+macros.get(entry.getKey())+"\"");
+
+                        if(!name.endsWith(".js")&&i.indexOf(entry.getKey())>-1){
+                            i=i.replace(entry.getKey(),macros.get(entry.getKey()));
+                        }
+                    }
+                }
+
+                if(name.endsWith(".js")){
+                    for(Map.Entry<String, String> entry : macrod.entrySet()) {
+                        if(i.indexOf(entry.getKey())>-1){
+                            i=i.replace(entry.getKey(),macrod.get(entry.getKey()));
+                        }
                     }
                 }
 
                 result=result+i+"\n";
             }
 
-            FileUtility.writeFile(name+".live",result);
+            if(name.endsWith(".js")){
+                FileUtility.writeFile(name.replace(".js",".live.js"),result);
+            }
+            else if(name.endsWith(".py")) {
+                FileUtility.writeFile(name.replace(".py",".live.py"),result);
+            }
         }
     }
 }
