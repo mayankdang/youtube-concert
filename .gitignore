@@ -17,3 +17,4 @@ extension/src/ie/*
 extension/src/safari/*
 pluginServer/.idea/*
 pluginServer/target/*
+simpleWebSocketServer/userJsonDump.dat

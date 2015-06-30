@@ -1,4 +1,5 @@
 import json
+import pickle
 import signal
 import sys
 import ssl
@@ -85,7 +86,7 @@ def dataStructuresDumper():
         # Main dumper code..
         print "Taking Data Structure dumps..."
         with open(jsonDumpFile, 'w') as outfile:
-            json.dump(concertTagHashMap, outfile)
+            pickle.dump(concertTagHashMap, outfile)
             outfile.close()
 
 t = Thread(target=dataStructuresDumper, args=())
