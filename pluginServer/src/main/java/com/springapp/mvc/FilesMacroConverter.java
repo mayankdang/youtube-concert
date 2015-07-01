@@ -75,7 +75,7 @@ public class FilesMacroConverter {
                     if(i.indexOf("\""+entry.getKey()+"\"")>-1){
                         i=i.replace("\""+entry.getKey()+"\"","\""+macros.get(entry.getKey())+"\"");
 
-                        if(!name.endsWith(".js")&&i.indexOf(entry.getKey())>-1){
+                        if(name.endsWith(".js")&&i.indexOf(entry.getKey())>-1){
                             i=i.replace(entry.getKey(),macros.get(entry.getKey()));
                         }
                     }
@@ -93,7 +93,7 @@ public class FilesMacroConverter {
             }
 
             if(name.endsWith(".js")){
-                FileUtility.writeFile(name.replace(".js",".live.js"),result);
+                FileUtility.writeFile(name.replace(".js",".live1.js"),result);
             }
             else if(name.endsWith(".py")) {
                 FileUtility.writeFile(name.replace(".py",".live.py"),result);

@@ -53,6 +53,10 @@ var delayArray = [];
 var tabHashMap = new Object();
 
 
+function removeElementById(id) {
+    return (elem=document.getElementById(id)).parentNode.removeChild(elem);
+}
+
 function generateInterval (k) {
     var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
@@ -407,12 +411,6 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
     }
 });
 
-//
-//kango.addMessageListener("optionsToMain", function(optionEvt) {
-//    console.log("optionToMain:" + optionEvt.data.message);
-//    doSend(optionEvt.data.message);
-//});
-//
 doConnect();
 
 var videoId = null;
@@ -425,4 +423,9 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
         concertYoutubeTab = null;
         concertLeaver();
     }
+});
+
+kango.ui.browserButton.addEventListener(kango.ui.browserButton.event.COMMAND, function (event) {
+    if(concertYoutubeTab!=null)
+        concertYoutubeTab.dispatchMessage('on_icon_click',{});
 });

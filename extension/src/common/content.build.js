@@ -3,20 +3,21 @@ var threshold = 42;
 var isOwner=false;
 var videoChecking=false;
 var playTime=new Date().getTime();
-
+console.log("helloooooooooooooooooooo");
 var link=window.location.href;
-var concertRole= -1;
+var concertRole= -1; // -1 initially, 1 for owner, 2 for joinee.
+// for sync-ers
 var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
 var ownerPlayerOffset = -1;
 var ownerUpdatedTimestamp = -1;
-var bufferDelay = 800;
+var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
 var EXTRA_DELAY=246;
 var BUFFER_DELAY=500;
 
 var ACK = "ACK";
-var AWESOME_DELAY = 248;
+var AWESOME_DELAY = 0;
 var CLIENT_TIMESTAMP = "CLIENT_TIMESTAMP";
 var CLIENT_VERSION = "CLIENT_VERSION";
 var CLOCK_DIFF = "CLOCK_DIFF";
@@ -66,6 +67,38 @@ var videoState=null;
 var goTo = null;
 var controlFlag = true;
 var events= [];
+
+
+function fade(element) {
+    var op = 1;  // initial opacity
+    var xt = 1;
+    var timer = setInterval(function () {
+        if ( xt<= 0.6){
+            clearInterval(timer);
+            element.style.display = 'none';
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        xt -= xt * 0.0034;
+    }, 30);
+}
+
+function removeElementById(id) {
+    return (elem=document.getElementById(id)).parentNode.removeChild(elem);
+}
+
+function showNotification(msg){
+    if(document.getElementById("prettify-notification")!=null)
+    {
+        removeElementById("prettify-notification");
+    }
+    var div=document.createElement("div");
+    div.id="prettify-notification";
+    div.innerHTML="<b>"+msg+"</b>";
+    div.style.cssText="max-width:300px;z-index:1000000;height:auto;position:absolute;right:28px;line-height: 50px;bottom:20px;background-color: #fed136;color: #333333;font-family: Helvetica;font-size: 20px;padding:20px;min-height:40px;text-align:center;border-radius: 2px;-webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);-moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);";
+    document.body.appendChild(div);
+    fade(document.getElementById("prettify-notification"));
+}
 
 function ytadb(){
     var DEBUG = window.adbYtDebug || false;
@@ -240,6 +273,9 @@ function loadUrl(vid,ct,of) {
         metaTag.setAttribute("http-equiv","refresh");
         metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
+
+        showNotification("Connecting to concert");
+
     }
     // this is for youtube.com#abcd
     else if (vid === null && ct !== null && of === false && (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag)) {
@@ -251,6 +287,8 @@ function loadUrl(vid,ct,of) {
         metaTag.setAttribute("http-equiv","refresh");
         metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
+
+        showNotification("Connecting to concert");
     }
 }
 
@@ -261,6 +299,7 @@ function concertLeaver() {
     VID = null;
     canSync = false;
     ownerFlag = null;
+    try{removeElementById("concertName");}catch (err){};
     doSend({a: LEAVE_CONCERT});
 }
 
@@ -396,11 +435,10 @@ function youtuber() {
             if (responseType == CONCERT_CREATED) {
                 displayConcertName(response[CONCERT_TAG]);
                 kango.storage.setItem(LATEST_OWNER_CONCERT,response[CONCERT_TAG]);
-
-                alert(responseType);
+                showNotification("#"+response[CONCERT_TAG]+" concert is live.");
                 updateTabInfoToMain();
             } else if (responseType==CONCERT_TAKEN) {
-                alert(responseType);
+                showNotification("#"+response[CONCERT_TAG]+" is already taken by another user.");
             } else if (responseType==CONCERT_JOINED) {
                 displayConcertName(response[CONCERT_TAG]);
                 kango.storage.setItem(LATEST_JOINEE_CONCERT,response[CONCERT_TAG]);
@@ -416,10 +454,9 @@ function youtuber() {
                 joineeStateHandler();
                 setOnEndInterrupt();
             } else if (responseType==NO_CONCERT) {
-                alert(responseType);
-
+                showNotification("#"+response[CONCERT_TAG]+" is not live!");
             } else if (responseType==I_AM_ALREADY_OWNER) {
-                alert(responseType);
+                showNotification("#"+response[CONCERT_TAG]+" You are DJ of this concert!")
             }
         } else if(mainEvt.data.action == DIE ) {
             window.close();
@@ -556,7 +593,12 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                 }catch (err){}
             }
 
-            if ( !bootingVideoFlag && isVideoPaused() === false && (new Date().getTime()-bootingVideoFlagTime) > 500 ) {
+            if (
+                (ownerFlag === true || ownerFlag === false)
+                && !bootingVideoFlag
+                && isVideoPaused() === false
+                && (new Date().getTime()-bootingVideoFlagTime) > 500
+            ) {
                 var tempConId = concert_parser(window.location.href);
                 if (!!tempConId){
                     displayConcertName(tempConId);
@@ -625,7 +667,7 @@ var mainSyncTimer = new Tock( {
                 (VS === 1)
                 && (
                 vp ||
-                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ) > threshold )
+                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO)  ) - 248 > threshold )
                 )
             )
             {
@@ -693,4 +735,16 @@ setInterval(function(){
 kango.addMessageListener("patchToContent", function(mainEvt) {
     console.log("Received message from main:" + mainEvt.data);
     eval(mainEvt.data.patch);
+});
+
+kango.addMessageListener("on_icon_click", function(mainEvt) {
+    var concert=kango.storage.getItem(LATEST_OWNER_CONCERT);
+    var vid=youtube_parser(window.location.href);
+    if(concert!=null&&concert.length>0&&vid!=null&&vid.length>0){
+        var metaTag = document.createElement("meta");
+        metaTag.setAttribute("http-equiv","refresh");
+        metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+concert+"#");
+        document.head.appendChild(metaTag);
+        showNotification("Broadcasting your concert!");
+    }
 });
