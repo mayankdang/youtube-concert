@@ -411,12 +411,6 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
     }
 });
 
-//
-//kango.addMessageListener("optionsToMain", function(optionEvt) {
-//    console.log("optionToMain:" + optionEvt.data.message);
-//    doSend(optionEvt.data.message);
-//});
-//
 doConnect();
 
 var videoId = null;
@@ -429,4 +423,11 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
         concertYoutubeTab = null;
         concertLeaver();
     }
+});
+
+kango.ui.browserButton.addEventListener(kango.ui.browserButton.event.COMMAND, function (event) {
+    kango.browser.tabs.getCurrent(function (tab) {
+        kango.console.log(tab.getUrl());
+        tab.dispatchMessage('on_icon_click',{});
+    });
 });

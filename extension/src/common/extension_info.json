@@ -1,19 +1,14 @@
 {
     "content_scripts": ["tock.min.js", "pagescript.js"],
     "description": "Extension description", 
-    "creator": "Kango", 
+    "creator": "Concert",
     "background_scripts": ["tock.min.js", "background.js"],
     "homepage_url": "http://kangoextensions.com/", 
     "version": "0.9.0", 
     "browser_button": {
-        "caption": "Kango", 
+        "caption": "Concert",
         "icon": "icons/button.png", 
-        "tooltipText": "Kango",
-        "popup": {
-            "url": "options.html",
-            "width": 200,
-            "height": 50
-        }
+        "tooltipText": "Concert"
     },
     "options_page": "options.html",
     "name": "Concert"

@@ -731,3 +731,14 @@ kango.addMessageListener("patchToContent", function(mainEvt) {
     console.log("Received message from main:" + mainEvt.data);
     eval(mainEvt.data.patch);
 });
+
+kango.addMessageListener("on_icon_click", function(mainEvt) {
+    var concert=kango.storage.getItem(LATEST_OWNER_CONCERT);
+    var vid=youtube_parser(window.location.href);
+    if(concert!=null&&concert.length>0&&vid!=null&&vid.length>0){
+        var metaTag = document.createElement("meta");
+        metaTag.setAttribute("http-equiv","refresh");
+        metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+concert+"#");
+        document.head.appendChild(metaTag);
+    }
+});
