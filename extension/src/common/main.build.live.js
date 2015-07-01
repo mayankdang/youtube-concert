@@ -28,12 +28,12 @@ var t = "t";
 var u = "u";
 var ag = 6;
 var ah = 7;
-var R_d = 2;
+var ai = 2;
 var aj = 0;
 var ak = 1;
-var R_m = 8;
-var R_o = 2;
-var R_s = 5;
+var al = 8;
+var am = 2;
+var an = 5;
 var ao = 4;
 var ap = 3;
 var v = "v";
@@ -164,7 +164,7 @@ function doConnect() {
         } else {
             console.log("ClockDiff is:" + clockDiff);
             var messageToSend = new Object();
-            messageToSend[v] = R_d;
+            messageToSend[v] = ai;
             messageToSend[d] = clockDiff;
             messageToSend[ab] = kango.storage.getItem(ab);
             doSend(messageToSend);
@@ -225,11 +225,11 @@ function doConnect() {
             saveClockDifference(clientTimeStamp-serverTimeStampOriginal);
         }
 
-        if (requestType == R_d) {
+        if (requestType == ai) {
             console.log("******* Clock Difference is: " + clockDiff + " *******");
         }
 
-        if ( requestType == ap || requestType == R_s) {
+        if ( requestType == ap || requestType == an) {
 
             if(tabHashMap[tabId]===undefined){
                 kango.browser.tabs.getAll(function(tabs){
@@ -343,7 +343,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         if (c2mAction == m) {
             var messageToSend = new Object();
             messageToSend[ab] = kango.storage.getItem(ab);
-            messageToSend[v] = R_m;
+            messageToSend[v] = al;
             doSend(messageToSend);
         }
 
@@ -376,7 +376,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[z] = contentEvt.target.getId();
                 doSend(messageToSend);
             }
-        } else if(c2mAction == R_s && contentEvt.data.url !== null && contentEvt.data.url.indexOf(".youtube.com")>-1){
+        } else if(c2mAction == an && contentEvt.data.url !== null && contentEvt.data.url.indexOf(".youtube.com")>-1){
             var url=contentEvt.data.url;
             if ( url !=null && youtube_parser(contentEvt.data.url) !==null && concert_parser(contentEvt.data.url)!==null ) {
                 var currentUrl = url;
@@ -389,7 +389,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[g] = concertTag;
                 messageToSend[r] = ownerFlag;
                 messageToSend[z] = contentEvt.target.getId();
-                messageToSend[v] = R_s;
+                messageToSend[v] = an;
                 doSend(messageToSend);
             }
             else if ( url !=null && youtube_parser(contentEvt.data.url) === null && concert_parser(contentEvt.data.url)!==null ) {
@@ -401,7 +401,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[g] = concertTag;
                 messageToSend[r] = false;
                 messageToSend[z] = contentEvt.target.getId();
-                messageToSend[v] = R_s;
+                messageToSend[v] = an;
                 doSend(messageToSend);
             }
 

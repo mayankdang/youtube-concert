@@ -40,12 +40,12 @@ var t = "t";
 var u = "u";
 var ag = 6;
 var ah = 7;
-var R_d = 2;
+var ai = 2;
 var aj = 0;
 var ak = 1;
-var R_m = 8;
-var R_o = 2;
-var R_s = 5;
+var al = 8;
+var am = 2;
+var an = 5;
 var ao = 4;
 var ap = 3;
 var v = "v";
@@ -430,7 +430,7 @@ function youtuber() {
             onOwnerUpdate(response[af] , response[ac], response[ae], response[b]);
             displayConcertName(response[g]);
         }
-        else if (response!=null && response[v]== R_s) {
+        else if (response!=null && response[v]== an) {
 
             if (responseType == e) {
                 displayConcertName(response[g]);
@@ -616,7 +616,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
     checkingTimer.start(1000000000);
 
 
-    doSend({a: R_s, url:window.location.href});
+    doSend({a: an, url:window.location.href});
 }
 
 function doSend(message)

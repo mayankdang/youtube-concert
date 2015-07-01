@@ -1,8 +1,8 @@
 package com.springapp.mvc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: rishabh
@@ -10,9 +10,8 @@ import java.util.Map;
  * Time: 11:31 PM
  */
 public class FilesMacroConverter {
-
     static HashMap<String,String> macros=new HashMap<String, String>();
-    static HashMap<String,String> macrod=new HashMap<String, String>();
+    static ArrayList<String> arr=new ArrayList<String>();
 
     static {
         macros.put("ACK","a");
@@ -48,17 +47,62 @@ public class FilesMacroConverter {
         macros.put("VIDEO_URL","ae");
         macros.put("VOFFSET","af");
 
-        macrod.put("R_ADMIN_PATCH","ag");
-        macrod.put("R_ADMIN_VERSION_UPDATE","ah");
-        macrod.put("R_CLOCK_DIFF","ai");
-        macrod.put("R_CREATE_USER","aj");
-        macrod.put("R_HANDSHAKING","ak");
-        macrod.put("R_LEAVE_CONCERT","al");
-        macrod.put("R_NETWORK_DELAY","am");
-        macrod.put("R_PAGE_LOADED","an");
-        macrod.put("R_USER_ONLINE","ao");
-        macrod.put("R_VIDEO_UPDATE","ap");
-        macrod.put("AWESOME_DELAY","aq");
+        macros.put("R_ADMIN_PATCH","ag");
+        macros.put("R_ADMIN_VERSION_UPDATE","ah");
+        macros.put("R_CLOCK_DIFF","ai");
+        macros.put("R_CREATE_USER","aj");
+        macros.put("R_HANDSHAKING","ak");
+        macros.put("R_LEAVE_CONCERT","al");
+        macros.put("R_NETWORK_DELAY","am");
+        macros.put("R_PAGE_LOADED","an");
+        macros.put("R_USER_ONLINE","ao");
+        macros.put("R_VIDEO_UPDATE","ap");
+        macros.put("AWESOME_DELAY","aq");
+
+
+        arr.add("AWESOME_DELAY");
+        arr.add("R_ADMIN_PATCH");
+        arr.add("R_ADMIN_VERSION_UPDATE");
+        arr.add("R_CLOCK_DIFF");
+        arr.add("R_CREATE_USER");
+        arr.add("R_HANDSHAKING");
+        arr.add("R_LEAVE_CONCERT");
+        arr.add("R_NETWORK_DELAY");
+        arr.add("R_PAGE_LOADED");
+        arr.add("R_USER_ONLINE");
+        arr.add("R_VIDEO_UPDATE");
+        arr.add("ACK");
+        arr.add("CLIENT_TIMESTAMP");
+        arr.add("CLIENT_VERSION");
+        arr.add("CLOCK_DIFF");
+        arr.add("CONCERT_CREATED");
+        arr.add("CONCERT_JOINED");
+        arr.add("CONCERT_TAG");
+        arr.add("CONCERT_TAKEN");
+        arr.add("DIE");
+        arr.add("I_AM_ALREADY_OWNER");
+        arr.add("LATEST_JOINEE_CONCERT");
+        arr.add("LATEST_OWNER_CONCERT");
+        arr.add("LEAVE_CONCERT");
+        arr.add("LOAD_VIDEO");
+        arr.add("NETWORK_DELAY");
+        arr.add("NO_CONCERT");
+        arr.add("OWNER_DELAY");
+        arr.add("OWNER_FLAG");
+        arr.add("PAGE_LOADED");
+        arr.add("PATCH_CONTENT");
+        arr.add("PATCH_MAIN");
+        arr.add("REQUEST_TYPE");
+        arr.add("RESPONSE_TYPE");
+        arr.add("SERVER_TIMESTAMP");
+        arr.add("SYNC_VIDEO");
+        arr.add("TAB_ID");
+        arr.add("TAB_UPDATE_LATEST");
+        arr.add("USER_ID");
+        arr.add("VIDEO_STATE");
+        arr.add("VIDEO_TIME");
+        arr.add("VIDEO_URL");
+        arr.add("VOFFSET");
     }
 
     public static void main(String[] args) {
@@ -71,20 +115,9 @@ public class FilesMacroConverter {
             String result="";
             for(String i : x){
 
-                for(Map.Entry<String, String> entry : macros.entrySet()) {
-
-                    if(i.indexOf("\""+entry.getKey()+"\"")>-1){
-                        i=i.replace("\""+entry.getKey()+"\"","\""+macros.get(entry.getKey())+"\"");
-                    }
-
-                    if(i.indexOf(entry.getKey())>-1){
-                        i=i.replace(entry.getKey(),macros.get(entry.getKey()));
-                    }
-                }
-
-                for(Map.Entry<String, String> entry : macrod.entrySet()) {
-                    if(i.indexOf(entry.getKey())>-1){
-                        i=i.replace(entry.getKey(),macrod.get(entry.getKey()));
+                for(String p : arr) {
+                    if(i.indexOf(p)>-1){
+                        i=i.replace(p,macros.get(p));
                     }
                 }
 

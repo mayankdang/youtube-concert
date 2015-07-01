@@ -48,13 +48,13 @@ ADMIN_TOKEN = "ADMIN_TOKEN"
 # Request Types
 aj = 0
 ak = 1
-R_d = 2
+ai = 2
 ap = 3
 ao = 4
-R_s = 5
+an = 5
 ag = 6
 ah = 7
-R_m = 8
+al = 8
 
 versionFilePath = "extension/src/common/version.txt"
 jsonDumpFile = "userJsonDump.dat"
@@ -270,7 +270,7 @@ class SimpleChat(WebSocket):
                     except Exception, err:
                         print "Exception:", err
 
-            elif requestType == R_m:
+            elif requestType == al:
                 if userId is not None:
                     if userId in userIdMainMap:
                         user = userIdMainMap[userId]
@@ -291,7 +291,7 @@ class SimpleChat(WebSocket):
                 print "Sending handshaking to user.."
                 self.sendingWrapper(responseMap)
 
-            elif requestType == R_d:
+            elif requestType == ai:
                 user = None
                 if userId in userIdMainMap:
                     user = userIdMainMap[userId]
@@ -302,14 +302,14 @@ class SimpleChat(WebSocket):
                 user.clockDiff = clockDiff
                 print "Clock Difference set as:", clockDiff, "for userId:", userId
                 responseMap[ab] = user.id
-                responseMap[v] = R_d
+                responseMap[v] = ai
                 responseMap[d] = clockDiff
                 self.sendingWrapper(responseMap)
 
             elif requestType == ao:
                 pass
 
-            elif requestType == R_s:
+            elif requestType == an:
                 user = userIdMainMap[userId]
                 user.setClient(self)
 
@@ -325,7 +325,7 @@ class SimpleChat(WebSocket):
                         responseMap[ae] = concertTagHashMap[concertTag].videoUrl
                         responseMap[ac] = videoState
                         responseMap[z] = tabId
-                        responseMap[v] = R_s
+                        responseMap[v] = an
                         responseMap[r] = False
                         self.sendingWrapper(responseMap)
                     else:
@@ -342,7 +342,7 @@ class SimpleChat(WebSocket):
                         responseMap[af] = concertTagHashMap[concertTag].getVideoOffset()
                         responseMap[ae] = concertTagHashMap[concertTag].videoUrl
                         responseMap[w] = e
-                        responseMap[v] = R_s
+                        responseMap[v] = an
                         self.sendingWrapper(responseMap)
 
                 # JOIN CONCERT
@@ -359,7 +359,7 @@ class SimpleChat(WebSocket):
                             responseMap[ae] = concertToJoin.videoUrl
                             responseMap[ac] = concertToJoin.getVideoState()
                             responseMap[z] = tabId
-                            responseMap[v] = R_s
+                            responseMap[v] = an
                             responseMap[w] = j
                             responseMap[r] = True
                             self.sendingWrapper(responseMap)
@@ -373,7 +373,7 @@ class SimpleChat(WebSocket):
                             responseMap[g] = concertTag
                             responseMap[ae] = concertToJoin.videoUrl
                             responseMap[z] = user.getTabId()
-                            responseMap[v] = R_s
+                            responseMap[v] = an
                             responseMap[w] = f
                             responseMap[ac] = concertToJoin.getVideoState()
                             responseMap[af] = concertToJoin.getVideoOffset()
@@ -384,7 +384,7 @@ class SimpleChat(WebSocket):
                         # no concert found.
                         responseMap[ab] = user.id
                         responseMap[z] = tabId
-                        responseMap[v] = R_s
+                        responseMap[v] = an
                         responseMap[w] = p
                         responseMap[r] = False
                         self.sendingWrapper(responseMap)
