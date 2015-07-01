@@ -115,7 +115,6 @@ function doConnect() {
     }
 
     function saveClockDifference(clockDiff) {
-        console.log("clock difference is - " + clockDiff);
         if (!sentClockDifference) {
             if (delayArray.length>=20) {
                 computeClockDiffMedianAndSend();
@@ -135,11 +134,9 @@ function doConnect() {
             return null;
         } else {
             arr.sort(sortNumberComparator);
-            // even
             if (arr.length % 2 === 0) {
                 return (arr[arr.length/2] + arr[arr.length/2-1] )/2;
             }
-            // odd
             else {
                 return arr[(arr.length-1)/2];
             }
@@ -151,23 +148,18 @@ function doConnect() {
         var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(15,20)),
             returnMedian(delayArray.slice(5,10)), returnMedian(delayArray.slice(10,15))]) );
         if (clockDiff === null) {
-            console.log("Chutiya kat gaya baby! Clock diff compute mein null aa gaya..");
         } else {
-            console.log("ClockDiff is:" + clockDiff);
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = ai;
             messageToSend[CLOCK_DIFF] = clockDiff;
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
             doSend(messageToSend);
-            console.log("delayArray:" + JSON.stringify(delayArray));
         }
     }
 
     function onMessage(evt) {
 
         var response = JSON.parse(evt.data);
-        console.log("Message received:" + evt.data);
-
         var userId = response[USER_ID];
         var concertTag = response[CONCERT_TAG];
         var videoUrl = response[VIDEO_URL];
@@ -210,14 +202,12 @@ function doConnect() {
         }
 
         if (requestType == ak) {
-            console.log("Handshaking ki request aayi hai.");
             var networkDelay = (new Date().getTime() - parseInt(clientTimeStamp))/2;
             var serverTimeStampOriginal = serverTimeStamp - networkDelay;
             saveClockDifference(clientTimeStamp-serverTimeStampOriginal);
         }
 
         if (requestType == ai) {
-            console.log("******* Clock Difference is: " + clockDiff + " *******");
         }
 
         if ( requestType == ap || requestType == an) {
@@ -264,7 +254,6 @@ function doDisconnect() {
 
 function doSend(requestMap)
 {
-    console.log("sent: " + JSON.stringify(requestMap) + '\n');
     websocket.send(JSON.stringify(requestMap));
 }
 
@@ -319,8 +308,6 @@ function youtube_parser(url){
 var concertYoutubeTab = null;
 
 kango.addMessageListener("contentToMain", function(contentEvt) {
-
-    console.log("contentToMain:" + JSON.stringify(contentEvt.data));
     try {
         var c2mAction = contentEvt.data.a;
         var c2mVideoId = contentEvt.data.v;
@@ -359,7 +346,7 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
                 messageToSend[VIDEO_URL] = c2mVideoId;
                 messageToSend[CONCERT_TAG] = c2mConcertTag;
-                messageToSend[VIDEO_STATE] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
+                messageToSend[VIDEO_STATE] = c2mVideoState;
                 messageToSend[VOFFSET] = c2mVOffset;
                 messageToSend[OWNER_FLAG] = c2mOwnerFlag;
                 messageToSend[REQUEST_TYPE] = ap;
