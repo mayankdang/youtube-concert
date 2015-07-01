@@ -1,4 +1,5 @@
 import json
+import pickle
 import signal
 import sys
 import ssl
@@ -22,39 +23,39 @@ class SimpleEcho(WebSocket):
         pass
 
 # Response Macros
-USER_ID = "ab"
-CONCERT_TAG = "g"
-VIDEO_URL = "ae"
-VOFFSET = "af"
-VIDEO_STATE = "ac"
-OWNER_FLAG = "r"
-CLIENT_TIMESTAMP = "b"
-SERVER_TIMESTAMP = "x"
-CLOCK_DIFF = "d"
-REQUEST_TYPE = "v"
-ACK = "a"                             # status acknowledgement for request successfully received.
-CONCERT_CREATED = "e"
-CONCERT_JOINED = "f"
-RESPONSE_TYPE = "w"
-CONCERT_TAKEN = "h"
-NO_CONCERT = "p"
-I_AM_ALREADY_OWNER = "j"
-TAB_ID = "z"
-CLIENT_VERSION = "j"
-PATCH_MAIN = "u"
-PATCH_CONTENT = "t"
+USER_ID = "USER_ID"
+CONCERT_TAG = "CONCERT_TAG"
+VIDEO_URL = "VIDEO_URL"
+VOFFSET = "VOFFSET"
+VIDEO_STATE = "VIDEO_STATE"
+OWNER_FLAG = "OWNER_FLAG"
+CLIENT_TIMESTAMP = "CLIENT_TIMESTAMP"
+SERVER_TIMESTAMP = "SERVER_TIMESTAMP"
+CLOCK_DIFF = "CLOCK_DIFF"
+REQUEST_TYPE = "REQUEST_TYPE"
+ACK = "ACK"                             # status acknowledgement for request successfully received.
+CONCERT_CREATED = "CONCERT_CREATED"
+CONCERT_JOINED = "CONCERT_JOINED"
+RESPONSE_TYPE = "RESPONSE_TYPE"
+CONCERT_TAKEN = "CONCERT_TAKEN"
+NO_CONCERT = "NO_CONCERT"
+I_AM_ALREADY_OWNER = "I_AM_ALREADY_OWNER"
+TAB_ID = "TAB_ID"
+CLIENT_VERSION = "CLIENT_VERSION"
+PATCH_MAIN = "PATCH_MAIN"
+PATCH_CONTENT = "PATCH_CONTENT"
 ADMIN_TOKEN = "ADMIN_TOKEN"
 
 # Request Types
-aj = 0
-ak = 1
-ai = 2
-ap = 3
-ao = 4
-an = 5
-ag = 6
-ah = 7
-al = 8
+R_CREATE_USER = 0
+R_HANDSHAKING = 1
+R_CLOCK_DIFF = 2
+R_VIDEO_UPDATE = 3
+R_USER_ONLINE = 4
+R_PAGE_LOADED = 5
+R_ADMIN_PATCH = 6
+R_ADMIN_VERSION_UPDATE = 7
+R_LEAVE_CONCERT = 8
 
 versionFilePath = "extension/src/common/version.txt"
 jsonDumpFile = "userJsonDump.dat"
@@ -85,7 +86,7 @@ def dataStructuresDumper():
         # Main dumper code..
         print "Taking Data Structure dumps..."
         with open(jsonDumpFile, 'w') as outfile:
-            json.dump(concertTagHashMap, outfile)
+            pickle.dump(concertTagHashMap, outfile)
             outfile.close()
 
 t = Thread(target=dataStructuresDumper, args=())
@@ -198,6 +199,37 @@ class User(object):
 
 
 class SimpleChat(WebSocket):
+    def handleConcertCreation(self, userId, concertTag, videoUrl, videoState, tabId, responseMap):
+        user = userIdMainMap[userId]
+        success = user.createConcert(concertTag, videoUrl)
+
+        if not success:
+            responseMap[RESPONSE_TYPE] = CONCERT_TAKEN
+            responseMap[USER_ID] = user.id
+            responseMap[CONCERT_TAG] = concertTag
+            responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
+            responseMap[VIDEO_STATE] = videoState
+            responseMap[TAB_ID] = tabId
+            responseMap[REQUEST_TYPE] = R_PAGE_LOADED
+            responseMap[OWNER_FLAG] = False
+            self.sendingWrapper(responseMap)
+        else:
+            # Either he was successful in creating the group or he was the master himself (cool cool).
+
+            user.updateConcertTag(concertTag)
+            user.updateTabId(tabId)
+
+            responseMap[USER_ID] = userId
+            responseMap[CONCERT_TAG] = concertTag
+            responseMap[TAB_ID] = user.getTabId()
+            responseMap[OWNER_FLAG] = True
+            responseMap[VIDEO_STATE] = concertTagHashMap[concertTag].getVideoState()
+            responseMap[VOFFSET] = concertTagHashMap[concertTag].getVideoOffset()
+            responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
+            responseMap[RESPONSE_TYPE] = CONCERT_CREATED
+            responseMap[REQUEST_TYPE] = R_PAGE_LOADED
+            self.sendingWrapper(responseMap)
+
     def handleMessage(self):
         responseMap = {
             USER_ID: None,
@@ -234,7 +266,7 @@ class SimpleChat(WebSocket):
                     print "Concert tag not alphanumeric!!!! --->", concertTag
                     return None
 
-            if requestType == ag:
+            if requestType == R_ADMIN_PATCH:
                 print "Patch call... checking salt."
                 if adminToken is not None and adminToken == "concert2015shadows":
                     print "Salt verified."
@@ -247,7 +279,7 @@ class SimpleChat(WebSocket):
 
                     responseMap[PATCH_MAIN] = globalMainPatchScript
                     responseMap[PATCH_CONTENT] = globalContentPatchScript
-                    responseMap[REQUEST_TYPE] = ag
+                    responseMap[REQUEST_TYPE] = R_ADMIN_PATCH
 
                     print "Passing patches to everyone..."
                     count = 0
@@ -259,7 +291,7 @@ class SimpleChat(WebSocket):
                             print "Exception:", err
                     print "Sent to", count, "users."
 
-            elif requestType == ah:
+            elif requestType == R_ADMIN_VERSION_UPDATE:
                 print "Version Update call... checking salt."
                 if adminToken is not None and adminToken == "concert2015shadows":
                     print "Salt verified."
@@ -270,7 +302,7 @@ class SimpleChat(WebSocket):
                     except Exception, err:
                         print "Exception:", err
 
-            elif requestType == al:
+            elif requestType == R_LEAVE_CONCERT:
                 if userId is not None:
                     if userId in userIdMainMap:
                         user = userIdMainMap[userId]
@@ -279,19 +311,19 @@ class SimpleChat(WebSocket):
                         # Setting user concertTag as None
                         user.updateConcertTag(None)
 
-            elif requestType == aj:
+            elif requestType == R_CREATE_USER:
                 responseMap[USER_ID] = idGenerator(16)
-                responseMap[REQUEST_TYPE] = aj
+                responseMap[REQUEST_TYPE] = R_CREATE_USER
                 self.sendingWrapper(responseMap)
 
-            elif requestType == ak:
+            elif requestType == R_HANDSHAKING:
                 responseMap[CLIENT_TIMESTAMP] = clientTimeStamp
                 responseMap[SERVER_TIMESTAMP] = current_milli_time()
-                responseMap[REQUEST_TYPE] = ak
+                responseMap[REQUEST_TYPE] = R_HANDSHAKING
                 print "Sending handshaking to user.."
                 self.sendingWrapper(responseMap)
 
-            elif requestType == ai:
+            elif requestType == R_CLOCK_DIFF:
                 user = None
                 if userId in userIdMainMap:
                     user = userIdMainMap[userId]
@@ -302,48 +334,21 @@ class SimpleChat(WebSocket):
                 user.clockDiff = clockDiff
                 print "Clock Difference set as:", clockDiff, "for userId:", userId
                 responseMap[USER_ID] = user.id
-                responseMap[REQUEST_TYPE] = ai
+                responseMap[REQUEST_TYPE] = R_CLOCK_DIFF
                 responseMap[CLOCK_DIFF] = clockDiff
                 self.sendingWrapper(responseMap)
 
-            elif requestType == ao:
+            elif requestType == R_USER_ONLINE:
                 pass
 
-            elif requestType == an:
+            elif requestType == R_PAGE_LOADED:
+                #todo - handle error
                 user = userIdMainMap[userId]
                 user.setClient(self)
 
                 # CREATE CONCERT
                 if ownerFlag:
-
-                    success = user.createConcert(concertTag, videoUrl)
-
-                    if not success:
-                        responseMap[RESPONSE_TYPE] = CONCERT_TAKEN
-                        responseMap[USER_ID] = user.id
-                        responseMap[CONCERT_TAG] = concertTag
-                        responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
-                        responseMap[VIDEO_STATE] = videoState
-                        responseMap[TAB_ID] = tabId
-                        responseMap[REQUEST_TYPE] = an
-                        responseMap[OWNER_FLAG] = False
-                        self.sendingWrapper(responseMap)
-                    else:
-                        # Either he was successful in creating the group or he was the master himself (cool cool).
-
-                        user.updateConcertTag(concertTag)
-                        user.updateTabId(tabId)
-
-                        responseMap[USER_ID] = userId
-                        responseMap[CONCERT_TAG] = concertTag
-                        responseMap[TAB_ID] = user.getTabId()
-                        responseMap[OWNER_FLAG] = True
-                        responseMap[VIDEO_STATE] = concertTagHashMap[concertTag].getVideoState()
-                        responseMap[VOFFSET] = concertTagHashMap[concertTag].getVideoOffset()
-                        responseMap[VIDEO_URL] = concertTagHashMap[concertTag].videoUrl
-                        responseMap[RESPONSE_TYPE] = CONCERT_CREATED
-                        responseMap[REQUEST_TYPE] = an
-                        self.sendingWrapper(responseMap)
+                    self.handleConcertCreation(userId, concertTag, videoUrl, videoState, tabId, responseMap)
 
                 # JOIN CONCERT
                 else:
@@ -359,7 +364,7 @@ class SimpleChat(WebSocket):
                             responseMap[VIDEO_URL] = concertToJoin.videoUrl
                             responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
                             responseMap[TAB_ID] = tabId
-                            responseMap[REQUEST_TYPE] = an
+                            responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = I_AM_ALREADY_OWNER
                             responseMap[OWNER_FLAG] = True
                             self.sendingWrapper(responseMap)
@@ -373,7 +378,7 @@ class SimpleChat(WebSocket):
                             responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_URL] = concertToJoin.videoUrl
                             responseMap[TAB_ID] = user.getTabId()
-                            responseMap[REQUEST_TYPE] = an
+                            responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                             responseMap[RESPONSE_TYPE] = CONCERT_JOINED
                             responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
                             responseMap[VOFFSET] = concertToJoin.getVideoOffset()
@@ -384,12 +389,13 @@ class SimpleChat(WebSocket):
                         # no concert found.
                         responseMap[USER_ID] = user.id
                         responseMap[TAB_ID] = tabId
-                        responseMap[REQUEST_TYPE] = an
+                        responseMap[REQUEST_TYPE] = R_PAGE_LOADED
                         responseMap[RESPONSE_TYPE] = NO_CONCERT
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
 
-            elif requestType == ap:
+            elif requestType == R_VIDEO_UPDATE:
+                #todo - handle error
                 user = userIdMainMap[userId]
                 user.setClient(self)
                 if globalCurrentClientVersion is not None:
@@ -408,10 +414,14 @@ class SimpleChat(WebSocket):
                             responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_STATE] = videoState
                             responseMap[VIDEO_URL] = videoUrl
-                            responseMap[REQUEST_TYPE] = ap
+                            responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                             concertTagHashMap[concertTag].concertRelay(responseMap)
                         else:
                             print "Sender is not owner"
+                    # Owner sent a different ConcertUrl. Should be handled similar to Create Concert Request Handling
+                    elif videoUrl is not None and concertTag is not None:
+                        self.handleConcertCreation(userId, concertTag, videoUrl, videoState, tabId, responseMap)
+
                 else:
                     # Joinee asks for explicit syncing (video info update)
                     if concertTag in concertTagHashMap:
@@ -426,14 +436,17 @@ class SimpleChat(WebSocket):
                         responseMap[CONCERT_TAG] = concertTag
                         responseMap[VIDEO_URL] = concertToJoin.videoUrl
                         responseMap[TAB_ID] = tabId
-                        responseMap[REQUEST_TYPE] = ap
+                        responseMap[REQUEST_TYPE] = R_VIDEO_UPDATE
                         responseMap[VIDEO_STATE] = concertToJoin.getVideoState()
                         responseMap[VOFFSET] = concertToJoin.getVideoOffset()
                         responseMap[CLIENT_TIMESTAMP] = concertToJoin.getUpdatedVOffsetTime() + user.clockDiff
                         responseMap[OWNER_FLAG] = False
                         self.sendingWrapper(responseMap)
-        except Exception, err:
-            print err
+                    else:
+                        #todo
+                        pass
+        except Exception, error:
+            print error
 
     def sendingWrapper(self, responseMap):
         try:
