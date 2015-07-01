@@ -5,10 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -82,4 +79,14 @@ public class HelloController {
         return new ResponseEntity<String>("ok", responseHeaders, HttpStatus.OK);
     }
 
+    @RequestMapping(method = RequestMethod.GET,value = "/")
+    public String handleRequest(ModelMap model) {
+        return "concert";
+    }
+
+
+    @ExceptionHandler
+    public void handle(Exception e) {
+        System.out.println("Exception :" + e);
+    }
 }

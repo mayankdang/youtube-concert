@@ -1,0 +1,11 @@
+@font-face {
+	font-family: 'CoconLight';
+	src: url('CoconLight.eot');
+	src: local('CoconLight'), url('CoconLight.woff') format('woff'), url('CoconLight.ttf') format('truetype');
+}
+/* use this class to attach this font to any element i.e. <p class="fontsforweb_fontid_1095">Text with this font applied</p> */
+.fontsforweb_fontid_1095 {
+	font-family: 'CoconLight' !important;
+}
+
+/* Font downloaded from FontsForWeb.com */
