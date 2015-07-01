@@ -426,8 +426,6 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
 });
 
 kango.ui.browserButton.addEventListener(kango.ui.browserButton.event.COMMAND, function (event) {
-    kango.browser.tabs.getCurrent(function (tab) {
-        kango.console.log(tab.getUrl());
-        tab.dispatchMessage('on_icon_click',{});
-    });
+    if(concertYoutubeTab!=null)
+        concertYoutubeTab.dispatchMessage('on_icon_click',{});
 });
