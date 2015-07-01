@@ -10,6 +10,5 @@
         "icon": "icons/button.png", 
         "tooltipText": "Concert"
     },
-    "options_page": "options.html",
     "name": "Concert"
 }
