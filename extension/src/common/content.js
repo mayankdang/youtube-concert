@@ -273,6 +273,9 @@ function loadUrl(vid,ct,of) {
         metaTag.setAttribute("http-equiv","refresh");
         metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
+
+        showNotification("Connecting to concert");
+
     }
     // this is for youtube.com#abcd
     else if (vid === null && ct !== null && of === false && (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag)) {
@@ -284,6 +287,8 @@ function loadUrl(vid,ct,of) {
         metaTag.setAttribute("http-equiv","refresh");
         metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"#"+ct+(of===true?"#":""));
         document.head.appendChild(metaTag);
+
+        showNotification("Connecting to concert");
     }
 }
 
@@ -740,5 +745,6 @@ kango.addMessageListener("on_icon_click", function(mainEvt) {
         metaTag.setAttribute("http-equiv","refresh");
         metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+vid+"#"+concert+"#");
         document.head.appendChild(metaTag);
+        showNotification("Broadcasting your concert!");
     }
 });
