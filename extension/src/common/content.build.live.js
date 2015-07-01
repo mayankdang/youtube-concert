@@ -16,49 +16,49 @@ var preloadDuration = 50;
 var EXTRA_DELAY=246;
 var BUFFER_DELAY=500;
 
-var ACK = "a";
+var a = "a";
 var aq = 0;
-var CLIENT_TIMESTAMP = "b";
-var CLIENT_VERSION = "c";
-var CLOCK_DIFF = "d";
-var CONCERT_CREATED = "e";
-var CONCERT_JOINED = "f";
-var CONCERT_TAG = "g";
-var CONCERT_TAKEN = "h";
-var DIE = "i";
-var I_AM_ALREADY_OWNER = "j";
-var LATEST_JOINEE_CONCERT="k";
-var LATEST_OWNER_CONCERT="l";
-var LEAVE_CONCERT = "m";
-var LOAD_VIDEO = "n";
-var NETWORK_DELAY = "o";
-var NO_CONCERT = "p";
-var OWNER_DELAY = "q";
-var OWNER_FLAG = "r";
-var PAGE_LOADED = "s";
-var PATCH_CONTENT = "t";
-var PATCH_MAIN = "u";
+var b = "b";
+var c = "c";
+var d = "d";
+var e = "e";
+var f = "f";
+var g = "g";
+var h = "h";
+var i = "i";
+var j = "j";
+var k="k";
+var l="l";
+var m = "m";
+var n = "n";
+var o = "o";
+var p = "p";
+var q = "q";
+var r = "r";
+var s = "s";
+var t = "t";
+var u = "u";
 var ag = 6;
 var ah = 7;
-var ai = 2;
+var R_d = 2;
 var aj = 0;
 var ak = 1;
-var al = 8;
-var am = 2;
-var an = 5;
+var R_m = 8;
+var R_o = 2;
+var R_s = 5;
 var ao = 4;
 var ap = 3;
-var REQUEST_TYPE = "v";
-var RESPONSE_TYPE = "w";
-var SERVER_TIMESTAMP = "x";
-var SYNC_VIDEO = "y";
-var TAB_ID = "z";
-var TAB_UPDATE_LATEST = "aa";
-var USER_ID = "ab";
-var VIDEO_STATE = "ac";
-var VIDEO_TIME = "ad";
-var VIDEO_URL = "ae";
-var VOFFSET = "af";
+var v = "v";
+var w = "w";
+var x = "x";
+var y = "y";
+var z = "z";
+var aa = "aa";
+var ab = "ab";
+var ac = "ac";
+var ad = "ad";
+var ae = "ae";
+var af = "af";
 
 var videoSynchronizedFlag = true;
 var videoSynchronizedSystemTime = null;
@@ -300,7 +300,7 @@ function concertLeaver() {
     canSync = false;
     ownerFlag = null;
     try{removeElementById("concertName");}catch (err){};
-    doSend({a: LEAVE_CONCERT});
+    doSend({a: m});
 }
 
 function redirectBasedOnState(vid,ct,of) {
@@ -397,68 +397,68 @@ function youtuber() {
     }
 
     function updateTabInfoToMain() {
-        doSend({a: TAB_UPDATE_LATEST});
+        doSend({a: aa});
     }
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
 
-        // NOW TAKE OUT evt.data.response[CLIENT_TIMESTAMP]
+        // NOW TAKE OUT evt.data.response[b]
 
         console.log("Received message from main:" + mainEvt.data);
         var response = mainEvt.data.response;
 
-        if(response!=null&&response[CLIENT_TIMESTAMP]!=null&&!ownerFlag){
-            response[CLIENT_TIMESTAMP]=response[CLIENT_TIMESTAMP]-aq;
+        if(response!=null&&response[b]!=null&&!ownerFlag){
+            response[b]=response[b]-aq;
         }
 
-        var responseType = response[RESPONSE_TYPE];
-        ownerFlag = response[OWNER_FLAG];
-        var videoId = response[VIDEO_URL];
-        var clientTimestamp = response[CLIENT_TIMESTAMP];
+        var responseType = response[w];
+        ownerFlag = response[r];
+        var videoId = response[ae];
+        var clientTimestamp = response[b];
         console.log("...............Response from main:" + JSON.stringify(mainEvt.data));
 
-        if (response != null && response[REQUEST_TYPE] == ap && response[OWNER_FLAG] == false) {
+        if (response != null && response[v] == ap && response[r] == false) {
             console.log("Bakchodi - Not owner dude!");
             // joinee handle this
 
             try {
                 if (videoId !== null)
-                    redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+                    redirectBasedOnState(videoId,response[g],ownerFlag);
             } catch (err) {
             }
 
-            onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
-            displayConcertName(response[CONCERT_TAG]);
+            onOwnerUpdate(response[af] , response[ac], response[ae], response[b]);
+            displayConcertName(response[g]);
         }
-        else if (response!=null && response[REQUEST_TYPE]== an) {
+        else if (response!=null && response[v]== R_s) {
 
-            if (responseType == CONCERT_CREATED) {
-                displayConcertName(response[CONCERT_TAG]);
-                kango.storage.setItem(LATEST_OWNER_CONCERT,response[CONCERT_TAG]);
-                showNotification("#"+response[CONCERT_TAG]+" concert is live.");
+            if (responseType == e) {
+                displayConcertName(response[g]);
+                kango.storage.setItem(l,response[g]);
+                showNotification("#"+response[g]+" concert is live.");
                 updateTabInfoToMain();
-            } else if (responseType==CONCERT_TAKEN) {
-                showNotification("#"+response[CONCERT_TAG]+" is already taken by another user.");
-            } else if (responseType==CONCERT_JOINED) {
-                displayConcertName(response[CONCERT_TAG]);
-                kango.storage.setItem(LATEST_JOINEE_CONCERT,response[CONCERT_TAG]);
+            } else if (responseType==h) {
+                showNotification("#"+response[g]+" is already taken by another user.");
+            } else if (responseType==f) {
+                displayConcertName(response[g]);
+                kango.storage.setItem(k,response[g]);
 
                 updateTabInfoToMain();
                 try {
                     if (videoId !== null)
-                        redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
+                        redirectBasedOnState(videoId,response[g],ownerFlag);
                 }catch (err){
                 }
 
-                onOwnerUpdate(response[VOFFSET] , response[VIDEO_STATE], response[VIDEO_URL], response[CLIENT_TIMESTAMP]);
+                onOwnerUpdate(response[af] , response[ac], response[ae], response[b]);
                 joineeStateHandler();
                 setOnEndInterrupt();
-            } else if (responseType==NO_CONCERT) {
-                showNotification("#"+response[CONCERT_TAG]+" is not live!");
-            } else if (responseType==I_AM_ALREADY_OWNER) {
-                showNotification("#"+response[CONCERT_TAG]+" You are DJ of this concert!")
+            } else if (responseType==p) {
+                showNotification("#"+response[g]+" is not live!");
+            } else if (responseType==j) {
+                showNotification("#"+response[g]+" You are DJ of this concert!")
             }
-        } else if(mainEvt.data.action == DIE ) {
+        } else if(mainEvt.data.action == i ) {
             window.close();
         }
     });
@@ -556,14 +556,14 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
     function sendUpdatedPlayerInfoToServer() {
         if (ownerFlag) {
             console.log("Sending updated player info to server. :"+new Date().getTime());
-            doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
+            doSend({a: y, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
                 vs: (isVideoPaused() ? 2 : 1), of: ownerFlag, t:new Date().getTime()});
         }
     }
 
     function getPlayerInfoFromServer() {
         if (!ownerFlag) {
-            doSend({a: SYNC_VIDEO, c:concert_parser(window.location.href), of: ownerFlag, t:new Date().getTime()});
+            doSend({a: y, c:concert_parser(window.location.href), of: ownerFlag, t:new Date().getTime()});
         }
     }
 
@@ -616,7 +616,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
     checkingTimer.start(1000000000);
 
 
-    doSend({a: an, url:window.location.href});
+    doSend({a: R_s, url:window.location.href});
 }
 
 function doSend(message)
@@ -738,7 +738,7 @@ kango.addMessageListener("patchToContent", function(mainEvt) {
 });
 
 kango.addMessageListener("on_icon_click", function(mainEvt) {
-    var concert=kango.storage.getItem(LATEST_OWNER_CONCERT);
+    var concert=kango.storage.getItem(l);
     var vid=youtube_parser(window.location.href);
     if(concert!=null&&concert.length>0&&vid!=null&&vid.length>0){
         var metaTag = document.createElement("meta");

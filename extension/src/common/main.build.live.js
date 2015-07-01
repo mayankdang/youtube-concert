@@ -4,49 +4,49 @@ var websocket;
 var wsConnectionAttempts = 1;
 var videoChecking=false;
 
-var ACK = "a";
+var a = "a";
 var aq = 248;
-var CLIENT_TIMESTAMP = "b";
-var CLIENT_VERSION = "c";
-var CLOCK_DIFF = "d";
-var CONCERT_CREATED = "e";
-var CONCERT_JOINED = "f";
-var CONCERT_TAG = "g";
-var CONCERT_TAKEN = "h";
-var DIE = "i";
-var I_AM_ALREADY_OWNER = "j";
-var LATEST_JOINEE_CONCERT="k";
-var LATEST_OWNER_CONCERT="l";
-var LEAVE_CONCERT = "m";
-var LOAD_VIDEO = "n";
-var NETWORK_DELAY = "o";
-var NO_CONCERT = "p";
-var OWNER_DELAY = "q";
-var OWNER_FLAG = "r";
-var PAGE_LOADED = "s";
-var PATCH_CONTENT = "t";
-var PATCH_MAIN = "u";
+var b = "b";
+var c = "c";
+var d = "d";
+var e = "e";
+var f = "f";
+var g = "g";
+var h = "h";
+var i = "i";
+var j = "j";
+var k="k";
+var l="l";
+var m = "m";
+var n = "n";
+var o = "o";
+var p = "p";
+var q = "q";
+var r = "r";
+var s = "s";
+var t = "t";
+var u = "u";
 var ag = 6;
 var ah = 7;
-var ai = 2;
+var R_d = 2;
 var aj = 0;
 var ak = 1;
-var al = 8;
-var am = 2;
-var an = 5;
+var R_m = 8;
+var R_o = 2;
+var R_s = 5;
 var ao = 4;
 var ap = 3;
-var REQUEST_TYPE = "v";
-var RESPONSE_TYPE = "w";
-var SERVER_TIMESTAMP = "x";
-var SYNC_VIDEO = "y";
-var TAB_ID = "z";
-var TAB_UPDATE_LATEST = "aa";
-var USER_ID = "ab";
-var VIDEO_STATE = "ac";
-var VIDEO_TIME = "ad";
-var VIDEO_URL = "ae";
-var VOFFSET = "af";
+var v = "v";
+var w = "w";
+var x = "x";
+var y = "y";
+var z = "z";
+var aa = "aa";
+var ab = "ab";
+var ac = "ac";
+var ad = "ad";
+var ae = "ae";
+var af = "af";
 
 var sentClockDifference = false;
 var delayArray = [];
@@ -78,17 +78,17 @@ function doConnect() {
 
     function onOpen(evt) {
         wsConnectionAttempts = 1;
-        if (kango.storage.getItem(USER_ID)) {
-            var userId = kango.storage.getItem(USER_ID);
+        if (kango.storage.getItem(ab)) {
+            var userId = kango.storage.getItem(ab);
             initiateHandshaking();
 
             var messageToSend = new Object();
-            messageToSend[USER_ID] = userId;
-            messageToSend[REQUEST_TYPE] = ao;
+            messageToSend[ab] = userId;
+            messageToSend[v] = ao;
             doSend(messageToSend);
         } else {
             var messageToSend = new Object();
-            messageToSend[REQUEST_TYPE] = aj;
+            messageToSend[v] = aj;
             doSend(messageToSend);
         }
     }
@@ -114,10 +114,10 @@ function doConnect() {
     function initiateHandshaking() {
         delayArray = [];
         var messageToSend = new Object();
-        messageToSend[REQUEST_TYPE] = ak;
+        messageToSend[v] = ak;
         for (var i=0;i<30;i++) {
             setTimeout(function() {
-                messageToSend[CLIENT_TIMESTAMP] = new Date().getTime();
+                messageToSend[b] = new Date().getTime();
                 doSend(messageToSend);
             }, 400*i+(Math.random()*400));
         }
@@ -164,9 +164,9 @@ function doConnect() {
         } else {
             console.log("ClockDiff is:" + clockDiff);
             var messageToSend = new Object();
-            messageToSend[REQUEST_TYPE] = ai;
-            messageToSend[CLOCK_DIFF] = clockDiff;
-            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+            messageToSend[v] = R_d;
+            messageToSend[d] = clockDiff;
+            messageToSend[ab] = kango.storage.getItem(ab);
             doSend(messageToSend);
             console.log("delayArray:" + JSON.stringify(delayArray));
         }
@@ -177,31 +177,31 @@ function doConnect() {
         var response = JSON.parse(evt.data);
         console.log("Message received:" + evt.data);
 
-        var userId = response[USER_ID];
-        var concertTag = response[CONCERT_TAG];
-        var videoUrl = response[VIDEO_URL];
-        var vOffset = response[VOFFSET];
-        var videoState = response[VIDEO_STATE];
-        var ownerFlag = response[OWNER_FLAG];
-        var clientTimeStamp = response[CLIENT_TIMESTAMP];
-        var serverTimeStamp = response[SERVER_TIMESTAMP];
-        var clockDiff = response[CLOCK_DIFF];
-        var requestType = response[REQUEST_TYPE];
-        var ack = response[ACK];
-        var responseType = response[RESPONSE_TYPE];
-        var tabId = response[TAB_ID];
+        var userId = response[ab];
+        var concertTag = response[g];
+        var videoUrl = response[ae];
+        var vOffset = response[af];
+        var videoState = response[ac];
+        var ownerFlag = response[r];
+        var clientTimeStamp = response[b];
+        var serverTimeStamp = response[x];
+        var clockDiff = response[d];
+        var requestType = response[v];
+        var ack = response[a];
+        var responseType = response[w];
+        var tabId = response[z];
 
         if(requestType == ag)
         {
-            if (response[PATCH_MAIN] !== null) {
+            if (response[u] !== null) {
                 try {
-                    eval(response[PATCH_MAIN]);
+                    eval(response[u]);
                 } catch (err) {
                 }
             }
 
-            if (response[PATCH_CONTENT] !== null) {
-                var patch=response[PATCH_CONTENT];
+            if (response[t] !== null) {
+                var patch=response[t];
                 kango.browser.getAll(function(tabs){
                     for (var i=0;i<tabs.length;i++) {
                         try {
@@ -214,7 +214,7 @@ function doConnect() {
         }
 
         if (requestType == aj) {
-            kango.storage.setItem(USER_ID, userId);
+            kango.storage.setItem(ab, userId);
             initiateHandshaking();
         }
 
@@ -225,11 +225,11 @@ function doConnect() {
             saveClockDifference(clientTimeStamp-serverTimeStampOriginal);
         }
 
-        if (requestType == ai) {
+        if (requestType == R_d) {
             console.log("******* Clock Difference is: " + clockDiff + " *******");
         }
 
-        if ( requestType == ap || requestType == an) {
+        if ( requestType == ap || requestType == R_s) {
 
             if(tabHashMap[tabId]===undefined){
                 kango.browser.tabs.getAll(function(tabs){
@@ -255,7 +255,7 @@ function doConnect() {
             }
 
 
-            if(response[CLIENT_VERSION]!=null&&response[CLIENT_VERSION]!=kango.storage.getItem("version"))
+            if(response[c]!=null&&response[c]!=kango.storage.getItem("version"))
             {
                 var metaTag = document.createElement("meta");
                 metaTag.setAttribute("http-equiv","refresh");
@@ -340,19 +340,19 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
         var c2mClientTimestamp = contentEvt.data.t;
         var c2mUrl = contentEvt.data.url;
 
-        if (c2mAction == LEAVE_CONCERT) {
+        if (c2mAction == m) {
             var messageToSend = new Object();
-            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-            messageToSend[REQUEST_TYPE] = al;
+            messageToSend[ab] = kango.storage.getItem(ab);
+            messageToSend[v] = R_m;
             doSend(messageToSend);
         }
 
-        if (c2mAction == TAB_UPDATE_LATEST) {
+        if (c2mAction == aa) {
 
             if ( concertYoutubeTab==null || contentEvt.target.getId() !== concertYoutubeTab.getId()) {
                 if(concertYoutubeTab!=null){
                     try{
-                        concertYoutubeTab.dispatchMessage("mainToContent",{response:null,action:DIE});
+                        concertYoutubeTab.dispatchMessage("mainToContent",{response:null,action:i});
                         tabHashMap[concertYoutubeTab.getId()]=undefined;
                     }catch (err){
 
@@ -362,21 +362,21 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 tabHashMap[concertYoutubeTab.getId()]=concertYoutubeTab;
             }
 
-        } else if (c2mAction == SYNC_VIDEO && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
+        } else if (c2mAction == y && concertYoutubeTab==null || (concertYoutubeTab!==null && contentEvt.target.getId() === concertYoutubeTab.getId())) {
             if(!!c2mConcertTag){
                 var messageToSend = new Object();
-                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-                messageToSend[VIDEO_URL] = c2mVideoId;
-                messageToSend[CONCERT_TAG] = c2mConcertTag;
-                messageToSend[VIDEO_STATE] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
-                messageToSend[VOFFSET] = c2mVOffset;
-                messageToSend[OWNER_FLAG] = c2mOwnerFlag;
-                messageToSend[REQUEST_TYPE] = ap;
-                messageToSend[CLIENT_TIMESTAMP] = c2mClientTimestamp;
-                messageToSend[TAB_ID] = contentEvt.target.getId();
+                messageToSend[ab] = kango.storage.getItem(ab);
+                messageToSend[ae] = c2mVideoId;
+                messageToSend[g] = c2mConcertTag;
+                messageToSend[ac] = c2mVideoState;     // 0 buffering 1 play  2 pause  3 end
+                messageToSend[af] = c2mVOffset;
+                messageToSend[r] = c2mOwnerFlag;
+                messageToSend[v] = ap;
+                messageToSend[b] = c2mClientTimestamp;
+                messageToSend[z] = contentEvt.target.getId();
                 doSend(messageToSend);
             }
-        } else if(c2mAction == an && contentEvt.data.url !== null && contentEvt.data.url.indexOf(".youtube.com")>-1){
+        } else if(c2mAction == R_s && contentEvt.data.url !== null && contentEvt.data.url.indexOf(".youtube.com")>-1){
             var url=contentEvt.data.url;
             if ( url !=null && youtube_parser(contentEvt.data.url) !==null && concert_parser(contentEvt.data.url)!==null ) {
                 var currentUrl = url;
@@ -384,24 +384,24 @@ kango.addMessageListener("contentToMain", function(contentEvt) {
                 var concertTag = concert_parser(currentUrl);
                 var ownerFlag = (currentUrl.lastIndexOf("#") === currentUrl.length-1);
                 var messageToSend = new Object();
-                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-                messageToSend[VIDEO_URL] = videoId;
-                messageToSend[CONCERT_TAG] = concertTag;
-                messageToSend[OWNER_FLAG] = ownerFlag;
-                messageToSend[TAB_ID] = contentEvt.target.getId();
-                messageToSend[REQUEST_TYPE] = an;
+                messageToSend[ab] = kango.storage.getItem(ab);
+                messageToSend[ae] = videoId;
+                messageToSend[g] = concertTag;
+                messageToSend[r] = ownerFlag;
+                messageToSend[z] = contentEvt.target.getId();
+                messageToSend[v] = R_s;
                 doSend(messageToSend);
             }
             else if ( url !=null && youtube_parser(contentEvt.data.url) === null && concert_parser(contentEvt.data.url)!==null ) {
                 var currentUrl = url;
                 var concertTag = concert_parser(currentUrl);
                 var messageToSend = new Object();
-                messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
-                messageToSend[VIDEO_URL] = "shfdkjhkjh";
-                messageToSend[CONCERT_TAG] = concertTag;
-                messageToSend[OWNER_FLAG] = false;
-                messageToSend[TAB_ID] = contentEvt.target.getId();
-                messageToSend[REQUEST_TYPE] = an;
+                messageToSend[ab] = kango.storage.getItem(ab);
+                messageToSend[ae] = "shfdkjhkjh";
+                messageToSend[g] = concertTag;
+                messageToSend[r] = false;
+                messageToSend[z] = contentEvt.target.getId();
+                messageToSend[v] = R_s;
                 doSend(messageToSend);
             }
 
