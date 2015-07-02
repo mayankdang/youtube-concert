@@ -10,9 +10,9 @@
     <properties>
         <spring.version>4.0.0.RELEASE</spring.version>
         <R_TEMP_DIR_PATH>temp/</R_TEMP_DIR_PATH>
-        <R_CONTENTJS_PATH>extension/src/common/content.js</R_CONTENTJS_PATH>
-        <R_MAINJS_PATH>extension/src/common/main.js</R_MAINJS_PATH>
-        <R_VERSION_PATH>extension/src/common/version.txt</R_VERSION_PATH>
+        <R_CONTENTJS_PATH>admin/extension/src/common/content.js</R_CONTENTJS_PATH>
+        <R_MAINJS_PATH>admin/extension/src/common/main.js</R_MAINJS_PATH>
+        <R_VERSION_PATH>admin/extension/src/common/version.txt</R_VERSION_PATH>
         <R_SERVER_PYTHON_PATH>simpleWebSocketServer/SimpleExampleServer.py</R_SERVER_PYTHON_PATH>
     </properties>
 
@@ -159,6 +159,5 @@
                 <SERVER_HOST_DOMAIN>52.74.240.238</SERVER_HOST_DOMAIN>
             </properties>
         </profile>
-
     </profiles>
 </project>
