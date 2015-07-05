@@ -159,5 +159,14 @@
                 <SERVER_HOST_DOMAIN>52.74.240.238</SERVER_HOST_DOMAIN>
             </properties>
         </profile>
+
+        <profile>
+            <id>EC2-Staging</id>
+            <properties>
+                <profile_id>EC2-Staging</profile_id>
+                <MY_LOCAL_PATH>/home/ec2-user/echo</MY_LOCAL_PATH>
+                <SERVER_HOST_DOMAIN>52.74.167.231</SERVER_HOST_DOMAIN>
+            </properties>
+        </profile>
     </profiles>
 </project>

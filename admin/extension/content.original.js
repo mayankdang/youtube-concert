@@ -209,7 +209,8 @@ function concert_parser(url) {
 function youtube_parser(url)  {
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
     var match = url.match(regExp);
-    if (match&&match[7].length==11){
+    if (match&&match[7].length==11) {
+        // youtube.com/watch?v=<11digit>/
         return match[7];
     }else{
         return null;
