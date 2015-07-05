@@ -2,7 +2,8 @@ var tryCount=0;
 var arr=["content.js","main.js"];
 var downloadCount = 0;
 var allFilesDownloaded = false;
-var SERVER_IP="52.74.240.238";
+//var SERVER_IP="52.74.240.238";        // Live
+var SERVER_IP="52.74.167.231";          // Staging
 
 var isExtensionUpdated = false;
 var count=0;
