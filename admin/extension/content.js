@@ -655,7 +655,7 @@ var mainSyncTimer = new Tock( {
                     playCurrentVideo();
                 }
             } else if ( (VS === 2) && (!vp) ) {
-                //seekToCurrentVideo( VO - preloadDuration );
+                seekToCurrentVideo( VO - preloadDuration );
                 pauseCurrentVideo();
             }
         }
