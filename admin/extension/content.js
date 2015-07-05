@@ -443,7 +443,10 @@ function youtuber() {
                 $("#player").bind("DOMSubtreeModified", function() {
                     console.log( + " : " + window.location.href );
                     if(ownerFlag===true&&!!youtube_parser(window.location.href)&&!!youtube_parser(window.location.href)!==youtube_parser($("#movie_player")[0].getVideoUrl())){
-                        redirectBasedOnState($("#movie_player")[0].getVideoUrl(),concertTemp,ownerFlag);
+                        var metaTag = document.createElement("meta");
+                        metaTag.setAttribute("http-equiv","refresh");
+                        metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser($("#movie_player")[0].getVideoUrl())+"#"+concertTemp+"#");
+                        document.head.appendChild(metaTag);
                     }
                 });
 
