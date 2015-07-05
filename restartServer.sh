@@ -1,7 +1,7 @@
 #!/bin/bash
 (cd $1; git reset --hard)
-(cd $1; git pull origin live)
-(cd $1; git checkout origin/live)
+(cd $1; git pull origin stage)
+(cd $1; git checkout origin/stage)
 process_pid() {
         echo `ps ax | grep example | grep python | cut -d' ' -f1`
 }
