@@ -608,7 +608,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
             }
         }
 
-        $("#player").bind("DOMSubtreeModified", function() {
+        function handleFullScreen(){
             var newUrl=null;
             try{
                 newUrl = $("#movie_player")[0].getVideoUrl();
@@ -616,12 +616,15 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
 
             console.log(" : " + window.location.href +":::"+newUrl);
             if(!!concert_parser(window.location.href)&&window.location.href.lastIndexOf("#")===window.location.href.length-1&&!!youtube_parser(newUrl)&&!!youtube_parser(window.location.href)&&youtube_parser(window.location.href)!==youtube_parser(newUrl)){
+                $("#player").unbind("DOMSubtreeModified", handleFullScreen);
                 var metaTag = document.createElement("meta");
                 metaTag.setAttribute("http-equiv","refresh");
                 metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser($("#movie_player")[0].getVideoUrl())+"#"+concert_parser(window.location.href)+"#");
                 document.head.appendChild(metaTag);
             }
-        });
+        }
+
+        $("#player").bind("DOMSubtreeModified", handleFullScreen);
     }
 
     var script=document.createElement("script");
