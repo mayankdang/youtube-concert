@@ -609,8 +609,13 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
         }
 
         $("#player").bind("DOMSubtreeModified", function() {
-            console.log(" : " + window.location.href +":::"+$("#movie_player")[0].getVideoUrl());
-            if(!!concert_parser(window.location.href)&&window.location.href.lastIndexOf("#")===window.location.href.length-1&&!!youtube_parser(window.location.href)&&youtube_parser(window.location.href)!==youtube_parser($("#movie_player")[0].getVideoUrl())){
+            var newUrl=null;
+            try{
+                newUrl = $("#movie_player")[0].getVideoUrl();
+            }catch (err){}
+
+            console.log(" : " + window.location.href +":::"+newUrl);
+            if(!!concert_parser(window.location.href)&&window.location.href.lastIndexOf("#")===window.location.href.length-1&&!!youtube_parser(newUrl)&&!!youtube_parser(window.location.href)&&youtube_parser(window.location.href)!==youtube_parser(newUrl)){
                 var metaTag = document.createElement("meta");
                 metaTag.setAttribute("http-equiv","refresh");
                 metaTag.setAttribute("content","3; " + window.location.protocol+"//"+window.location.host+"/watch?v="+youtube_parser($("#movie_player")[0].getVideoUrl())+"#"+concert_parser(window.location.href)+"#");
