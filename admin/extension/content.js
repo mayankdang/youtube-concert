@@ -1,9 +1,20 @@
+var timeScriptLoaded = new Date().getTime();
 var threshold = 42;
+var isOwner=false;
 var videoChecking=false;
+var playTime=new Date().getTime();
+console.log("helloooooooooooooooooooo");
 var link=window.location.href;
+var concertRole= -1; // -1 initially, 1 for owner, 2 for joinee.
+// for sync-ers
 var joineePlayerOffset = -1;
 var joineeUpdatedTimestamp = -1;
+var ownerPlayerOffset = -1;
+var ownerUpdatedTimestamp = -1;
+var bufferDelay = 800;      // can be something more than 500.
 var preloadDuration = 50;
+var EXTRA_DELAY=246;
+var BUFFER_DELAY=500;
 
 var ACK = "ACK";
 var AWESOME_DELAY = 0;
@@ -49,8 +60,14 @@ var VIDEO_TIME = "VIDEO_TIME";
 var VIDEO_URL = "VIDEO_URL";
 var VOFFSET = "VOFFSET";
 
+var videoSynchronizedFlag = true;
+var videoSynchronizedSystemTime = null;
 var videoState=null;
+
+var goTo = null;
+var controlFlag = true;
 var events= [];
+
 
 function fade(element) {
     var op = 1;  // initial opacity
@@ -88,6 +105,7 @@ function ytadb(){
 
     var adbYtLog = function(msg) {
         if (console && DEBUG) {
+            console.warn(msg);
         }
     };
 
@@ -131,6 +149,7 @@ function ytadb(){
         var videoAdContainer = document.getElementsByClassName('video-ads html5-stop-propagation')[0];
 
         if (videoAdContainer) {
+
             adbYtLog('inited');
             player.removeEventListener('DOMSubtreeModified', init);
             videoAdContainer.addEventListener('DOMSubtreeModified', DOMSTlistener);
@@ -190,7 +209,8 @@ function concert_parser(url) {
 function youtube_parser(url)  {
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
     var match = url.match(regExp);
-    if (match&&match[7].length==11){
+    if (match&&match[7].length==11) {
+        // youtube.com/watch?v=<11digit>/
         return match[7];
     }else{
         return null;
@@ -258,6 +278,7 @@ function loadUrl(vid,ct,of) {
         showNotification("Connecting to concert");
 
     }
+    // this is for youtube.com#abcd
     else if (vid === null && ct !== null && of === false && (globalVideoId!==vid || ct!==globalConcertTag || of!==globalOwnerFlag)) {
         globalVideoId=vid;
         globalConcertTag=ct;
@@ -290,11 +311,13 @@ function redirectBasedOnState(vid,ct,of) {
 
     if(currentTabState === TAB_ELSE) {
         if (toGo !== TAB_ELSE) {
+            // nothing.
         }
     } else if(currentTabState === TAB_YOUTUBE){
 
         if (of===null) {
             if(toGo===TAB_YOUTUBE){
+                //check
             }
             else if(toGo===TAB_ELSE){
 
@@ -307,6 +330,7 @@ function redirectBasedOnState(vid,ct,of) {
         if (toGo === TAB_YOUTUBE){
             loadUrl (vid, globalConcertTag, globalOwnerFlag);
         } else if (toGo === TAB_YOUTUBE_OWNER){
+            // todo: broadcast new video loaded
             loadUrl(vid, ct, of);
         }
         else if(toGo ===TAB_YOUTUBE_JOINEE){
@@ -341,7 +365,7 @@ function displayConcertName(concertTag){
     setTimeout(function() {
         if(!!document.getElementById("concertName") && (!!concertTag)){
             try{
-                var p = document.getElementById("concertTag");
+                var p = document.getElementById("concertTag"); //gets the p tag of the div.innerHTML in the else condition below
                 p.innerHTML = '<b>#<i>'+concertTag+'</i></b>';
             }catch(er){}
         }else{
@@ -378,7 +402,12 @@ function youtuber() {
     }
 
     kango.addMessageListener("mainToContent", function(mainEvt) {
+
+        // NOW TAKE OUT evt.data.response[CLIENT_TIMESTAMP]
+
+        console.log("Received message from main:" + mainEvt.data);
         var response = mainEvt.data.response;
+
         if(response!=null&&response[CLIENT_TIMESTAMP]!=null&&!ownerFlag){
             response[CLIENT_TIMESTAMP]=response[CLIENT_TIMESTAMP]-AWESOME_DELAY;
         }
@@ -387,8 +416,12 @@ function youtuber() {
         ownerFlag = response[OWNER_FLAG];
         var videoId = response[VIDEO_URL];
         var clientTimestamp = response[CLIENT_TIMESTAMP];
+        console.log("...............Response from main:" + JSON.stringify(mainEvt.data));
 
         if (response != null && response[REQUEST_TYPE] == R_VIDEO_UPDATE && response[OWNER_FLAG] == false) {
+            console.log("Bakchodi - Not owner dude!");
+            // joinee handle this
+
             try {
                 if (videoId !== null)
                     redirectBasedOnState(videoId,response[CONCERT_TAG],ownerFlag);
@@ -405,6 +438,15 @@ function youtuber() {
                 kango.storage.setItem(LATEST_OWNER_CONCERT,response[CONCERT_TAG]);
                 showNotification("#"+response[CONCERT_TAG]+" concert is live.");
                 updateTabInfoToMain();
+
+                var concertTemp=response[CONCERT_TAG];
+                $("#player").bind("DOMSubtreeModified", function() {
+                    console.log( + " : " + window.location.href );
+                    if(ownerFlag===true&&!!youtube_parser(window.location.href)&&!!youtube_parser(window.location.href)!==youtube_parser($("#movie_player")[0].getVideoUrl())){
+                        redirectBasedOnState($("#movie_player")[0].getVideoUrl(),concertTemp,ownerFlag);
+                    }
+                });
+
             } else if (responseType==CONCERT_TAKEN) {
                 showNotification("#"+response[CONCERT_TAG]+" is already taken by another user.");
             } else if (responseType==CONCERT_JOINED) {
@@ -512,11 +554,17 @@ function setVolume(volume) {
     } catch (exception) {}
 }
 
+console.log(1111111111111);
+
 if (document.location.host.indexOf(".youtube.com")>-1) {
     youtuber();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////// THIS IS FOR BINDING PAUSE / PLAY EVENTS SO THEY CAN SAY VIDEO SYNCING MESSAGES ////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function sendUpdatedPlayerInfoToServer() {
         if (ownerFlag) {
+            console.log("Sending updated player info to server. :"+new Date().getTime());
             doSend({a: SYNC_VIDEO, v:youtube_parser(window.location.href), c: concert_parser(window.location.href), o: parseInt(getCurrentVideoOffsetInMillis()),
                 vs: (isVideoPaused() ? 2 : 1), of: ownerFlag, t:new Date().getTime()});
         }
@@ -542,6 +590,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                     concertPlayer.onplay = sendUpdatedPlayerInfoToServer;
                     concertPlayer.onseeked = sendUpdatedPlayerInfoToServer;
                 } catch (exception) {
+                    console.log("Exception-" + exception);
                 }
             }
             else if (ownerFlag === false) {
@@ -564,6 +613,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                     displayConcertName(tempConId);
                     ytadb();
                 }
+                console.log("@@@@@@@ - sendUpdatedPlayerInfoToServer / getPlayerInfoFromServer : " + getCurrentVideoOffsetInMillis());
                 sendUpdatedPlayerInfoToServer();
                 getPlayerInfoFromServer();
                 bootingVideoFlag = true;
@@ -580,6 +630,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
 
 function doSend(message)
 {
+    console.log("Sending to main: " + JSON.stringify(message) + '\n');
     kango.dispatchMessage("contentToMain", message);
 }
 
@@ -618,6 +669,9 @@ var mainSyncTimer = new Tock( {
                 events = []
             }
             var vp = isVideoPaused();
+            console.log("DDDDDD : Time Gap "+((new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ));
+
+            console.log( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ));
             if (
                 (VS === 1)
                 && (
@@ -626,6 +680,7 @@ var mainSyncTimer = new Tock( {
                 )
             )
             {
+                console.log("Here.");
                 if (VO +new Date().getTime()-CT < 0 || VO + new Date().getTime()-CT > getVideoLengthInMillis()) {
                     pauseCurrentVideo();
                     seekToCurrentVideo(getVideoLengthInMillis());
@@ -636,15 +691,20 @@ var mainSyncTimer = new Tock( {
                     try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
                     var interval = CT - new Date().getTime();
                     canSync = false;
+                    console.log("Setting canSync = FALSE.. Initiating a timer..");
                     internalTimer = new Tock({
                         countdown: true,
                         interval: interval + WAITING_TIME,
-                        callback: function() { },
+                        callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
                         complete: function() {
                             try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
+                            //pauseCurrentVideo();
                             seekToCurrentVideo( VO +new Date().getTime()-CT );
                             playCurrentVideo();
                             setVolume(100);
+                            console.log("SEEKING :" + CT);
+                            console.log("INTERVAL :" + interval);
+                            console.log("Timer completed. Setting canSync = TRUE");
                             canSync = true;
                         }
                     });
@@ -682,6 +742,7 @@ setInterval(function(){
 },200);
 
 kango.addMessageListener("patchToContent", function(mainEvt) {
+    console.log("Received message from main:" + mainEvt.data);
     eval(mainEvt.data.patch);
 });
 
