@@ -68,6 +68,10 @@ function generateInterval (k) {
     return Math.random() * maxInterval;
 }
 
+var handshakingSent = 0;
+var handshakingReceived = 0;
+
+
 function doConnect() {
     websocket = new WebSocket( "ws://"+IP+":"+PORT+"/" );
     websocket.onopen = function(evt) { onOpen(evt) };
@@ -112,23 +116,41 @@ function doConnect() {
 
     function initiateHandshaking() {
         delayArray = [];
+        singlePing()
+    }
+
+    var lastTime=null;
+    function singlePing(){
+        console.log("SinglePing called!");
+        handshakingSent++;
         var messageToSend = new Object();
         messageToSend[REQUEST_TYPE] = R_HANDSHAKING;
-        for (var i=0;i<30;i++) {
-            setTimeout(function() {
-                messageToSend[CLIENT_TIMESTAMP] = new Date().getTime();
-                doSend(messageToSend);
-            }, 400*i+(Math.random()*400));
-        }
+        messageToSend[CLIENT_TIMESTAMP] = new Date().getTime();
+        doSend(messageToSend);
+
+        setTimeout(function(){
+            if (handshakingReceived < handshakingSent)
+            {
+                console.log("Mila nahi. Maar raha hu main renegade!");
+                handshakingReceived=handshakingSent;
+                if(lastTime==null || new Date().getTime()-lastTime > 2000 ){
+                    lastTime=new Date().getTime();
+                    singlePing();
+                }
+            }
+        },800+400*Math.random());
     }
 
     function saveClockDifference(clockDiff) {
+        handshakingReceived++;
         if (!sentClockDifference) {
             if (delayArray.length>=20) {
                 computeClockDiffMedianAndSend();
                 sentClockDifference = true;
             } else {
                 delayArray.push(parseInt(clockDiff));
+                console.log("About to call singlePing. ");
+                singlePing();
             }
         }
     }
@@ -414,7 +436,10 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
 });
 
 kango.ui.browserButton.addEventListener(kango.ui.browserButton.event.COMMAND, function (event) {
-    kango.browser.tabs.getCurrent(function(tab) {
-        tab.dispatchMessage('on_icon_click',{});
-    });
+    if(concertYoutubeTab!=null)
+        concertYoutubeTab.dispatchMessage('on_icon_click',{});
+    else
+        kango.browser.tabs.getCurrent(function(tab) {
+            tab.dispatchMessage('on_icon_click',{});
+        });
 });
