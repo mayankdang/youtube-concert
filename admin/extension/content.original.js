@@ -438,15 +438,6 @@ function youtuber() {
                 kango.storage.setItem(LATEST_OWNER_CONCERT,response[CONCERT_TAG]);
                 showNotification("#"+response[CONCERT_TAG]+" concert is live.");
                 updateTabInfoToMain();
-
-                var concertTemp=response[CONCERT_TAG];
-                $("#player").bind("DOMSubtreeModified", function() {
-                    console.log( + " : " + window.location.href );
-                    if(ownerFlag===true&&!!youtube_parser(window.location.href)&&!!youtube_parser(window.location.href)!==youtube_parser($("#movie_player")[0].getVideoUrl())){
-                        redirectBasedOnState($("#movie_player")[0].getVideoUrl(),concertTemp,ownerFlag);
-                    }
-                });
-
             } else if (responseType==CONCERT_TAKEN) {
                 showNotification("#"+response[CONCERT_TAG]+" is already taken by another user.");
             } else if (responseType==CONCERT_JOINED) {
