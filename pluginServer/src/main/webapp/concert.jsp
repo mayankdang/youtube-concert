@@ -87,13 +87,15 @@
             <div class="intro-lead-in">Party with a <span style="color:#ff0000;">#</span><span style="color:#ff7f00;">h</span><span style="color:#ffff00;">a</span><span style="color:#80ff00;">s</span><span style="color:#00ff00;">h</span><span style="color:#00ffff;">t</span><span style="color:#0000ff;">a</span><span style="color:#8b00ff;">g</span></div>
             <div style="font-family: 'CoconLight'; font-size:25px; width:600px; align:center; margin: 0 auto; ">Play the same youtube videos on many computers. Control , play or pause them as you desire. Be your party's own DJ.</div>
             <br/><br/>
-            <a class="page-scroll btn btn-xl" href="#" onclick="chrome.webstore.install()" id="install-button" ><img src="static/img/logo-white-40x48.png"/>&nbsp;&nbsp;&nbsp;Add To Google Chrome</a>
+            <a class="btn btn-xl" href="#" onclick="chrome.webstore.install()" id="install-button" ><img src="static/img/logo-white-40x48.png"/>&nbsp;&nbsp;&nbsp;Add To Google Chrome</a>
 
             <%--<script type="text/javascript">--%>
                 <%--if (chrome.app.isInstalled) {--%>
                     <%--document.getElementById('install-button').textContent = 'none';--%>
                 <%--}--%>
             <%--</script>--%>
+            <br/>
+            <a href="#services" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:100px; padding-bottom:50px"></i></a>  
 
         </div>
     </div>
