@@ -1,4 +1,4 @@
-var IP = "www.youtubeconcert.com";
+var IP = "52.74.167.231";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
