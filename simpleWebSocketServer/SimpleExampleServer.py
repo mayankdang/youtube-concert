@@ -66,7 +66,7 @@ userIdMainMap = {}
 concertTagHashMap = {}
 try:
     with open(jsonDumpFile) as data_file:
-        concertTagHashMap = json.load(data_file)
+        concertTagHashMap = pickle.load(data_file)
 except Exception, err:
     pass
 

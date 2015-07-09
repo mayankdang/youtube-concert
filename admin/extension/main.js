@@ -116,7 +116,7 @@ function doConnect() {
 
     function initiateHandshaking() {
         delayArray = [];
-        singlePing()
+        singlePing();
     }
 
     var lastTime=null;
@@ -431,7 +431,6 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
         tabHashMap[concertYoutubeTab.getId()]=undefined;
         concertYoutubeTab = null;
-        concertLeaver();
     }
 });
 
