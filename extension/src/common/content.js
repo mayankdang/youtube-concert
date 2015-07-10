@@ -701,120 +701,128 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
 
 
     doSend({a: R_PAGE_LOADED, url:window.location.href});
-}
 
-function doSend(message)
-{
-    console.log("Sending to main: " + JSON.stringify(message) + '\n');
-    kango.dispatchMessage("contentToMain", message);
-}
 
-var WAITING_TIME = 2000;
-var internalTimer = null;
-var VO = null;
-var VS = null;
-var CT = null;
-var VID = null;
-var canSync = true;
-var pullTime = null;
-
-var mainSyncTimer = new Tock( {
-    countdown: true,
-    interval: 2500,
-    callback: function() {
-        if (canSync) {
-            if (events.length > 0) {
-                var latestEvent = events[events.length-1];
-
-                for (var i=0;i<events.length;i++) {
-                    if (   events[i].videoId != null
-                        && youtube_parser(window.location.href) != null
-                        && events[i].videoId != youtube_parser(window.location.href)
-                    )
-                    {
-                        latestEvent = events[i];
-                    }
-                }
-
-                VO = latestEvent.vOffset;
-                VS = latestEvent.videoState;
-                CT = latestEvent.clientTimestamp;
-                VID = latestEvent.videoId;
-                pullTime = new Date().getTime();
-                events = []
-            }
-            var vp = isVideoPaused();
-            console.log("DDDDDD : Time Gap "+((new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ));
-
-            console.log( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ));
-            if (
-                (VS === 1)
-                && (
-                vp ||
-                ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO)  ) - 248 > threshold )
-                )
-            )
-            {
-                console.log("Here.");
-                if (VO +new Date().getTime()-CT < 0 || VO + new Date().getTime()-CT > getVideoLengthInMillis()) {
-                    pauseCurrentVideo();
-                    seekToCurrentVideo(getVideoLengthInMillis());
-                } else {
-                    if (internalTimer !== null) {
-                        internalTimer.stop();
-                    }
-                    try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
-                    var interval = CT - new Date().getTime();
-                    canSync = false;
-                    console.log("Setting canSync = FALSE.. Initiating a timer..");
-                    internalTimer = new Tock({
-                        countdown: true,
-                        interval: interval + WAITING_TIME,
-                        callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
-                        complete: function() {
-                            try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
-                            //pauseCurrentVideo();
-                            seekToCurrentVideo( VO +new Date().getTime()-CT );
-                            playCurrentVideo();
-                            setVolume(100);
-                            console.log("SEEKING :" + CT);
-                            console.log("INTERVAL :" + interval);
-                            console.log("Timer completed. Setting canSync = TRUE");
-                            canSync = true;
-                        }
-                    });
-
-                    internalTimer.start(interval+WAITING_TIME);
-                    seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration );
-                    setVolume(0);
-                    playCurrentVideo();
-                }
-            } else if ( (VS === 2) && (!vp) ) {
-                seekToCurrentVideo( VO - preloadDuration );
-                pauseCurrentVideo();
-            }
-        }
-    },
-    complete: function(){
-
-    }
-});
-
-mainSyncTimer.start(1000000000);
-var prevLink = null;
-
-setInterval(function(){
-    if( prevLink!==window.location.href || prevLink==null)
+    function doSend(message)
     {
-        var tempYt = youtube_parser(window.location.href);
-        var tempCt = concert_parser(window.location.href);
-        var tempOf = (tempCt===null ? null : (window.location.href.lastIndexOf("#") === window.location.href.length-1) && (
-            (window.location.href.indexOf("youtube.com")>-1)
-        ));
-        redirectBasedOnState(tempYt, tempCt, tempOf);
-        prevLink = window.location.href;
+        console.log("Sending to main: " + JSON.stringify(message) + '\n');
+        kango.dispatchMessage("contentToMain", message);
     }
-},200);
+
+    var WAITING_TIME = 2000;
+    var internalTimer = null;
+    var VO = null;
+    var VS = null;
+    var CT = null;
+    var VID = null;
+    var canSync = true;
+    var pullTime = null;
+
+    var sendPingCount = 0;
+    var mainSyncTimer = new Tock( {
+        countdown: true,
+        interval: 2500,
+        callback: function() {
+            if (canSync) {
+                if (events.length > 0) {
+                    var latestEvent = events[events.length-1];
+
+                    for (var i=0;i<events.length;i++) {
+                        if (   events[i].videoId != null
+                            && youtube_parser(window.location.href) != null
+                            && events[i].videoId != youtube_parser(window.location.href)
+                        )
+                        {
+                            latestEvent = events[i];
+                        }
+                    }
+
+                    VO = latestEvent.vOffset;
+                    VS = latestEvent.videoState;
+                    CT = latestEvent.clientTimestamp;
+                    VID = latestEvent.videoId;
+                    pullTime = new Date().getTime();
+                    events = []
+                }
+                var vp = isVideoPaused();
+                console.log("DDDDDD : Time Gap "+((new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) -AWESOME_DELAY ));
+
+                console.log( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO) ));
+                if (
+                    (VS === 1)
+                    && (
+                    vp ||
+                    ( Math.abs( (new Date().getTime() - CT) - (getCurrentVideoOffsetInMillis() - VO)  ) - 248 > threshold )
+                    )
+                )
+                {
+                    console.log("Here.");
+                    if (VO +new Date().getTime()-CT < 0 || VO + new Date().getTime()-CT > getVideoLengthInMillis()) {
+                        pauseCurrentVideo();
+                        seekToCurrentVideo(getVideoLengthInMillis());
+                    } else {
+                        if (internalTimer !== null) {
+                            internalTimer.stop();
+                        }
+                        try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
+                        var interval = CT - new Date().getTime();
+                        canSync = false;
+                        console.log("Setting canSync = FALSE.. Initiating a timer..");
+                        internalTimer = new Tock({
+                            countdown: true,
+                            interval: interval + WAITING_TIME,
+                            callback: function() { console.log("Video Synced with internalTimer: " + new Date().getTime()) },
+                            complete: function() {
+                                try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
+                                //pauseCurrentVideo();
+                                seekToCurrentVideo( VO +new Date().getTime()-CT );
+                                playCurrentVideo();
+                                setVolume(100);
+                                console.log("SEEKING :" + CT);
+                                console.log("INTERVAL :" + interval);
+                                console.log("Timer completed. Setting canSync = TRUE");
+                                canSync = true;
+                            }
+                        });
+
+                        internalTimer.start(interval+WAITING_TIME);
+                        seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration );
+                        setVolume(0);
+                        playCurrentVideo();
+                    }
+                } else if ( (VS === 2) && (!vp) ) {
+                    seekToCurrentVideo( VO - preloadDuration );
+                    pauseCurrentVideo();
+                }
+            }
+
+            sendPingCount++;
+            if(ownerFlag===true&&sendPingCount>8){
+                sendPingCount=0;
+                sendUpdatedPlayerInfoToServer();
+            }
+        },
+        complete: function(){
+
+        }
+    });
+
+    mainSyncTimer.start(1000000000);
+    var prevLink = null;
+
+    setInterval(function(){
+        if( prevLink!==window.location.href || prevLink==null)
+        {
+            var tempYt = youtube_parser(window.location.href);
+            var tempCt = concert_parser(window.location.href);
+            var tempOf = (tempCt===null ? null : (window.location.href.lastIndexOf("#") === window.location.href.length-1) && (
+                (window.location.href.indexOf("youtube.com")>-1)
+            ));
+            redirectBasedOnState(tempYt, tempCt, tempOf);
+            prevLink = window.location.href;
+        }
+    },200);
+}
 
 kango.addMessageListener("patchToContent", function(mainEvt) {
     console.log("Received message from main:" + mainEvt.data);
