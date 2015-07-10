@@ -17,7 +17,7 @@ var EXTRA_DELAY=246;
 var BUFFER_DELAY=500;
 
 var ACK = "ACK";
-var AWESOME_DELAY = 0;
+var AWESOME_DELAY = 100;
 var CLIENT_TIMESTAMP = "CLIENT_TIMESTAMP";
 var CLIENT_VERSION = "CLIENT_VERSION";
 var CLOCK_DIFF = "CLOCK_DIFF";
@@ -764,6 +764,9 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                         if (internalTimer !== null) {
                             internalTimer.stop();
                         }
+
+                        VO=VO+AWESOME_DELAY;
+
                         try { document.getElementsByTagName("video").style.opacity = 0.1; } catch (er) {}
                         var interval = CT - new Date().getTime();
                         canSync = false;
@@ -775,7 +778,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                             complete: function() {
                                 try { document.getElementsByTagName("video").style.opacity=1; } catch (er) {}
                                 //pauseCurrentVideo();
-                                seekToCurrentVideo( VO +new Date().getTime()-CT );
+                                seekToCurrentVideo( VO +new Date().getTime()-CT  );
                                 playCurrentVideo();
                                 setVolume(100);
                                 console.log("SEEKING :" + CT);
@@ -786,7 +789,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
                         });
 
                         internalTimer.start(interval+WAITING_TIME);
-                        seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration );
+                        seekToCurrentVideo( VO + new Date().getTime() - CT - preloadDuration);
                         setVolume(0);
                         playCurrentVideo();
                     }

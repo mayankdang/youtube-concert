@@ -1,4 +1,4 @@
-var IP = "www.youtubeconcert.com";
+var IP = "52.74.167.231";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
@@ -431,7 +431,6 @@ kango.browser.addEventListener(kango.browser.event.TAB_REMOVED, function(event){
     if (concertYoutubeTab !==null && concertYoutubeTab.getId()==event.tabId){
         tabHashMap[concertYoutubeTab.getId()]=undefined;
         concertYoutubeTab = null;
-        concertLeaver();
     }
 });
 
