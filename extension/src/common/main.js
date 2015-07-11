@@ -141,7 +141,6 @@ function doConnect() {
         handshakingReceived++;
         if (!sentClockDifference) {
             if (delayArray.length>=20) {
-                sentClockDifference = true;
                 computeClockDiffMedianAndSend();
             } else {
                 delayArray.push(parseInt(clockDiff));
@@ -218,10 +217,15 @@ function doConnect() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function computeClockDiffMedianAndSend() {
+        console.log("ComputeClockDiffMedianAndSend function called!");
+        console.log(delayArray);
         delayArray.sort(sortNumberComparator);
         var midDelayArray = delayArray.slice(5, 15);
+        console.log(midDelayArray);
         var supposedClockDiff = parseInt(returnMedian(midDelayArray));
-        if (getStandardDeviation(midDelayArray) < 20) {
+        var stdDev = getStandardDeviation(midDelayArray);
+        console.log("SupposedClockDiff:" + supposedClockDiff + ", standard deviation:" + stdDev);
+        if ((stdDev < 20) && (supposedClockDiff !== null)) {
             sentClockDifference = true;
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
