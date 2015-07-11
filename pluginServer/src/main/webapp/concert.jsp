@@ -9,6 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.png' />
     <title>Concert.Party with a hashtag!</title>
 
     <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/gbopepfdcaaccigflmmbddchgcjcinbe">
@@ -90,12 +91,12 @@
             <a class="btn btn-xl" href="#" onclick="chrome.webstore.install()" id="install-button" ><img src="static/img/logo-white-40x48.png"/>&nbsp;&nbsp;&nbsp;Add To Google Chrome</a>
 
             <%--<script type="text/javascript">--%>
-                <%--if (chrome.app.isInstalled) {--%>
-                    <%--document.getElementById('install-button').textContent = 'none';--%>
-                <%--}--%>
+            <%--if (chrome.app.isInstalled) {--%>
+            <%--document.getElementById('install-button').textContent = 'none';--%>
+            <%--}--%>
             <%--</script>--%>
             <br/>
-            <a href="#services" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:100px; padding-bottom:50px"></i></a>  
+            <a href="#services" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:100px; padding-bottom:50px"></i></a>
 
         </div>
     </div>
@@ -125,8 +126,11 @@
                         <i class="fa fa-circle fa-stack-2x text-primary"></i>
                         <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
                     </span>
+                <a href="#portfolio" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:100px; padding-bottom:50px"></i></a>
             </div>
+
             <div class="col-md-4"></div>
+
         </div>
     </div>
 </section>
