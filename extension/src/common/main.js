@@ -50,12 +50,9 @@ var VOFFSET = "VOFFSET";
 
 var sentClockDifference = false;
 var delayArray = [];
+var handshakingSent = 0;
+var handshakingReceived = 0;
 var tabHashMap = new Object();
-
-
-function removeElementById(id) {
-    return (elem=document.getElementById(id)).parentNode.removeChild(elem);
-}
 
 function generateInterval (k) {
     var maxInterval = (Math.pow(2, k) - 1) * 1000;
@@ -67,10 +64,6 @@ function generateInterval (k) {
     // generate the interval to a random number between 0 and the maxInterval determined from above
     return Math.random() * maxInterval;
 }
-
-var handshakingSent = 0;
-var handshakingReceived = 0;
-
 
 function doConnect() {
     websocket = new WebSocket( "ws://"+IP+":"+PORT+"/" );
@@ -116,7 +109,10 @@ function doConnect() {
 
     function initiateHandshaking() {
         delayArray = [];
-        singlePing()
+        sentClockDifference = false;
+        handshakingSent = 0;
+        handshakingReceived = 0;
+        singlePing();
     }
 
     var lastTime=null;
@@ -145,8 +141,8 @@ function doConnect() {
         handshakingReceived++;
         if (!sentClockDifference) {
             if (delayArray.length>=20) {
-                computeClockDiffMedianAndSend();
                 sentClockDifference = true;
+                computeClockDiffMedianAndSend();
             } else {
                 delayArray.push(parseInt(clockDiff));
                 console.log("About to call singlePing. ");
@@ -155,8 +151,50 @@ function doConnect() {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////// Statistics Functions ///////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     function sortNumberComparator(a,b) {
         return a - b;
+    }
+
+    function isArray (obj) {
+        return Object.prototype.toString.call(obj) === "[object Array]";
+    }
+
+    function getNumWithSetDec ( num, numOfDec ) {
+        var pow10s = Math.pow( 10, numOfDec || 0 );
+        return ( numOfDec ) ? Math.round( pow10s * num ) / pow10s : num;
+    }
+
+    function getAverageFromNumArr ( numArr, numOfDec ) {
+        if( !isArray( numArr ) ){ return false;	}
+        var i = numArr.length,
+            sum = 0;
+        while( i-- ){
+            sum += numArr[ i ];
+        }
+        return getNumWithSetDec( (sum / numArr.length ), numOfDec );
+    }
+
+    function getVariance ( numArr, numOfDec ){
+        if( !isArray(numArr) ){ return false; }
+        var avg = getAverageFromNumArr( numArr, numOfDec ),
+            i = numArr.length,
+            v = 0;
+
+        while( i-- ){
+            v += Math.pow( (numArr[ i ] - avg), 2 );
+        }
+        v /= numArr.length;
+        return getNumWithSetDec( v, numOfDec );
+    }
+
+    function getStandardDeviation ( numArr, numOfDec ){
+        if( !isArray(numArr) ){ return false; }
+        var stdDev = Math.sqrt( getVariance( numArr, numOfDec ) );
+        return getNumWithSetDec( stdDev, numOfDec );
     }
 
     function returnMedian(arr) {
@@ -175,17 +213,23 @@ function doConnect() {
         }
     }
 
-    function computeClockDiffMedianAndSend() {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        var clockDiff = parseInt( returnMedian([returnMedian(delayArray.slice(15,20)),
-            returnMedian(delayArray.slice(5,10)), returnMedian(delayArray.slice(10,15))]) );
-        if (clockDiff === null) {
-        } else {
+    function computeClockDiffMedianAndSend() {
+        delayArray.sort(sortNumberComparator);
+        var midDelayArray = delayArray.slice(5, 15);
+        var supposedClockDiff = parseInt(returnMedian(midDelayArray));
+        if (getStandardDeviation(midDelayArray) < 20) {
+            sentClockDifference = true;
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
-            messageToSend[CLOCK_DIFF] = clockDiff;
+            messageToSend[CLOCK_DIFF] = supposedClockDiff;
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
             doSend(messageToSend);
+        } else {
+            initiateHandshaking();
         }
     }
 
