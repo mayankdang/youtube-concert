@@ -48,6 +48,8 @@ var VIDEO_TIME = "VIDEO_TIME";
 var VIDEO_URL = "VIDEO_URL";
 var VOFFSET = "VOFFSET";
 
+var handshakingCount = 0;
+var handshakingArray = [];
 var sentClockDifference = false;
 var delayArray = [];
 var handshakingSent = 0;
@@ -108,6 +110,7 @@ function doConnect() {
     }
 
     function initiateHandshaking() {
+        handshakingCount++;
         delayArray = [];
         sentClockDifference = false;
         handshakingSent = 0;
@@ -225,11 +228,21 @@ function doConnect() {
         var supposedClockDiff = parseInt(returnMedian(midDelayArray));
         var stdDev = getStandardDeviation(midDelayArray);
         console.log("SupposedClockDiff:" + supposedClockDiff + ", standard deviation:" + stdDev);
+
+        handshakingArray.push(supposedClockDiff);
+
         if ((stdDev < 20) && (supposedClockDiff !== null)) {
             sentClockDifference = true;
             var messageToSend = new Object();
             messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
             messageToSend[CLOCK_DIFF] = supposedClockDiff;
+            messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
+            doSend(messageToSend);
+        } else if (handshakingCount>2) {
+            sentClockDifference = true;
+            var messageToSend = new Object();
+            messageToSend[REQUEST_TYPE] = R_CLOCK_DIFF;
+            messageToSend[CLOCK_DIFF] = returnMedian(handshakingArray);
             messageToSend[USER_ID] = kango.storage.getItem(USER_ID);
             doSend(messageToSend);
         } else {

@@ -455,7 +455,7 @@ function youtuber() {
                 joineeStateHandler();
                 setOnEndInterrupt();
             } else if (responseType==NO_CONCERT) {
-                showNotification("#"+response[CONCERT_TAG]+" is not live!");
+                showNotification("#"+concert_parser(window.location.href)+" is not live! It can be yours!");
             } else if (responseType==I_AM_ALREADY_OWNER) {
                 showNotification("#"+response[CONCERT_TAG]+" You are DJ of this concert!")
             }
