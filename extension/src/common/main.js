@@ -1,4 +1,4 @@
-var IP = "52.74.167.231";
+var IP = "www.youtubeconcert.com";
 var PORT = "8000";
 var websocket;
 var wsConnectionAttempts = 1;
@@ -60,10 +60,8 @@ function generateInterval (k) {
     var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
     if (maxInterval > 30*1000) {
-        maxInterval = 30*1000; // If the generated interval is more than 30 seconds, truncate it down to 30 seconds.
+        maxInterval = 30*1000;
     }
-
-    // generate the interval to a random number between 0 and the maxInterval determined from above
     return Math.random() * maxInterval;
 }
 
@@ -96,10 +94,7 @@ function doConnect() {
         var time = generateInterval(wsConnectionAttempts);
 
         setTimeout(function () {
-            // We've tried to reconnect so increment the attempts by 1
             wsConnectionAttempts++;
-
-            // Connection has closed so try to reconnect every 10 seconds.
             doConnect();
         }, time);
     }
@@ -152,10 +147,6 @@ function doConnect() {
             }
         }
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////// Statistics Functions ///////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function sortNumberComparator(a,b) {
         return a - b;
@@ -220,14 +211,10 @@ function doConnect() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     function computeClockDiffMedianAndSend() {
-        console.log("ComputeClockDiffMedianAndSend function called!");
-        console.log(delayArray);
         delayArray.sort(sortNumberComparator);
         var midDelayArray = delayArray.slice(5, 15);
-        console.log(midDelayArray);
         var supposedClockDiff = parseInt(returnMedian(midDelayArray));
         var stdDev = getStandardDeviation(midDelayArray);
-        console.log("SupposedClockDiff:" + supposedClockDiff + ", standard deviation:" + stdDev);
 
         handshakingArray.push(supposedClockDiff);
 

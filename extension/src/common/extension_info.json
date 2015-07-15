@@ -4,7 +4,7 @@
     "creator": "Concert",
     "background_scripts": ["tock.min.js", "main.js"],
     "homepage_url": "http://kangoextensions.com/", 
-    "version": "0.9.0", 
+    "version": "0.9.1",
     "browser_button": {
         "caption": "Concert",
         "icon": "icons/button.png", 
