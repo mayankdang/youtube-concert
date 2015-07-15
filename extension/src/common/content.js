@@ -800,7 +800,7 @@ if (document.location.host.indexOf(".youtube.com")>-1) {
             }
 
             sendPingCount++;
-            if(ownerFlag===true&&sendPingCount>8){
+            if(ownerFlag===true&&sendPingCount>4){
                 sendPingCount=0;
                 sendUpdatedPlayerInfoToServer();
             }
