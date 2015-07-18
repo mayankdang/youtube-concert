@@ -14,21 +14,6 @@
 
     <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/gbopepfdcaaccigflmmbddchgcjcinbe">
 
-    <!-- jQuery -->
-    <script src="static/js/jquery.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="static/js/bootstrap.min.js"></script>
-    <script src="static/js/classie.js"></script>
-    <script src="static/js/cbpAnimatedHeader.js"></script>
-
-    <!-- Contact Form JavaScript -->
-    <script src="static/js/jqBootstrapValidation.js"></script>
-    <script src="static/js/contact_me.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="static/js/agency.js"></script>
-
     <!-- Bootstrap Core CSS -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
 
@@ -84,9 +69,9 @@
 
 <!-- Header -->    <header>
     <div class="container">
-        <div class="intro-text" style="padding:200px">
+        <div class="intro-text">
             <div class="intro-lead-in">Party with a <span style="color:#ff0000;">#</span><span style="color:#ff7f00;">h</span><span style="color:#ffff00;">a</span><span style="color:#80ff00;">s</span><span style="color:#00ff00;">h</span><span style="color:#00ffff;">t</span><span style="color:#0000ff;">a</span><span style="color:#8b00ff;">g</span></div>
-            <div style="font-family: 'CoconLight'; font-size:25px; width:600px; align:center; margin: 0 auto; ">Play the same youtube videos on many computers. Control , play or pause them as you desire. Be your party's own DJ.</div>
+            <div class="intro-heading">Play the same youtube videos on many computers. Control , play or pause them as you desire. Be your party's own DJ.</div>
             <br/><br/>
             <a class="btn btn-xl" href="#" onclick="chrome.webstore.install()" id="install-button" ><img src="static/img/logo-white-40x48.png"/>&nbsp;&nbsp;&nbsp;Add To Google Chrome</a>
 
@@ -96,7 +81,7 @@
             <%--}--%>
             <%--</script>--%>
             <br/>
-            <a href="#services" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:100px; padding-bottom:50px"></i></a>
+            <a href="#services" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:40px; padding-bottom:20px"></i></a>
 
         </div>
     </div>
@@ -114,6 +99,7 @@
         <div class="row text-center">
             <div class="col-md-4"></div>
             <div class="col-md-4">
+
                     <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x text-primary"></i>
                         <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
@@ -126,11 +112,17 @@
                         <i class="fa fa-circle fa-stack-2x text-primary"></i>
                         <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
                     </span>
-                <a href="#portfolio" class="page-scroll"><i class="fa fa-chevron-down fa-3x" style="padding-top:100px; padding-bottom:50px"></i></a>
             </div>
-
             <div class="col-md-4"></div>
-
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <a href="#portfolio" class="page-scroll">
+                    <i class="fa fa-chevron-down fa-3x" style="padding-top:50px"></i>
+                </a>
+            </div>
+            <div class="col-md-4"></div>
         </div>
     </div>
 </section>
@@ -192,15 +184,11 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4">
-                <span class="copyright">Copyright &copy; PlayMore 2015</span>
+                <span class="copyright">Copyright &copy; Annoying Pidgeons 2015</span>
             </div>
             <div class="col-md-4">
                 <ul class="list-inline social-buttons">
-                    <li><a href="#"><i class="fa fa-twitter"></i></a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-facebook"></i></a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-linkedin"></i></a>
+                    <li><a href="https://www.facebook.com/getconcert"><i class="fa fa-facebook"></i></a>
                     </li>
                 </ul>
             </div>
@@ -271,6 +259,20 @@
 
 <!-- Plugin JavaScript -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<!-- jQuery -->
+<script src="static/js/jquery.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="static/js/bootstrap.min.js"></script>
+<script src="static/js/classie.js"></script>
+<script src="static/js/cbpAnimatedHeader.js"></script>
+
+<!-- Contact Form JavaScript -->
+<script src="static/js/jqBootstrapValidation.js"></script>
+<script src="static/js/contact_me.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="static/js/agency.js"></script>
 </body>
 
 </html>

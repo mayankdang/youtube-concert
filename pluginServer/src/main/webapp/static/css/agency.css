@@ -118,7 +118,7 @@ fieldset[disabled] .btn-primary.active {
 }
 
 .btn-xl {
-    padding: 20px 40px;
+    padding: 20px 20px;
     /*border-color: #fed136;*/
     border-radius: 3px;
     text-transform: uppercase;
@@ -320,41 +320,40 @@ header .intro-text {
 header .intro-text .intro-lead-in {
     margin-bottom: 25px;
     font-family: "Droid Serif","Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 22px;
+    font-size: 40px;
     font-style: italic;
-    line-height: 22px;
+    line-height: 55px;
 }
 
 header .intro-text .intro-heading {
     margin-bottom: 25px;
     text-transform: uppercase;
-    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 50px;
-    font-weight: 700;
-    line-height: 50px;
+    font-family: 'CoconLight';
+    font-size: 25px;
+    line-height: 40px;
 }
 
 @media(min-width:768px) {
     header .intro-text {
-        padding-top: 300px;
-        padding-bottom: 200px;
+        padding-top: 150px;
     }
 
     header .intro-text .intro-lead-in {
-        margin-bottom: 25px;
+        margin-top: 45px;
         font-family: "Droid Serif","Helvetica Neue",Helvetica,Arial,sans-serif;
-        font-size: 40px;
+        font-size: 55px;
         font-style: italic;
-        line-height: 40px;
+        line-height: 75px;
     }
 
     header .intro-text .intro-heading {
-        margin-bottom: 50px;
+        margin-bottom: 25px;
         text-transform: uppercase;
-        font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
-        font-size: 75px;
-        font-weight: 700;
-        line-height: 75px;
+        font-family: 'CoconLight';
+        font-size: 25px;
+        line-height: 40px;
+        display: inline-block;
+        max-width: 600px;
     }
 }
 
