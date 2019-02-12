@@ -16,16 +16,16 @@ class SimpleEcho(WebSocket):
         pass
 
 # Response Macros
-USER_ID = "userId"
-CONCERT_TAG = "concertTag"
-VIDEO_URL = "videoUrl"
-VOFFSET = "vOffset"
-VIDEO_STATE = "videoState"
-OWNER_FLAG = "ownerFlag"
-CLIENT_TIMESTAMP = "clientTimeStamp"
-SERVER_TIMESTAMP = "serverTimeStamp"
-CLOCK_DIFF = "clockDiff"
-REQUEST_TYPE = "requestType"
+USER_ID = "USER_ID"
+CONCERT_TAG = "CONCERT_TAG"
+VIDEO_URL = "VIDEO_URL"
+VOFFSET = "VOFFSET"
+VIDEO_STATE = "VIDEO_STATE"
+OWNER_FLAG = "OWNER_FLAG"
+CLIENT_TIMESTAMP = "CLIENT_TIMESTAMP"
+SERVER_TIMESTAMP = "SERVER_TIMESTAMP"
+CLOCK_DIFF = "CLOCK_DIFF"
+REQUEST_TYPE = "REQUEST_TYPE"
 ACK = "ack"                             # status acknowledgement for request successfully received.
 CONCERT_CREATED = "concertCreated"
 CONCERT_JOINED = "concertJoined"
@@ -33,7 +33,7 @@ RESPONSE_TYPE = "responseType"
 CONCERT_TAKEN = "concertTaken"
 NO_CONCERT = "noConcert"
 I_AM_ALREADY_OWNER = "iAmAlreadyOwner"
-TAB_ID = "tab_id"
+TAB_ID = "TAB_ID"
 
 
 # Request Types
@@ -65,10 +65,14 @@ class Concert(object):
         self._videoState = 2
 
     def concertRelay(self, responseMap):
+        print "Relaying to users", responseMap
         responseMap[OWNER_FLAG] = False
         for tempUserId in self.users:
+            print "\ttempUserId: ", tempUserId
+            print "\tself.ownerId", self.ownerId
             responseMap[USER_ID] = tempUserId
             if tempUserId != self.ownerId:
+                print "Not owner. Relaying..."
                 try:
                     if userIdMainMap[tempUserId].getConcertTag() == self.concertTag:
                         responseMap[CLIENT_TIMESTAMP] = self._updatedVOffsetTime + userIdMainMap[tempUserId].clockDiff
@@ -76,6 +80,9 @@ class Concert(object):
                         userIdMainMap[tempUserId].client.sendingWrapper(responseMap)
                 except Exception, e:
                     print "Exception: ", e
+            else:
+                print "Owner. Not relaying."
+        print "Relayed to users."
 
     def syncVideoAttributes(self, vOffset, videoState, clientTimeStamp):
         self._vOffset = vOffset
@@ -172,7 +179,7 @@ class SimpleChat(WebSocket):
 
         try:
             message = json.loads(self.data)
-
+            print "message received:", message
             userId = getH(message, USER_ID)
             concertTag = getH(message, CONCERT_TAG)
             videoUrl = getH(message, VIDEO_URL)
@@ -220,7 +227,7 @@ class SimpleChat(WebSocket):
 
                 # CREATE CONCERT
                 if ownerFlag:
-
+                    print "Owner flag is true. Creating concert..."
                     success = user.createConcert(concertTag, videoUrl)
 
                     if not success:
@@ -250,8 +257,9 @@ class SimpleChat(WebSocket):
 
                 # JOIN CONCERT
                 else:
+                    print "Owner flag is false. Joining concert..."
                     concertToJoin = concertTagHashMap.get(concertTag)
-
+                    print "concert to join: ", concertToJoin
                     if concertToJoin is not None:
                         user.updateConcertTag(concertTag)
 
@@ -285,6 +293,7 @@ class SimpleChat(WebSocket):
                             self.sendingWrapper(responseMap)
                     else:
                         # no concert found.
+                        print "No concert found to join :("
                         responseMap[USER_ID] = user.id
                         responseMap[TAB_ID] = tabId
                         responseMap[REQUEST_TYPE] = R_PAGE_LOADED
@@ -302,9 +311,12 @@ class SimpleChat(WebSocket):
                             # BROADCAST
                             print "vOffset:", vOffset
                             print "videoState:", videoState
+                            print "clientTimeStamp:", clientTimeStamp
                             if vOffset is not None and videoState is not None and clientTimeStamp is not None:
+                                print "syncing video attributes"
                                 concertTagHashMap[concertTag].syncVideoAttributes(vOffset, videoState, clientTimeStamp)
-
+                            else:
+                                print "not syncing video attributes"
                             responseMap[VOFFSET] = vOffset if vOffset is not None else None
                             responseMap[CONCERT_TAG] = concertTag
                             responseMap[VIDEO_STATE] = videoState
