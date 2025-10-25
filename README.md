@@ -176,13 +176,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ### Debug Mode
 Enable console logging by setting debug flags in the extension scripts.
 
-## 📞 Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the troubleshooting section
-- Review the code documentation
-
 ## 📅 Project Status
 
 **Note**: This extension was originally developed in 2015 and is no longer actively maintained by the original authors. While the codebase remains available for educational and development purposes, users should be aware that:
