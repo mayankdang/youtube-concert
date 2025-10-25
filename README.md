@@ -183,6 +183,15 @@ For support and questions:
 - Check the troubleshooting section
 - Review the code documentation
 
+## 📅 Project Status
+
+**Note**: This extension was originally developed in 2015 and is no longer actively maintained by the original authors. While the codebase remains available for educational and development purposes, users should be aware that:
+
+- The extension may not be compatible with newer browser versions
+- YouTube's API changes may affect functionality
+- No official support or updates are provided
+- Community contributions and forks are welcome
+
 ---
 
 **Made with ❤️ for synchronized video experiences**
