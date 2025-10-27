@@ -38,7 +38,7 @@ Concert is a browser extension that allows you to create synchronized YouTube vi
 
 [![Concert Extension Demo](https://img.youtube.com/vi/JFLnZdVv8o0/maxresdefault.jpg)](https://youtu.be/JFLnZdVv8o0)
 
-*Click the image above to watch the full demo on YouTube, or if that doesn't work, click [here](https://youtu.be/JFLnZdVv8o0).*
+*Click the image above to watch the full demo on YouTube. If that doesn't work, click [here](https://youtu.be/JFLnZdVv8o0).*
 
 ## 🏗️ Architecture
 
